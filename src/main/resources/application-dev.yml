@@ -1,0 +1,145 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ai_teaching_assistant
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 10
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      pool-name: HikariPool
+  jpa:
+    hibernate:
+      ddl-auto: update # Local/dev: auto sync schema; production uses versioned SQL scripts
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+  liquibase:
+    enabled: false
+  mail:
+    from: teacherassistant@gmail.com
+    host: smtp.gmail.com
+    port: 587
+    username: vuong251103
+    password: jutwhpgimrzpzrwo
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: smtp.gmail.com
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  cache:
+    type: redis
+    redis:
+      time-to-live: 300000 # 5 phút
+      cache-null-values: false
+  ai:
+    openai:
+      api-key: AIzaSyAMaqP-4fvjDFNDy9pUficpyWIeQ50YqOw
+      chat:
+        base-url: https://generativelanguage.googleapis.com
+        completions-path: /v1beta/openai/chat/completions
+        options:
+          model: gemini-3.1-flash-lite-preview
+          temperature: 0.2
+      embedding:
+        base-url: https://generativelanguage.googleapis.com
+        embeddings-path: /v1beta/openai/embeddings
+        options:
+          model: gemini-embedding-2-preview
+    chat:
+      memory:
+        repository:
+          jdbc:
+            initialize-schema: always
+    vectorstore:
+      pgvector:
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+
+application:
+  encryption:
+    key: 8q9xAmcT1zD4Y5k6P7sA9d2f4g6h8jK1
+  jwt:
+    signer-key: RGTpEo990czwgYq+8gfA5Z56nVJcjQi25cPKtaJ+hapof7rMtBoZkat9pkqdvWpv
+    valid-duration: 36000 # in seconds
+    refreshable-duration: 360000 # in seconds
+  mailing:
+    front-end:
+      verification-code-length: 6
+      verification-code-expiration-minutes: 2 # in minutes
+      activation-url: http://localhost:4200/activate-account
+  minio:
+    endpoint: http://localhost:9000
+    server-url: http://localhost:9000
+    access-key: minio
+    secret-key: minio123
+    bucket: resources
+    key-prefix: uploads/
+    presign-expiry-seconds: 7200 # in seconds
+    make-bucket-public: false
+  google:
+    oauth2:
+      client-id: 1029043302518-qpl0getluhhvmlt87f49j8jkj1fqdmqk.apps.googleusercontent.com
+  zalo-pay:
+    app-id: 2553
+    key1: PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL
+    key2: kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz
+    endpoint: https://sb-openapi.zalopay.vn/v2/create
+    callback-url: https://social.io.vn/api/payment/callback
+  docling:
+    base-url: http://localhost:5001
+    timeout-seconds: 120
+    retry-attempts: 8
+    retry-backoff-millis: 1200
+    max-inflight-requests: 1
+    parse:
+      do-ocr: false
+      include-images: false
+  document:
+    max-docx-bytes: 102400
+    max-txt-bytes: 102400
+    pdf-split-pages: 10
+    pdf-large-threshold-pages: 150
+    pdf-large-split-pages: 8
+    pdf-chunk-delay-millis: 250
+    pdf-large-chunk-delay-millis: 900
+    parse-concurrency: 2
+  rag:
+    top-k: 6
+    max-top-k: 8
+    candidate-top-k: 24
+    min-chunk-chars: 40
+    embedding-dimensions: 3072
+    max-history-messages: 8
+    gemini:
+      api-key: AIzaSyAMaqP-4fvjDFNDy9pUficpyWIeQ50YqOw
+      base-url: https://generativelanguage.googleapis.com
+      llm-model: gemini-3.1-flash-lite-preview
+      embedding-model: gemini-embedding-2-preview
+      timeout-seconds: 60
+
+logging:
+  level:
+    root: INFO
+    liquibase: INFO
+    liquibase.executor: DEBUG
+    liquibase.database: DEBUG
+    org.springframework: INFO
+
+server:
+  port: 8080

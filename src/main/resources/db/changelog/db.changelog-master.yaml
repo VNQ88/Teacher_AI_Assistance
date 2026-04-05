@@ -1,0 +1,22 @@
+databaseChangeLog:
+
+  # Schema changes
+#  - include:
+#      file: db/changes/v1.0-initial-schema.sql
+  - include:
+      file: db/changes/v1.1-add-vector-column.sql
+#  - include:
+#      file: db/changes/v1.2-create-vector-index.sql
+  - include:
+      file: db/changes/v1.3-migrate-embedding-to-3072.sql
+  - include:
+      file: db/changes/v1.4-migrate-embedding-to-halfvec-3072.sql
+
+  # Seed data
+#  - include:
+#      file: db/data/v1.0-seed-data.sql
+#  - include:
+#      file: db/data/v1.1-swagger-test-data.sql
+#  - include:
+#      file: db/data/v1.2-seed-question-banks.sql
+
