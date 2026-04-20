@@ -95,12 +95,6 @@ application:
   google:
     oauth2:
       client-id: 1029043302518-qpl0getluhhvmlt87f49j8jkj1fqdmqk.apps.googleusercontent.com
-  zalo-pay:
-    app-id: 2553
-    key1: PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL
-    key2: kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz
-    endpoint: https://sb-openapi.zalopay.vn/v2/create
-    callback-url: https://social.io.vn/api/payment/callback
   docling:
     base-url: http://localhost:5001
     timeout-seconds: 120
@@ -125,7 +119,7 @@ application:
     candidate-top-k: 24
     min-chunk-chars: 40
     embedding-dimensions: 3072
-    max-history-messages: 8
+    max-history-messages: 5
     gemini:
       api-key: AIzaSyAMaqP-4fvjDFNDy9pUficpyWIeQ50YqOw
       base-url: https://generativelanguage.googleapis.com

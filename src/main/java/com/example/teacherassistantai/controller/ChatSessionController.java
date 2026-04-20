@@ -59,5 +59,13 @@ public class ChatSessionController {
         chatSessionService.close(sessionId);
         return new ResponseData<>(HttpStatus.OK.value(), "Chat session closed");
     }
+
+    @DeleteMapping("/{sessionId}")
+    @PreAuthorize("hasAnyAuthority('STUDENT', 'TEACHER', 'ADMIN')")
+    @Operation(summary = "Delete chat session permanently")
+    public ResponseData<Void> delete(@PathVariable @Min(1) Long sessionId) {
+        chatSessionService.delete(sessionId);
+        return new ResponseData<>(HttpStatus.OK.value(), "Chat session deleted");
+    }
 }
 

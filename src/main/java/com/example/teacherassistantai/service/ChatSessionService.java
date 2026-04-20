@@ -10,6 +10,7 @@ import com.example.teacherassistantai.entity.Subject;
 import com.example.teacherassistantai.entity.User;
 import com.example.teacherassistantai.exception.InvalidDataException;
 import com.example.teacherassistantai.exception.ResourceNotFoundException;
+import com.example.teacherassistantai.repository.ChatMessageRepository;
 import com.example.teacherassistantai.repository.ChatSessionRepository;
 import com.example.teacherassistantai.repository.ClassroomRepository;
 import com.example.teacherassistantai.repository.SubjectRepository;
@@ -27,6 +28,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatSessionService {
 
+    private static final String ADMIN_ROLE = "ADMIN";
+
+    private final ChatMessageRepository chatMessageRepository;
     private final ChatSessionRepository chatSessionRepository;
     private final SubjectRepository subjectRepository;
     private final ClassroomRepository classroomRepository;
@@ -84,9 +88,31 @@ public class ChatSessionService {
         chatSessionRepository.save(session);
     }
 
+    @Transactional
+    public void delete(Long sessionId) {
+        ChatSession session = getOwnedOrAdminSession(sessionId);
+        chatMessageRepository.deleteMessageSourceLinksBySessionId(session.getId());
+        chatMessageRepository.deleteBySessionId(session.getId());
+        chatSessionRepository.delete(session);
+    }
+
     @Transactional(readOnly = true)
     public ChatSession getOwnedSession(Long sessionId) {
         User current = getCurrentUser();
+        return chatSessionRepository.findByIdAndUserId(sessionId, current.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Chat session not found with id: " + sessionId));
+    }
+
+    private ChatSession getOwnedOrAdminSession(Long sessionId) {
+        User current = getCurrentUser();
+        boolean isAdmin = current.getRoles().stream()
+                .anyMatch(role -> ADMIN_ROLE.equalsIgnoreCase(role.getName()));
+
+        if (isAdmin) {
+            return chatSessionRepository.findById(sessionId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Chat session not found with id: " + sessionId));
+        }
+
         return chatSessionRepository.findByIdAndUserId(sessionId, current.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Chat session not found with id: " + sessionId));
     }

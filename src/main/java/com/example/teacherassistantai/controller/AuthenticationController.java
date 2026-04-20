@@ -1,7 +1,6 @@
 package com.example.teacherassistantai.controller;
 
 import com.example.teacherassistantai.common.response.ResponseData;
-import com.example.teacherassistantai.common.response.ResponseError;
 import com.example.teacherassistantai.dto.auth.AuthenticationRequest;
 import com.example.teacherassistantai.dto.auth.RegistrationRequest;
 import com.example.teacherassistantai.dto.auth.SetNewPasswordRequest;
@@ -31,20 +30,12 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Authentication Controller")
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
-    private final UserRepository userRepository;
-    private final UserDetailServiceImpl userDetailServiceImpl;
-    private final JwtService jwtService;
-
-    @Value("${application.jwt.valid-duration}")
-    private long validDuration;
-    @Value("${application.jwt.refreshable-duration}")
-    private long refreshDuration;
 
     @Operation(
             summary = "User login",
             description = "Xác thực người dùng bằng email/password và trả về access token + refresh token."
     )
-    @PostMapping("/authenticate")
+    @PostMapping("/login")
     public ResponseData<?> authenticate(@RequestBody @Valid AuthenticationRequest authenticationRequest) {
         return new ResponseData<>(HttpStatus.OK.value(), "Authentication successful",
                 authenticationService.authenticate(authenticationRequest));
@@ -88,7 +79,7 @@ public class AuthenticationController {
             description = "Kích hoạt tài khoản bằng mã code đã được gửi qua email."
     )
     @PostMapping("/activate-account")
-    public ResponseData<?> confirmAccount(@RequestParam String code) throws MessagingException {
+    public ResponseData<?> confirmAccount(@RequestParam String code) {
         authenticationService.activateAccount(code);
         return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Account activated.");
     }
@@ -109,7 +100,7 @@ public class AuthenticationController {
             description = "Xác minh mã code đặt lại mật khẩu đã được gửi qua email."
     )
     @PostMapping("/verify-reset-code")
-    public ResponseData<?> verifyResetCode(@RequestBody @Valid VerifyCodeRequest request) throws MessagingException {
+    public ResponseData<?> verifyResetCode(@RequestBody @Valid VerifyCodeRequest request) {
         authenticationService.verifyResetCode(request);
         return new ResponseData<>(HttpStatus.OK.value(), "Code verified successfully");
     }

@@ -23,6 +23,9 @@ import java.util.List;
 @Table(name = "subjects")
 public class Subject extends BaseEntity {
 
+    @Column(name = "owner_id")
+    Long ownerId;
+
     @Column(length = 100, nullable = false, unique = true)
     String name; // Ví dụ: "Tiếng Anh", "Toán", "Văn học"
 

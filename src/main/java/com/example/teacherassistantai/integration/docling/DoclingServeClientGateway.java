@@ -1,5 +1,6 @@
 package com.example.teacherassistantai.integration.docling;
 
+import com.example.teacherassistantai.exception.ExternalServiceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
@@ -245,7 +246,7 @@ public class DoclingServeClientGateway implements DoclingGateway {
                     backoff(baseBackoff, attempt, operation, ex.getStatusCode().value());
                     continue;
                 }
-                throw new RuntimeException("Docling " + operation + " failed: HTTP " + ex.getStatusCode().value()
+                throw new ExternalServiceException("Docling " + operation + " failed: HTTP " + ex.getStatusCode().value()
                         + ", body=" + ex.getResponseBodyAsString(), ex);
             } catch (ResourceAccessException ex) {
                 if (attempt < attempts) {
@@ -253,14 +254,14 @@ public class DoclingServeClientGateway implements DoclingGateway {
                     backoff(baseBackoff, attempt, operation, null);
                     continue;
                 }
-                throw new RuntimeException("Docling " + operation + " failed: " + formatIoError(ex), ex);
+                throw new ExternalServiceException("Docling " + operation + " failed: " + formatIoError(ex), ex);
             } catch (RuntimeException ex) {
                 if (attempt < attempts && isTransientIo(ex)) {
                     resetClient();
                     backoff(baseBackoff, attempt, operation, null);
                     continue;
                 }
-                throw new RuntimeException("Docling " + operation + " failed: " + ex.getMessage(), ex);
+                throw new ExternalServiceException("Docling " + operation + " failed: " + ex.getMessage(), ex);
             }
         }
 
@@ -312,7 +313,7 @@ public class DoclingServeClientGateway implements DoclingGateway {
             Thread.sleep(sleepMillis);
         } catch (InterruptedException interruptedException) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Docling retry interrupted", interruptedException);
+            throw new ExternalServiceException("Docling retry interrupted", interruptedException);
         }
     }
 
@@ -343,12 +344,12 @@ public class DoclingServeClientGateway implements DoclingGateway {
         try {
             acquired = semaphore.tryAcquire(doclingProps.getTimeoutSeconds(), TimeUnit.SECONDS);
             if (!acquired) {
-                throw new RuntimeException("Timeout waiting Docling request permit");
+                throw new ExternalServiceException("Timeout waiting Docling request permit");
             }
             return supplier.get();
         } catch (InterruptedException interruptedException) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Interrupted while waiting Docling request permit", interruptedException);
+            throw new ExternalServiceException("Interrupted while waiting Docling request permit", interruptedException);
         } finally {
             if (acquired) {
                 semaphore.release();

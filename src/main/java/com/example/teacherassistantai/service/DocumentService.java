@@ -6,12 +6,16 @@ import com.example.teacherassistantai.config.DocumentIngestionProps;
 import com.example.teacherassistantai.dto.response.DocumentResponse;
 import com.example.teacherassistantai.entity.Classroom;
 import com.example.teacherassistantai.entity.Document;
+import com.example.teacherassistantai.entity.Role;
 import com.example.teacherassistantai.entity.Subject;
 import com.example.teacherassistantai.entity.User;
+import com.example.teacherassistantai.exception.AccessDeniedOperationException;
 import com.example.teacherassistantai.exception.InvalidDataException;
 import com.example.teacherassistantai.exception.ResourceNotFoundException;
+import com.example.teacherassistantai.exception.StorageOperationException;
 import com.example.teacherassistantai.integration.minio.MinioChannel;
 import com.example.teacherassistantai.repository.ClassroomRepository;
+import com.example.teacherassistantai.repository.DocumentChunkRepository;
 import com.example.teacherassistantai.repository.DocumentRepository;
 import com.example.teacherassistantai.repository.SubjectRepository;
 import com.example.teacherassistantai.repository.UserRepository;
@@ -24,10 +28,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -43,6 +47,7 @@ public class DocumentService {
     private final SubjectRepository subjectRepository;
     private final ClassroomRepository classroomRepository;
     private final UserRepository userRepository;
+    private final DocumentChunkRepository documentChunkRepository;
     private final MinioChannel minioChannel;
     private final DocumentProcessingService documentProcessingService;
     private final DocumentIngestionProps ingestionProps;
@@ -77,7 +82,7 @@ public class DocumentService {
         try {
             minioChannel.upload(file, objectKey);
         } catch (Exception e) {
-            throw new RuntimeException("Upload original document to storage failed", e);
+            throw new StorageOperationException("Upload original document to storage failed", e);
         }
 
         String resolvedTitle = StringUtils.hasText(title)
@@ -139,6 +144,28 @@ public class DocumentService {
                 .build();
     }
 
+    @Transactional
+    public void deleteDocument(Long documentId) {
+        Document document = documentRepository.findById(documentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + documentId));
+
+        User currentUser = getCurrentUser();
+        validateDeletePermission(document, currentUser);
+
+        removeStorageObject(document.getOriginalObjectKey(), documentId, "original");
+        removeStorageObject(document.getMarkdownObjectKey(), documentId, "markdown");
+
+        documentChunkRepository.deleteMessageSourceLinksByDocumentId(documentId);
+        documentChunkRepository.deleteByDocumentId(documentId);
+        documentRepository.delete(document);
+        log.info("Deleted document id={} and related chunks", documentId);
+    }
+
+    @Transactional
+    public void deleteDocumentById(Long documentId) {
+        deleteDocument(documentId);
+    }
+
     private void validateUploadRequest(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new InvalidDataException("File is required");
@@ -192,6 +219,34 @@ public class DocumentService {
         }
         return userRepository.findByEmail(auth.getName())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    }
+
+    private void validateDeletePermission(Document document, User currentUser) {
+        boolean isAdmin = currentUser.getRoles().stream()
+                .map(Role::getName)
+                .anyMatch("ADMIN"::equalsIgnoreCase);
+
+        Long uploaderId = document.getUploadedBy() == null ? null : document.getUploadedBy().getId();
+        boolean isUploader = uploaderId != null && uploaderId.equals(currentUser.getId());
+
+        if (!isAdmin && !isUploader) {
+            throw new AccessDeniedOperationException("You don't have permission to delete this document");
+        }
+    }
+
+    private void removeStorageObject(String objectKey, Long documentId, String objectType) {
+        if (!StringUtils.hasText(objectKey)) {
+            return;
+        }
+
+        try {
+            minioChannel.removeObject(objectKey);
+        } catch (StorageOperationException ex) {
+            throw new StorageOperationException(
+                    "Failed to delete %s object for document id=%d".formatted(objectType, documentId),
+                    ex
+            );
+        }
     }
 
     private DocumentResponse toResponse(Document document) {

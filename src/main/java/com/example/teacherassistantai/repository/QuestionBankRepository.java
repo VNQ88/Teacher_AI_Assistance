@@ -7,7 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface QuestionBankRepository extends JpaRepository<QuestionBank, Long> {
+
+    List<QuestionBank> findBySubject_Id(Long subjectId);
 
     @Query("SELECT qb FROM QuestionBank qb WHERE " +
             "(:subjectId IS NULL OR qb.subject.id = :subjectId) AND " +

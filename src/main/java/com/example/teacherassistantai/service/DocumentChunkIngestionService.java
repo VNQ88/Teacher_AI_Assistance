@@ -33,7 +33,6 @@ public class DocumentChunkIngestionService {
             DocumentChunk chunk = DocumentChunk.builder()
                     .document(document)
                     .subjectId(document.getSubject().getId())
-                    .classroomId(document.getClassroom() != null ? document.getClassroom().getId() : null)
                     .chunkIndex(i + 1)
                     .chunkType("TEXT")
                     .content(content)

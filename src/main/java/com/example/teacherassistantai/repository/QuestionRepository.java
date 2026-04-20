@@ -9,7 +9,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface QuestionRepository extends JpaRepository<Question, Long> {
+
+    void deleteByQuestionBankId(Long questionBankId);
+
+    @Query("SELECT q.id FROM Question q WHERE q.questionBank.id = :questionBankId")
+    List<Long> findIdsByQuestionBankId(@Param("questionBankId") Long questionBankId);
     
     @Query("SELECT q FROM Question q WHERE q.questionBank.id = :questionBankId AND " +
             "(:questionType IS NULL OR q.questionType = :questionType) AND " +

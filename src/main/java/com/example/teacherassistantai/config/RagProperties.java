@@ -29,7 +29,7 @@ public class RagProperties {
     private int embeddingDimensions = 3072;
 
     @Min(1)
-    private int maxHistoryMessages = 8;
+    private int maxHistoryMessages = 5;
 
     private Gemini gemini = new Gemini();
 

@@ -11,7 +11,6 @@ import java.util.Map;
 
 /**
  * Đoạn văn bản đã được chunk từ Document, dùng cho RAG (Retrieval-Augmented Generation).
- *
  * Thiết kế cho multi-subject:
  * - Lưu subjectId dạng denormalized để query nhanh khi filter theo môn
  *   (tránh JOIN qua Document → Subject mỗi lần tìm kiếm)
@@ -27,8 +26,7 @@ import java.util.Map;
 @Entity
 @Table(name = "document_chunks", indexes = {
         @Index(name = "idx_chunk_document", columnList = "document_id"),
-        @Index(name = "idx_chunk_subject", columnList = "subject_id"),
-        @Index(name = "idx_chunk_subject_classroom", columnList = "subject_id, classroom_id")
+        @Index(name = "idx_chunk_subject", columnList = "subject_id")
 })
 public class DocumentChunk extends BaseEntity {
 
@@ -43,9 +41,6 @@ public class DocumentChunk extends BaseEntity {
     @Column(name = "subject_id", nullable = false)
     Long subjectId;
 
-    @Column(name = "classroom_id")
-    Long classroomId;
-
     @Column(nullable = false)
     Integer chunkIndex; // Thứ tự chunk trong document
 
@@ -56,24 +51,9 @@ public class DocumentChunk extends BaseEntity {
     @Column(columnDefinition = "TEXT", nullable = false)
     String content; // Nội dung đoạn văn bản
 
-    @Column(length = 100)
-    String contentHash; // MD5/SHA hash để phát hiện trùng lặp
-
-    @Column(name = "page_from")
-    Integer pageFrom;
-
-    @Column(name = "page_to")
-    Integer pageTo;
-
     @Column(name = "token_count")
     Integer tokenCount;
 
-    /**
-     * Metadata bổ sung dạng JSON (trang số, tiêu đề đoạn, loại nội dung...).
-     * Ví dụ: {"page": 5, "section": "Chapter 2 - Vocabulary", "topic": "Past Tense"}
-     */
-    @Column(columnDefinition = "TEXT")
-    String metadata;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "metadata_jsonb", columnDefinition = "jsonb", nullable = false)

@@ -16,6 +16,11 @@ public interface ExamQuestionRepository extends JpaRepository<ExamQuestion, Long
 
     Optional<ExamQuestion> findByExamIdAndId(Long examId, Long examQuestionId);
 
+    @Query("SELECT eq.id FROM ExamQuestion eq WHERE eq.question.id IN :questionIds")
+    List<Long> findIdsByQuestionIdIn(@Param("questionIds") List<Long> questionIds);
+
+    void deleteByQuestionIdIn(List<Long> questionIds);
+
     @Query("SELECT COUNT(eq) FROM ExamQuestion eq WHERE eq.exam.id = :examId")
     int countByExamId(@Param("examId") Long examId);
 }

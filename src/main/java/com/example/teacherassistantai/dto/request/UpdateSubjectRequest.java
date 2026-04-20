@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 public class UpdateSubjectRequest {
 
-    private Boolean active;
+    private Boolean active = true;
 
     @NotNull(message = "Subject type is required")
     private SubjectType subjectType;

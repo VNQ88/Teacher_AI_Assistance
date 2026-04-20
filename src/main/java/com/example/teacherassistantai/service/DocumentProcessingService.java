@@ -4,6 +4,7 @@ import com.example.teacherassistantai.common.enumerate.DocumentStatus;
 import com.example.teacherassistantai.common.file.InMemoryMultipartFile;
 import com.example.teacherassistantai.config.DocumentIngestionProps;
 import com.example.teacherassistantai.entity.Document;
+import com.example.teacherassistantai.exception.DocumentProcessingException;
 import com.example.teacherassistantai.integration.docling.DoclingGateway;
 import com.example.teacherassistantai.integration.docling.DoclingProps;
 import com.example.teacherassistantai.integration.minio.MinioChannel;
@@ -16,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
@@ -34,7 +34,6 @@ public class DocumentProcessingService {
     private static final Pattern DATA_URI_IMAGE_PATTERN = Pattern.compile("(?i)data:image/[^;]+;base64,[a-zA-Z0-9+/=]+", Pattern.MULTILINE);
 
     private final DocumentRepository documentRepository;
-    private final DocumentChunkRepository documentChunkRepository;
     private final MinioChannel minioChannel;
     private final MinioProps minioProps;
     private final DoclingGateway doclingGateway;
@@ -43,7 +42,6 @@ public class DocumentProcessingService {
     private final DocumentChunkIngestionService documentChunkIngestionService;
 
     @Async("documentProcessingExecutor")
-    @Transactional
     public void processDocumentAsync(Long documentId) {
         try {
             processDocument(documentId);
@@ -73,7 +71,6 @@ public class DocumentProcessingService {
         document.setStatus(DocumentStatus.CHUNKING);
         documentRepository.save(document);
 
-        documentChunkRepository.deleteByDocumentId(document.getId());
         documentChunkIngestionService.ingest(document, cleanedMarkdown);
 
         document.setStatus(DocumentStatus.EMBEDDING);
@@ -126,7 +123,7 @@ public class DocumentProcessingService {
                 }
             }
         } catch (Exception ex) {
-            throw new RuntimeException("Failed to split PDF by page window", ex);
+            throw new DocumentProcessingException("Failed to split PDF by page window", ex);
         }
 
         return chunks.isEmpty() ? List.of(pdfBytes) : chunks;
@@ -157,9 +154,9 @@ public class DocumentProcessingService {
              return String.join("\n\n", markdownParts);
          } catch (InterruptedException interruptedException) {
              Thread.currentThread().interrupt();
-             throw new RuntimeException("PDF chunk parsing interrupted", interruptedException);
+             throw new DocumentProcessingException("PDF chunk parsing interrupted", interruptedException);
          } catch (RuntimeException ex) {
-             throw new RuntimeException("Docling PDF chunk parse failed: " + ex.getMessage(), ex);
+             throw new DocumentProcessingException("Docling PDF chunk parse failed: " + ex.getMessage(), ex);
          }
     }
 

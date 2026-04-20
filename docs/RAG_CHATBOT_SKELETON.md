@@ -6,6 +6,7 @@
   - `GET /chat/sessions`
   - `GET /chat/sessions/{sessionId}`
   - `PATCH /chat/sessions/{sessionId}/close`
+  - `DELETE /chat/sessions/{sessionId}`
 - RAG message APIs:
   - `POST /chat/sessions/{sessionId}/messages`
   - `GET /chat/sessions/{sessionId}/messages`

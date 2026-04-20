@@ -28,7 +28,7 @@ public class MinioProps {
     private String keyPrefix = "";
 
     /** TTL cho pre-signed URL (giây). */
-    private int presignExpirySeconds = 300;
+    private int presignExpirySeconds = 1500;
 
     /**
      * CHỈ bật nếu bạn chắc chắn muốn public đọc GET cho toàn bucket (không khuyến nghị).

@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,6 +60,15 @@ public class DocumentController {
                                                       @RequestParam(defaultValue = "20") @Min(1) int pageSize) {
         return new ResponseData<>(HttpStatus.OK.value(), "Documents",
                 documentService.getDocuments(subjectId, status, pageNo, pageSize));
+    }
+
+    @DeleteMapping("/{documentId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
+    @Operation(summary = "Delete document", description = "Delete document, all related chunks, and storage objects")
+    public ResponseData<Void> deleteDocument(@PathVariable @Min(1) Long documentId) {
+        log.info("Delete document request: id={}", documentId);
+        documentService.deleteDocumentById(documentId);
+        return new ResponseData<>(HttpStatus.OK.value(), "Document deleted");
     }
 }
 

@@ -8,8 +8,8 @@ import java.util.Optional;
 
 public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, Long> {
 
-    Optional<StudentAnswer> findBySubmissionIdAndExamQuestionId(Long submissionId, Long examQuestionId);
-
     List<StudentAnswer> findBySubmissionId(Long submissionId);
+
+    void deleteByExamQuestionIdIn(List<Long> examQuestionIds);
 }
 

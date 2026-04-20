@@ -2,6 +2,7 @@ package com.example.teacherassistantai.integration.minio;
 
 import com.example.teacherassistantai.entity.Subject;
 import com.example.teacherassistantai.exception.ResourceNotFoundException;
+import com.example.teacherassistantai.exception.StorageOperationException;
 import com.example.teacherassistantai.integration.minio.dto.UploadResult;
 import com.example.teacherassistantai.repository.SubjectRepository;
 import io.minio.BucketExistsArgs;
@@ -305,7 +306,7 @@ public class MinioChannel {
             log.info("Removed object {} from bucket {}", objectKey, props.getBucket());
         } catch (Exception e) {
             log.error("Failed to remove object {} from bucket {}", objectKey, props.getBucket(), e);
-            throw new RuntimeException("Could not remove object from MinIO", e);
+            throw new StorageOperationException("Could not remove object from MinIO", e);
         }
     }
 

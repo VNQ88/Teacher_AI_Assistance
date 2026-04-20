@@ -57,7 +57,7 @@ public class SubjectController {
     }
 
     @DeleteMapping("/{subjectId}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
     @Operation(summary = "Delete subject")
     public ResponseData<Void> deleteSubject(@PathVariable @Min(1) Long subjectId) {
         subjectService.deleteSubject(subjectId);

@@ -2,13 +2,9 @@ package com.example.teacherassistantai.service;
 
 import com.example.teacherassistantai.common.enumerate.AgentType;
 import com.example.teacherassistantai.common.enumerate.MessageRole;
-import com.example.teacherassistantai.common.response.PageResponse;
 import com.example.teacherassistantai.config.RagProperties;
 import com.example.teacherassistantai.dto.request.SendChatMessageRequest;
 import com.example.teacherassistantai.dto.response.ChatMessageResponse;
-import com.example.teacherassistantai.dto.response.RagAnswerResponse;
-import com.example.teacherassistantai.dto.response.RagSourceResponse;
-import com.example.teacherassistantai.dto.response.TokenUsageResponse;
 import com.example.teacherassistantai.entity.AgentLog;
 import com.example.teacherassistantai.entity.ChatMessage;
 import com.example.teacherassistantai.entity.ChatSession;
@@ -23,7 +19,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +39,7 @@ public class RagChatService {
     private final RagProperties ragProperties;
 
     @Transactional
-    public RagAnswerResponse sendMessage(Long sessionId, SendChatMessageRequest request) {
+    public ChatMessageResponse sendMessage(Long sessionId, SendChatMessageRequest request) {
         long startedAt = System.currentTimeMillis();
         ChatSession session = chatSessionService.getOwnedSession(sessionId);
 
@@ -53,11 +53,11 @@ public class RagChatService {
         int topK = request.getTopK() != null ? request.getTopK() : ragProperties.getTopK();
         List<DocumentChunk> sources = retrievalService.retrieve(session, request.getQuestion(), topK);
 
-        List<ChatMessage> history = loadHistory(session.getId(), ragProperties.getMaxHistoryMessages());
+        List<ChatMessage> history = loadHistory(session.getId(), request.getQuestion(), ragProperties.getMaxHistoryMessages());
         String prompt = promptBuilderService.buildPrompt(request.getQuestion(), history, sources);
         String answer = geminiChatGateway.generateAnswer(prompt, request.getTemperature());
 
-        double confidenceScore = confidenceService.score(sources, answer);
+        double confidenceScore = confidenceService.score(request.getQuestion(), sources, answer);
         String confidenceLevel = confidenceService.level(confidenceScore);
 
         ChatMessage assistantMessage = ChatMessage.builder()
@@ -84,43 +84,64 @@ public class RagChatService {
                 .relatedEntityId(session.getId())
                 .build());
 
-        return RagAnswerResponse.builder()
-                .sessionId(session.getId())
-                .messageId(savedAssistant.getId())
-                .answer(answer)
-                .confidenceScore(confidenceScore)
-                .confidenceLevel(confidenceLevel)
-                .fallback("LOW".equals(confidenceLevel))
-                .lowConfidenceReason("LOW".equals(confidenceLevel) ? "INSUFFICIENT_RETRIEVAL_CONTEXT" : null)
-                .suggestions("LOW".equals(confidenceLevel)
-                        ? List.of("Ban co the mo ta cu the hon chu de?", "Ban muon minh uu tien tai lieu lop hoc nao?")
-                        : List.of())
-                .sources(toSources(sources))
-                .usage(TokenUsageResponse.builder()
-                        .totalTokens(savedAssistant.getTokensUsed())
-                        .latencyMs(savedAssistant.getResponseTimeMs())
-                        .build())
-                .createdAt(savedAssistant.getCreatedAt())
-                .build();
+        return toResponse(savedAssistant, confidenceScore, confidenceLevel);
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<?> getMessages(Long sessionId, int pageNo, int pageSize) {
+    public List<ChatMessageResponse> getHistory(Long sessionId) {
         ChatSession session = chatSessionService.getOwnedSession(sessionId);
-        Page<ChatMessage> page = chatMessageRepository.findBySessionIdOrderByCreatedAtAsc(session.getId(), PageRequest.of(pageNo, pageSize));
-        List<ChatMessageResponse> items = page.getContent().stream().map(this::toResponse).toList();
-
-        return PageResponse.<List<ChatMessageResponse>>builder()
-                .pageNo(pageNo)
-                .pageSize(pageSize)
-                .totalPage(page.getTotalPages())
-                .items(items)
-                .build();
+        return chatMessageRepository.findBySessionIdOrderByCreatedAtAsc(session.getId())
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    private List<ChatMessage> loadHistory(Long sessionId, int maxMessages) {
-        Page<ChatMessage> page = chatMessageRepository.findBySessionIdOrderByCreatedAtAsc(sessionId, PageRequest.of(0, Math.max(1, maxMessages)));
-        return page.getContent();
+    private List<ChatMessage> loadHistory(Long sessionId, String question, int maxMessages) {
+        int historyLimit = Math.max(1, Math.min(5, maxMessages));
+        int recentWindow = Math.max(10, historyLimit * 4);
+
+        Page<ChatMessage> page = chatMessageRepository.findBySessionIdOrderByCreatedAtDesc(
+                sessionId,
+                PageRequest.of(0, recentWindow)
+        );
+
+        Set<String> questionTokens = normalizeTokens(question);
+        return page.getContent().stream()
+                .filter(message -> message.getRole() != MessageRole.USER)
+                .sorted(Comparator
+                        .comparingDouble((ChatMessage message) -> overlapScore(questionTokens, message.getContent())).reversed()
+                        .thenComparing(ChatMessage::getCreatedAt, Comparator.reverseOrder()))
+                .limit(historyLimit)
+                .sorted(Comparator.comparing(ChatMessage::getCreatedAt))
+                .toList();
+    }
+
+    private double overlapScore(Set<String> questionTokens, String text) {
+        if (questionTokens.isEmpty() || text == null || text.isBlank()) {
+            return 0.0;
+        }
+        Set<String> messageTokens = normalizeTokens(text);
+        int overlap = 0;
+        for (String token : questionTokens) {
+            if (messageTokens.contains(token)) {
+                overlap++;
+            }
+        }
+        return (double) overlap / questionTokens.size();
+    }
+
+    private Set<String> normalizeTokens(String text) {
+        if (text == null || text.isBlank()) {
+            return Set.of();
+        }
+        String[] raw = text.toLowerCase().replaceAll("[^\\p{L}\\p{N}\\s]", " ").trim().split("\\s+");
+        Set<String> tokens = new HashSet<>();
+        for (String token : raw) {
+            if (token.length() >= 2 || token.chars().allMatch(Character::isDigit)) {
+                tokens.add(token);
+            }
+        }
+        return tokens;
     }
 
     private int estimateTokens(String prompt, String answer) {
@@ -129,37 +150,41 @@ public class RagChatService {
         return promptTokens + answerTokens;
     }
 
-    private List<RagSourceResponse> toSources(List<DocumentChunk> chunks) {
-        List<RagSourceResponse> sources = new ArrayList<>();
-        for (DocumentChunk chunk : chunks) {
-            sources.add(RagSourceResponse.builder()
-                    .chunkId(chunk.getId())
-                    .documentId(chunk.getDocument() != null ? chunk.getDocument().getId() : null)
-                    .documentTitle(chunk.getDocument() != null ? chunk.getDocument().getTitle() : null)
-                    .score(null)
-                    .excerpt(excerpt(chunk.getContent(), 240))
-                    .build());
-        }
-        return sources;
-    }
-
-    private String excerpt(String text, int maxLen) {
-        if (text == null) return null;
-        if (text.length() <= maxLen) return text;
-        return text.substring(0, maxLen) + "...";
-    }
-
     private ChatMessageResponse toResponse(ChatMessage message) {
+        return toResponse(message, null, null);
+    }
+
+    private ChatMessageResponse toResponse(ChatMessage message, Double confidenceScore, String confidenceLevel) {
         return ChatMessageResponse.builder()
                 .id(message.getId())
                 .role(message.getRole())
                 .content(message.getContent())
                 .agentType(message.getAgentType())
+                .confidenceScore(confidenceScore)
+                .confidenceLevel(confidenceLevel)
                 .tokensUsed(message.getTokensUsed())
                 .responseTimeMs(message.getResponseTimeMs())
-                .sources(message.getSourceChunks() == null ? List.of() : toSources(message.getSourceChunks()))
+                .sources(extractDistinctDocumentTitles(message.getSourceChunks()))
                 .createdAt(message.getCreatedAt())
                 .build();
+    }
+
+    private List<String> extractDistinctDocumentTitles(List<DocumentChunk> chunks) {
+        if (chunks == null || chunks.isEmpty()) {
+            return List.of();
+        }
+
+        Set<String> titles = new LinkedHashSet<>();
+        for (DocumentChunk chunk : chunks) {
+            if (chunk.getDocument() == null) {
+                continue;
+            }
+            String title = chunk.getDocument().getTitle();
+            if (title != null && !title.isBlank()) {
+                titles.add(title);
+            }
+        }
+        return new ArrayList<>(titles);
     }
 }
 

@@ -2,7 +2,6 @@ package com.example.teacherassistantai.dto.request;
 
 import com.example.teacherassistantai.common.enumerate.SubjectType;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,7 +21,7 @@ public class CreateSubjectRequest {
     @Size(max = 1000, message = "Description must be <= 1000 characters")
     private String description;
 
-    @NotNull(message = "Subject type is required")
+
     private SubjectType subjectType;
 }
 
