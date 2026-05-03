@@ -39,8 +39,8 @@ public class DocumentChunkIngestionService {
                     .content(content)
                     .tokenCount(Math.max(1, content.length() / 4))
                     .metadataJsonb(chunkMetadataBuilder.buildHierarchicalJsonb(
-                            null,
-                            null,
+                            hierarchicalChunk.pageFrom(),
+                            hierarchicalChunk.pageTo(),
                             hierarchicalChunk.sectionHeader(),
                             hierarchicalChunk.chunkType(),
                             content.length(),

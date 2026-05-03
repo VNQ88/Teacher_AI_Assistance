@@ -24,9 +24,10 @@ public class DocumentResponse {
     private Long fileSizeBytes;
     private String originalObjectKey;
     private String markdownObjectKey;
+    private String hierarchyObjectKey;
+    private String chunksObjectKey;
     private DocumentStatus status;
     private String processingError;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
-

@@ -10,6 +10,8 @@ public record HierarchicalMarkdownChunk(
         String parentNodeId,
         String sectionHeader,
         List<String> breadcrumb,
+        Integer pageFrom,
+        Integer pageTo,
         Integer charStart,
         Integer charEnd
 ) {

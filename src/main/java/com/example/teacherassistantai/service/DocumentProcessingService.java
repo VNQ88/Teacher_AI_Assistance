@@ -31,6 +31,7 @@ public class DocumentProcessingService {
     private final MinioProps minioProps;
     private final TikaMarkdownParser tikaMarkdownParser;
     private final DocumentChunkIngestionService documentChunkIngestionService;
+    private final DocumentHierarchyArtifactService documentHierarchyArtifactService;
 
     @Async("documentProcessingExecutor")
     public void processDocumentAsync(Long documentId) {
@@ -54,15 +55,23 @@ public class DocumentProcessingService {
         String cleanedMarkdown = sanitizeMarkdown(markdown);
 
         String markdownObjectKey = buildMarkdownObjectKey(document.getSubject().getId());
-        uploadMarkdown(markdownObjectKey, document.getTitle(), cleanedMarkdown);
-
+        String hierarchyObjectKey = buildSiblingObjectKey(markdownObjectKey, ".hierarchy.json");
+        String chunksObjectKey = buildSiblingObjectKey(markdownObjectKey, ".chunks.jsonl");
         document.setMarkdownObjectKey(markdownObjectKey);
+        document.setHierarchyObjectKey(hierarchyObjectKey);
+        document.setChunksObjectKey(chunksObjectKey);
+        DocumentHierarchyArtifactService.Artifacts artifacts =
+                documentHierarchyArtifactService.buildArtifacts(document, cleanedMarkdown);
+
+        uploadArtifact(markdownObjectKey, document.getTitle(), "text/markdown", artifacts.normalizedMarkdown());
+        uploadArtifact(hierarchyObjectKey, document.getTitle(), "application/json", artifacts.hierarchyJson());
+        uploadArtifact(chunksObjectKey, document.getTitle(), "application/x-ndjson", artifacts.chunksJsonl());
 
 //        // Keep skeleton flow explicit so status transitions are visible in DB.
 //        document.setStatus(DocumentStatus.CHUNKING);
 //        documentRepository.save(document);
 //
-//        documentChunkIngestionService.ingest(document, cleanedMarkdown);
+//        documentChunkIngestionService.ingest(document, artifacts.normalizedMarkdown());
 //
 //        document.setStatus(DocumentStatus.EMBEDDING);
 //        documentRepository.save(document);
@@ -95,14 +104,26 @@ public class DocumentProcessingService {
         return String.format("uploads/subjects/%d/md/%s.md", subjectId, UUID.randomUUID());
     }
 
-    private void uploadMarkdown(String objectKey, String title, String markdown) throws Exception {
-        byte[] bytes = markdown.getBytes(StandardCharsets.UTF_8);
-        String fileName = (title == null || title.isBlank() ? "document" : title.replaceAll("[^a-zA-Z0-9._-]", "_")) + ".md";
+    private String buildSiblingObjectKey(String markdownObjectKey, String suffix) {
+        if (markdownObjectKey == null || !markdownObjectKey.endsWith(".md")) {
+            return markdownObjectKey + suffix;
+        }
+        return markdownObjectKey.substring(0, markdownObjectKey.length() - 3) + suffix;
+    }
+
+    private void uploadArtifact(String objectKey, String title, String contentType, String content) throws Exception {
+        byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
+        String extension = switch (contentType) {
+            case "application/json" -> ".hierarchy.json";
+            case "application/x-ndjson" -> ".chunks.jsonl";
+            default -> ".md";
+        };
+        String fileName = (title == null || title.isBlank() ? "document" : title.replaceAll("[^a-zA-Z0-9._-]", "_")) + extension;
 
         InMemoryMultipartFile markdownFile = new InMemoryMultipartFile(
                 "file",
                 fileName,
-                "text/markdown",
+                contentType,
                 bytes
         );
         minioChannel.upload(markdownFile, objectKey);

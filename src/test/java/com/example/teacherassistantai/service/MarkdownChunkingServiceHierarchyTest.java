@@ -42,5 +42,49 @@ class MarkdownChunkingServiceHierarchyTest {
                 .anySatisfy(chunk -> assertThat(chunk.chunkType()).isEqualTo("SUMMARY"));
         assertThat(law)
                 .anySatisfy(chunk -> assertThat(chunk.chunkType()).isEqualTo("REVIEW_QUESTIONS"));
+        assertThat(law)
+                .filteredOn(chunk -> chunk.chunkType().equals("SUMMARY"))
+                .anySatisfy(chunk -> assertThat(chunk.content()).contains("Nhà nước là một tổ chức đặc biệt"));
+        assertThat(law)
+                .filteredOn(chunk -> chunk.chunkType().equals("REVIEW_QUESTIONS"))
+                .anySatisfy(chunk -> assertThat(chunk.content()).contains("Tại sao nói nhà nước ra đời"));
+    }
+
+    @Test
+    void normalizeMarkdownForHierarchy_repairs_broken_and_attached_headings() {
+        String markdown = """
+                ### Chương 5: Luật Hành Chính Hoạt động chấp hành và điều hành là một loại hoạt động quản lý.
+
+                #### III. Phương pháp nghiên cứu, học tập môn học Lịch sử Đảng Cộng sản Việt
+
+                Nam
+                """;
+
+        String normalized = chunkingService.normalizeMarkdownForHierarchy(markdown);
+
+        assertThat(normalized).contains("""
+                ### Chương 5: Luật Hành Chính
+
+                Hoạt động chấp hành và điều hành là một loại hoạt động quản lý.""");
+        assertThat(normalized).contains("#### III. Phương pháp nghiên cứu, học tập môn học Lịch sử Đảng Cộng sản Việt Nam");
+    }
+
+    @Test
+    void chunkHierarchical_treats_numbered_question_headings_asReviewQuestions() {
+        List<HierarchicalMarkdownChunk> chunks = chunkingService.chunkHierarchical("""
+                # Triết
+
+                ### Chương X
+
+                ##### 1. Quan điểm của triết học duy vật biện chứng về nguồn gốc và bản chất của ý thức?
+
+                Câu hỏi ôn tập.
+                """);
+
+        assertThat(chunks)
+                .anySatisfy(chunk -> {
+                    assertThat(chunk.chunkType()).isEqualTo("REVIEW_QUESTIONS");
+                    assertThat(chunk.sectionHeader()).contains("Quan điểm của triết học");
+                });
     }
 }

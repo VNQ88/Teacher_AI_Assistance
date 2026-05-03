@@ -25,6 +25,7 @@ public class MarkdownChunkingService {
     private static final Pattern HEADER_PATTERN = Pattern.compile("^(#{1,6})\\s+.+$");
     private static final Pattern TABLE_LINE_PATTERN = Pattern.compile("^\\s*\\|.*\\|\\s*$");
     private static final Pattern MARKDOWN_HEADER_PATTERN = Pattern.compile("^(#{1,6})\\s+(.+)$");
+    private static final Pattern PAGE_MARKER_PATTERN = Pattern.compile("^<!--\\s*page:\\s*(\\d+)\\s*-->$");
     private static final Pattern PART_TITLE_PATTERN = Pattern.compile("(?iu)^phần\\s+[ivxlcdm]+\\b.*$");
     private static final Pattern CHAPTER_TITLE_PATTERN = Pattern.compile("(?iu)^chương\\s+([0-9ivxlcdm]+|nhập\\s+môn)\\b.*$");
     private static final Pattern ROMAN_SECTION_PATTERN = Pattern.compile("(?iu)^[ivxlcdm]+[.-]\\s+.+$");
@@ -57,38 +58,55 @@ public class MarkdownChunkingService {
             throw new InvalidDataException("Markdown content is empty");
         }
 
+        return parseHierarchicalDocument(markdown).chunks();
+    }
+
+    public HierarchicalMarkdownDocument parseHierarchicalDocument(String markdown) {
+        if (markdown == null || markdown.isBlank()) {
+            throw new InvalidDataException("Markdown content is empty");
+        }
+
         String normalized = normalizeForHierarchy(markdown);
         HierarchyNode root = parseHierarchy(normalized);
         List<HierarchicalMarkdownChunk> chunks = new ArrayList<>();
         emitHierarchicalChunks(root, chunks);
         if (chunks.isEmpty()) {
-            List<String> flatChunks = new ArrayList<>();
-            for (String input : preSplitLargeInput(markdown)) {
-                flatChunks.addAll(chunkStructured(input));
-            }
-            for (int i = 0; i < flatChunks.size(); i++) {
-                String content = flatChunks.get(i);
-                chunks.add(new HierarchicalMarkdownChunk(
-                        content,
-                        "TEXT",
-                        "body",
-                        "flat-" + (i + 1),
-                        null,
-                        null,
-                        List.of(),
-                        null,
-                        null
-                ));
-            }
+            chunks.addAll(flatFallbackChunks(markdown));
+        }
+        return new HierarchicalMarkdownDocument(normalized, toPublicNode(root), chunks);
+    }
+
+    private List<HierarchicalMarkdownChunk> flatFallbackChunks(String markdown) {
+        List<String> flatChunks = new ArrayList<>();
+        for (String input : preSplitLargeInput(markdown)) {
+            flatChunks.addAll(chunkStructured(input));
+        }
+        List<HierarchicalMarkdownChunk> chunks = new ArrayList<>();
+        for (int i = 0; i < flatChunks.size(); i++) {
+            String content = flatChunks.get(i);
+            chunks.add(new HierarchicalMarkdownChunk(
+                    content,
+                    "TEXT",
+                    "body",
+                    "flat-" + (i + 1),
+                    null,
+                    null,
+                    List.of(),
+                    null,
+                    null,
+                    null,
+                    null
+            ));
         }
         return chunks;
     }
 
-    private String normalizeForHierarchy(String markdown) {
+    public String normalizeMarkdownForHierarchy(String markdown) {
         String normalized = markdown.replace("\r\n", "\n").replace('\r', '\n');
         List<String> output = new ArrayList<>();
-        int offset = 0;
-        for (String rawLine : normalized.split("\n", -1)) {
+        List<String> lines = normalized.lines().toList();
+        for (int i = 0; i < lines.size(); i++) {
+            String rawLine = lines.get(i);
             String line = rawLine.stripTrailing();
             SplitHeading split = splitHeadingWithAttachedBody(line);
             if (split != null) {
@@ -98,32 +116,131 @@ public class MarkdownChunkingService {
             } else {
                 output.add(line);
             }
-            offset += rawLine.length() + 1;
         }
-        return String.join("\n", output).replaceAll("\\n{4,}", "\n\n\n").trim();
+        return repairBrokenHeadings(String.join("\n", output).replaceAll("\\n{4,}", "\n\n\n")).trim();
+    }
+
+    private String normalizeForHierarchy(String markdown) {
+        return normalizeMarkdownForHierarchy(markdown);
+    }
+
+    private String repairBrokenHeadings(String markdown) {
+        String[] lines = markdown.split("\\n", -1);
+        List<String> output = new ArrayList<>();
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i];
+            String next = nextNonBlank(lines, i + 1);
+            if (isIncompleteMarkdownHeading(line) && next != null && isHeadingContinuation(next)) {
+                int nextIndex = nextNonBlankIndex(lines, i + 1);
+                output.add(line.stripTrailing() + " " + next.trim());
+                i = nextIndex;
+                continue;
+            }
+            output.add(line);
+        }
+        return String.join("\n", output);
+    }
+
+    private boolean isIncompleteMarkdownHeading(String line) {
+        java.util.regex.Matcher matcher = MARKDOWN_HEADER_PATTERN.matcher(line == null ? "" : line.trim());
+        if (!matcher.matches()) {
+            return false;
+        }
+        String title = matcher.group(2).trim();
+        if (title.length() > 160 || title.matches(".*[.!?:;]$")) {
+            return false;
+        }
+        String lower = title.toLowerCase(Locale.ROOT);
+        return lower.endsWith(" của")
+                || lower.endsWith(" cách")
+                || lower.endsWith(" công")
+                || lower.endsWith(" xây dựng")
+                || lower.endsWith(" chống")
+                || lower.endsWith(" đổi")
+                || lower.endsWith(" hội")
+                || lower.endsWith(" kết")
+                || lower.endsWith(" thống")
+                || lower.endsWith(" cơ")
+                || lower.endsWith(" hiến")
+                || lower.endsWith(" tác")
+                || lower.endsWith(" biện")
+                || lower.endsWith(" chủ")
+                || lower.endsWith(" nguồn")
+                || lower.endsWith(" phạm")
+                || lower.endsWith(" nghĩa")
+                || lower.endsWith(" việt");
+    }
+
+    private boolean isHeadingContinuation(String line) {
+        if (line == null || line.isBlank() || line.length() > 120) {
+            return false;
+        }
+        if (MARKDOWN_HEADER_PATTERN.matcher(line.trim()).matches() || PAGE_MARKER_PATTERN.matcher(line.trim()).matches()) {
+            return false;
+        }
+        return !line.trim().matches("^[-+*]\\s+.+$");
+    }
+
+    private String nextNonBlank(String[] lines, int start) {
+        int index = nextNonBlankIndex(lines, start);
+        return index >= 0 ? lines[index] : null;
+    }
+
+    private int nextNonBlankIndex(String[] lines, int start) {
+        for (int i = start; i < lines.length; i++) {
+            if (!lines[i].isBlank()) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private SplitHeading splitHeadingWithAttachedBody(String line) {
         java.util.regex.Matcher matcher = MARKDOWN_HEADER_PATTERN.matcher(line);
-        if (!matcher.matches() || line.length() <= 150) {
+        if (!matcher.matches() || line.length() <= 90) {
             return null;
         }
 
         String hashes = matcher.group(1);
         String title = matcher.group(2).trim();
-        if (!CHAPTER_TITLE_PATTERN.matcher(title.toLowerCase(Locale.ROOT)).matches()
-                && !title.matches("(?iu)^\\d+(?:\\.\\d+)+\\.?\\s+.+$")) {
+        if (!isSplittableLongHeading(title)) {
             return null;
         }
 
-        for (String marker : List.of(" Từ ", " Phép ", " Hoạt động ", " Với tư cách ", " Sản xuất ", " Giữa ")) {
+        for (String marker : List.of(
+                " Từ ",
+                " Trong ",
+                " Theo ",
+                " Hiện thực ",
+                " Khả năng ",
+                " Phép ",
+                " Hoạt động ",
+                " Với tư cách ",
+                " Sản xuất ",
+                " Xã hội ",
+                " Chức năng ",
+                " Nguyên nhân ",
+                " Các cuộc ",
+                " Những hình thái ",
+                " Trước Mác, ",
+                " Để cho ",
+                " 1. ")) {
             int index = title.indexOf(marker);
-            if (index > 35 && index < title.length() - 20) {
+            if (index >= 20 && index < title.length() - 20) {
                 return new SplitHeading(hashes + " " + title.substring(0, index).trim(),
                         title.substring(index + 1).trim());
             }
         }
         return null;
+    }
+
+    private boolean isSplittableLongHeading(String title) {
+        String lower = title.toLowerCase(Locale.ROOT);
+        return CHAPTER_TITLE_PATTERN.matcher(lower).matches()
+                || DECIMAL_SECTION_PATTERN.matcher(title).matches()
+                || SINGLE_NUMBERED_PATTERN.matcher(title).matches()
+                || ALPHA_SECTION_PATTERN.matcher(title).matches()
+                || ROMAN_SECTION_PATTERN.matcher(lower).matches();
     }
 
     private HierarchyNode parseHierarchy(String markdown) {
@@ -135,9 +252,19 @@ public class MarkdownChunkingService {
         int offset = 0;
         int nodeSequence = 1;
         boolean inSpecialNode = false;
+        Integer currentPage = markdown.contains("<!-- page:") ? 1 : null;
+        root.observePage(currentPage);
 
         for (String line : lines) {
             String trimmed = line.trim();
+            java.util.regex.Matcher pageMatcher = PAGE_MARKER_PATTERN.matcher(trimmed);
+            if (pageMatcher.matches()) {
+                currentPage = Integer.parseInt(pageMatcher.group(1));
+                stack.peek().observePage(currentPage);
+                offset += line.length() + 1;
+                continue;
+            }
+
             SpecialMarker specialMarker = specialMarker(trimmed);
             if (specialMarker != null) {
                 while (stack.peek().level >= 3 && stack.size() > 1) {
@@ -146,6 +273,7 @@ public class MarkdownChunkingService {
                 HierarchyNode parent = stack.peek();
                 HierarchyNode node = new HierarchyNode("n" + nodeSequence++, parent, parent.level + 1,
                         specialMarker.nodeType(), specialMarker.title(), offset);
+                node.observePage(currentPage);
                 parent.children.add(node);
                 stack.push(node);
                 inSpecialNode = true;
@@ -161,11 +289,12 @@ public class MarkdownChunkingService {
                 HierarchyNode parent = stack.peek();
                 HierarchyNode node = new HierarchyNode("n" + nodeSequence++, parent, heading.level(),
                         heading.type(), heading.title(), offset);
+                node.observePage(currentPage);
                 parent.children.add(node);
                 stack.push(node);
                 inSpecialNode = heading.type().equals("summary") || heading.type().equals("review_questions");
             } else {
-                stack.peek().appendContent(line, offset);
+                stack.peek().appendContent(line, offset, currentPage);
             }
             offset += line.length() + 1;
         }
@@ -209,7 +338,7 @@ public class MarkdownChunkingService {
 
     private boolean isReviewQuestionHeading(String title) {
         String lower = title.toLowerCase(Locale.ROOT);
-        return title.endsWith("?")
+        return lower.matches("^\\d{1,2}\\.\\s+.+\\?$")
                 || lower.contains("anh (chị)")
                 || lower.startsWith("tại sao ")
                 || lower.startsWith("vì sao ")
@@ -221,14 +350,19 @@ public class MarkdownChunkingService {
 
     private SpecialMarker specialMarker(String line) {
         String lower = line.toLowerCase(Locale.ROOT);
+        String withoutHeading = line.replaceFirst("^#{1,6}\\s+", "");
+        lower = withoutHeading.toLowerCase(Locale.ROOT);
+        if (MARKDOWN_HEADER_PATTERN.matcher(line).matches() && isReviewQuestionHeading(withoutHeading)) {
+            return new SpecialMarker("review_questions", withoutHeading);
+        }
         if (lower.matches("(?iu)^tóm\\s+tắt\\s+chương.*$")) {
-            return new SpecialMarker("summary", line);
+            return new SpecialMarker("summary", withoutHeading);
         }
         if (lower.matches("(?iu)^(câu\\s+hỏi\\s+ôn\\s+tập|nội\\s+dung\\s+ôn\\s+tập.*).*$")) {
-            return new SpecialMarker("review_questions", line);
+            return new SpecialMarker("review_questions", withoutHeading);
         }
         if (lower.matches("(?iu)^kết\\s+luận$")) {
-            return new SpecialMarker("section", line);
+            return new SpecialMarker("section", withoutHeading);
         }
         return null;
     }
@@ -239,6 +373,9 @@ public class MarkdownChunkingService {
         }
 
         String body = node.content.toString().trim();
+        if (node.type.equals("review_questions") && !node.title.isBlank() && isReviewQuestionHeading(node.title)) {
+            body = body.isBlank() ? node.title : node.title + "\n\n" + body;
+        }
         if (node.parent == null || body.isBlank()) {
             return;
         }
@@ -256,6 +393,8 @@ public class MarkdownChunkingService {
                     parentNodeId(node),
                     node.title,
                     breadcrumb,
+                    node.pageFrom,
+                    node.pageTo,
                     node.charStart,
                     node.charEnd
             ));
@@ -290,6 +429,25 @@ public class MarkdownChunkingService {
         }
         Collections.reverse(values);
         return values;
+    }
+
+    private PublicHierarchyNode toPublicNode(HierarchyNode node) {
+        List<PublicHierarchyNode> children = node.children.stream()
+                .map(this::toPublicNode)
+                .toList();
+        return new PublicHierarchyNode(
+                node.id,
+                node.parent == null ? null : node.parent.id,
+                node.type,
+                node.title,
+                node.parent == null ? List.of() : breadcrumb(node),
+                node.pageFrom,
+                node.pageTo,
+                node.charStart,
+                node.charEnd,
+                node.content.toString().trim().length(),
+                children
+        );
     }
 
     private List<String> preSplitLargeInput(String markdown) {
@@ -574,6 +732,28 @@ public class MarkdownChunkingService {
     private record SplitHeading(String heading, String body) {
     }
 
+    public record HierarchicalMarkdownDocument(
+            String normalizedMarkdown,
+            PublicHierarchyNode root,
+            List<HierarchicalMarkdownChunk> chunks
+    ) {
+    }
+
+    public record PublicHierarchyNode(
+            String nodeId,
+            String parentNodeId,
+            String nodeType,
+            String title,
+            List<String> breadcrumb,
+            Integer pageFrom,
+            Integer pageTo,
+            Integer charStart,
+            Integer charEnd,
+            Integer contentCharCount,
+            List<PublicHierarchyNode> children
+    ) {
+    }
+
     private static final class HierarchyNode {
         private final String id;
         private final HierarchyNode parent;
@@ -582,6 +762,8 @@ public class MarkdownChunkingService {
         private final String title;
         private final int charStart;
         private int charEnd;
+        private Integer pageFrom;
+        private Integer pageTo;
         private final StringBuilder content = new StringBuilder();
         private final List<HierarchyNode> children = new ArrayList<>();
 
@@ -600,15 +782,28 @@ public class MarkdownChunkingService {
             this.charEnd = charStart;
         }
 
-        private void appendContent(String line, int offset) {
+        private void appendContent(String line, int offset, Integer page) {
             if (content.isEmpty() && line.isBlank()) {
                 return;
             }
+            observePage(page);
             if (content.isEmpty()) {
                 charEnd = offset;
             }
             content.append(line).append('\n');
             charEnd = offset + line.length();
+        }
+
+        private void observePage(Integer page) {
+            if (page == null) {
+                return;
+            }
+            if (pageFrom == null || page < pageFrom) {
+                pageFrom = page;
+            }
+            if (pageTo == null || page > pageTo) {
+                pageTo = page;
+            }
         }
 
         private void close(int fallbackEnd) {

@@ -37,6 +37,12 @@ public class Document extends BaseEntity {
     @Column(length = 500, unique = true)
     String markdownObjectKey; // Key object file markdown trong MinIO/S3 (co the null khi chua parse xong)
 
+    @Column(length = 500, unique = true)
+    String hierarchyObjectKey;
+
+    @Column(length = 500, unique = true)
+    String chunksObjectKey;
+
     @Column(length = 20, nullable = false)
     String fileType; // "PDF", "DOCX", "TXT"
 

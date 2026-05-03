@@ -20,8 +20,7 @@
   - `./gradlew bootRun`
   - `./gradlew test`
 - OpenAPI UI is enabled via springdoc + `SwaggerConfig`.
-- Liquibase is enabled, but `db.changelog-master.yaml` currently includes only `v1.1-add-vector-column.sql`; `v1.0-initial-schema.sql` and seeds are commented out.
-- `init-db.sql` also creates pgvector extension for container bootstrap.
+- Liquibase is disabled. Current DB schema is current-sql.sql; update this and include in changelog when changing schema.
 
 ## Project-Specific Conventions
 - Authorization is mostly method-level via `@PreAuthorize`; global security is in `security/SecurityConfig.java`.

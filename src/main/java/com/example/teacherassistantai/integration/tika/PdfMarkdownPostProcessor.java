@@ -28,6 +28,7 @@ public class PdfMarkdownPostProcessor {
     private static final Pattern BULLET_PATTERN = Pattern.compile("^[-+*]\\s+.+$");
     private static final Pattern FOOTNOTE_PATTERN = Pattern.compile("^\\d{1,3}\\s+\\S.+$");
     private static final Pattern TOC_LINE_PATTERN = Pattern.compile("(?iu).+\\s+\\d{1,3}$");
+    private static final String PAGE_BREAK_SENTINEL = "[[PDF_PAGE_BREAK]]";
 
     public String toMarkdown(String rawText, String title) {
         List<String> lines = normalizeLines(rawText);
@@ -46,6 +47,11 @@ public class PdfMarkdownPostProcessor {
             String line = lines.get(i);
             if (line.isBlank()) {
                 flushParagraph(markdownBlocks, paragraph);
+                continue;
+            }
+            if (isPageMarker(line)) {
+                flushParagraph(markdownBlocks, paragraph);
+                markdownBlocks.add(line);
                 continue;
             }
 
@@ -84,12 +90,19 @@ public class PdfMarkdownPostProcessor {
 
     private List<String> normalizeLines(String rawText) {
         String normalized = rawText == null ? "" : rawText;
-        normalized = normalized.replace("\r\n", "\n").replace('\r', '\n').replace('\f', '\n');
+        normalized = normalized.replace("\r\n", "\n").replace('\r', '\n').replace("\f", "\n" + PAGE_BREAK_SENTINEL + "\n");
         String[] split = normalized.split("\\n", -1);
         List<String> lines = new ArrayList<>();
         boolean previousBlank = true;
+        int page = 1;
         for (String value : split) {
             String line = normalizeWhitespace(value);
+            if (PAGE_BREAK_SENTINEL.equals(line)) {
+                page++;
+                lines.add("<!-- page: " + page + " -->");
+                previousBlank = false;
+                continue;
+            }
             if (PAGE_NUMBER_PATTERN.matcher(line).matches()) {
                 continue;
             }
@@ -258,6 +271,10 @@ public class PdfMarkdownPostProcessor {
     private boolean isFootnote(String line) {
         return FOOTNOTE_PATTERN.matcher(line).matches()
                 && (line.contains("Nxb") || line.contains("Toan tap") || line.contains("V.I.") || line.contains("C.Mac"));
+    }
+
+    private boolean isPageMarker(String line) {
+        return line != null && line.matches("^<!--\\s*page:\\s*\\d+\\s*-->$");
     }
 
     private boolean isTocTitle(String line) {

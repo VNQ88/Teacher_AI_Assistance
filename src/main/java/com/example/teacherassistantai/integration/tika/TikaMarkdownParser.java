@@ -12,10 +12,14 @@ import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.pdf.PDFParserConfig;
 import org.apache.tika.sax.BodyContentHandler;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.stereotype.Component;
 import org.xml.sax.ContentHandler;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
@@ -30,8 +34,35 @@ public class TikaMarkdownParser {
             throw new DocumentProcessingException("Document source is empty");
         }
 
-        String extractedText = extractText(sourceBytes, fileName, mimeType);
+        String extractedText = isPdf(fileName, mimeType)
+                ? extractPdfTextByPage(sourceBytes, fileName)
+                : extractText(sourceBytes, fileName, mimeType);
         return pdfMarkdownPostProcessor.toMarkdown(extractedText, fileName);
+    }
+
+    private boolean isPdf(String fileName, String mimeType) {
+        return "application/pdf".equalsIgnoreCase(mimeType)
+                || (fileName != null && fileName.toLowerCase().endsWith(".pdf"));
+    }
+
+    private String extractPdfTextByPage(byte[] sourceBytes, String fileName) {
+        try (PDDocument document = Loader.loadPDF(sourceBytes)) {
+            PDFTextStripper stripper = new PDFTextStripper();
+            stripper.setSortByPosition(true);
+            StringBuilder builder = new StringBuilder();
+            for (int page = 1; page <= document.getNumberOfPages(); page++) {
+                if (page > 1) {
+                    builder.append('\f');
+                }
+                stripper.setStartPage(page);
+                stripper.setEndPage(page);
+                builder.append(stripper.getText(document));
+            }
+            return builder.toString();
+        } catch (IOException | RuntimeException ex) {
+            log.warn("PDFBox page-aware extraction failed for fileName={}, falling back to Tika", fileName, ex);
+            return extractText(sourceBytes, fileName, "application/pdf");
+        }
     }
 
     private String extractText(byte[] sourceBytes, String fileName, String mimeType) {

@@ -154,6 +154,8 @@ public class DocumentService {
 
         removeStorageObject(document.getOriginalObjectKey(), documentId, "original");
         removeStorageObject(document.getMarkdownObjectKey(), documentId, "markdown");
+        removeStorageObject(document.getHierarchyObjectKey(), documentId, "hierarchy");
+        removeStorageObject(document.getChunksObjectKey(), documentId, "chunks");
 
         documentChunkRepository.deleteMessageSourceLinksByDocumentId(documentId);
         documentChunkRepository.deleteByDocumentId(documentId);
@@ -262,6 +264,8 @@ public class DocumentService {
                 .fileSizeBytes(document.getFileSizeBytes())
                 .originalObjectKey(document.getOriginalObjectKey())
                 .markdownObjectKey(document.getMarkdownObjectKey())
+                .hierarchyObjectKey(document.getHierarchyObjectKey())
+                .chunksObjectKey(document.getChunksObjectKey())
                 .status(document.getStatus())
                 .processingError(document.getProcessingError())
                 .createdAt(document.getCreatedAt())
