@@ -11,7 +11,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./init-db.sql:/docker-entrypoint-initdb.d/01-init.sql
     ports:
-      - "5432:5432"
+      - "5433:5432"
     networks:
       - backend
 
@@ -23,7 +23,7 @@ services:
     volumes:
       - redis_data:/data
     ports:
-      - "6379:6379"
+      - "6380:6379"
     networks:
       - backend
 
@@ -34,16 +34,16 @@ services:
     environment:
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: minio123
-      MINIO_SERVER_URL: http://localhost:9000
-      MINIO_BROWSER_REDIRECT_URL: http://localhost:9001
+      MINIO_SERVER_URL: http://localhost:9100
+      MINIO_BROWSER_REDIRECT_URL: http://localhost:9101
       MINIO_KMS_SECRET_KEY: minio-default-key:ujWdfWgGBWHFDY7cekhUZ+qArDs8q/8YD8bgmNe8edA=
       MINIO_KMS_AUTO_ENCRYPTION: "on"
-    command: server /data --console-address ":9001"
+    command: server /data --address ":9100" --console-address ":9101"
     volumes:
       - minio_data:/data
     ports:
-      - "127.0.0.1:9000:9000"
-      - "127.0.0.1:9001:9001"
+      - "127.0.0.1:9100:9100"
+      - "127.0.0.1:9101:9101"
     networks:
       - backend
 

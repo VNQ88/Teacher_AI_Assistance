@@ -25,19 +25,31 @@ public class DocumentChunkIngestionService {
 
     @Transactional
     public List<DocumentChunk> ingest(Document document, String markdown) {
-        List<String> chunks = markdownChunkingService.chunk(markdown);
+        List<HierarchicalMarkdownChunk> chunks = markdownChunkingService.chunkHierarchical(markdown);
         List<DocumentChunk> persisted = new ArrayList<>();
 
         for (int i = 0; i < chunks.size(); i++) {
-            String content = chunks.get(i);
+            HierarchicalMarkdownChunk hierarchicalChunk = chunks.get(i);
+            String content = hierarchicalChunk.content();
             DocumentChunk chunk = DocumentChunk.builder()
                     .document(document)
                     .subjectId(document.getSubject().getId())
                     .chunkIndex(i + 1)
-                    .chunkType("TEXT")
+                    .chunkType(hierarchicalChunk.chunkType())
                     .content(content)
                     .tokenCount(Math.max(1, content.length() / 4))
-                    .metadataJsonb(chunkMetadataBuilder.buildJsonb(null, null, null, "TEXT", content.length()))
+                    .metadataJsonb(chunkMetadataBuilder.buildHierarchicalJsonb(
+                            null,
+                            null,
+                            hierarchicalChunk.sectionHeader(),
+                            hierarchicalChunk.chunkType(),
+                            content.length(),
+                            hierarchicalChunk.nodeType(),
+                            hierarchicalChunk.nodeId(),
+                            hierarchicalChunk.parentNodeId(),
+                            hierarchicalChunk.breadcrumb(),
+                            hierarchicalChunk.charStart(),
+                            hierarchicalChunk.charEnd()))
                     .build();
 
             DocumentChunk saved = documentChunkRepository.save(chunk);

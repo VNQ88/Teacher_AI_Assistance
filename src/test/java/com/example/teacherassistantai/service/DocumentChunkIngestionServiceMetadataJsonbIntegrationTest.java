@@ -2,6 +2,7 @@ package com.example.teacherassistantai.service;
 
 import com.example.teacherassistantai.common.enumerate.DocumentStatus;
 import com.example.teacherassistantai.common.enumerate.SubjectType;
+import com.example.teacherassistantai.config.RagProperties;
 import com.example.teacherassistantai.entity.Document;
 import com.example.teacherassistantai.entity.DocumentChunk;
 import com.example.teacherassistantai.entity.Subject;
@@ -19,11 +20,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.data.domain.AuditorAware;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
@@ -129,6 +134,24 @@ class DocumentChunkIngestionServiceMetadataJsonbIntegrationTest {
                             .toList();
                 }
             };
+        }
+
+        @Bean
+        @Primary
+        RagProperties ragProperties() {
+            RagProperties properties = new RagProperties();
+            properties.setEmbeddingDimensions(3072);
+            return properties;
+        }
+
+        @Bean(name = "auditorProvider")
+        AuditorAware<Long> auditorProvider() {
+            return () -> Optional.of(1L);
+        }
+
+        @Bean
+        CacheManager cacheManager() {
+            return new ConcurrentMapCacheManager();
         }
     }
 }

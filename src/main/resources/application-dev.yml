@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/ai_teaching_assistant
+    url: jdbc:postgresql://localhost:5433/ai_teaching_assistant
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -41,7 +41,7 @@ spring:
   data:
     redis:
       host: localhost
-      port: 6379
+      port: 6380
   cache:
     type: redis
     redis:
@@ -84,8 +84,8 @@ application:
       verification-code-expiration-minutes: 2 # in minutes
       activation-url: http://localhost:4200/activate-account
   minio:
-    endpoint: http://localhost:9000
-    server-url: http://localhost:9000
+    endpoint: http://localhost:9100
+    server-url: http://localhost:9100
     access-key: minio
     secret-key: minio123
     bucket: resources
@@ -95,24 +95,11 @@ application:
   google:
     oauth2:
       client-id: 1029043302518-qpl0getluhhvmlt87f49j8jkj1fqdmqk.apps.googleusercontent.com
-  docling:
-    base-url: http://localhost:5001
-    timeout-seconds: 120
-    retry-attempts: 8
-    retry-backoff-millis: 1200
-    max-inflight-requests: 1
-    parse:
-      do-ocr: false
-      include-images: false
   document:
     max-docx-bytes: 102400
     max-txt-bytes: 102400
-    pdf-split-pages: 10
-    pdf-large-threshold-pages: 150
-    pdf-large-split-pages: 8
-    pdf-chunk-delay-millis: 250
-    pdf-large-chunk-delay-millis: 900
     parse-concurrency: 2
+    tika-max-chars: 5000000
   rag:
     top-k: 6
     max-top-k: 8
