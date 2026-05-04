@@ -193,25 +193,16 @@ create table documents
     markdown_object_key  varchar(500)
         constraint uk_documents_markdown_object_key
             unique,
-    docling_object_key   varchar(500),
-    structure_object_key varchar(500),
-    constraint uktep4xlu4e4w9wo6wxrtneotqe
-        unique (
-            ) ,
-    constraint ukh5qah95isythjselvgvav35t9
-        unique ()
+    hierarchy_object_key varchar(500)
+        constraint uk_documents_hierarchy_object_key
+            unique,
+    chunks_object_key    varchar(500)
+        constraint uk_documents_chunks_object_key
+            unique
 );
 
 alter table documents
     owner to postgres;
-
-create unique index uk_documents_docling_object_key
-    on documents (docling_object_key)
-    where (docling_object_key IS NOT NULL);
-
-create unique index uk_documents_structure_object_key
-    on documents (structure_object_key)
-    where (structure_object_key IS NOT NULL);
 
 create table exams
 (
@@ -430,6 +421,7 @@ create table document_nodes
         references document_nodes
             on delete cascade,
     subject_id     bigint                              not null,
+    node_key       varchar(100)                        not null,
     node_type      varchar(30)                         not null,
     level          integer                             not null,
     title          varchar(500),
@@ -537,6 +529,11 @@ create index idx_document_node_subject
 create index idx_document_node_doc_order
     on document_nodes (document_id, order_index);
 
+create unique index uk_document_nodes_document_node_key
+    on document_nodes (document_id, node_key);
+
+create index idx_document_nodes_doc_parent_order
+    on document_nodes (document_id, parent_id, order_index);
+
 create index idx_document_node_metadata_jsonb_gin
     on document_nodes using gin (metadata_jsonb);
-

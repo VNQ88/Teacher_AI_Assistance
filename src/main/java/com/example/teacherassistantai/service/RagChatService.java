@@ -5,6 +5,7 @@ import com.example.teacherassistantai.common.enumerate.MessageRole;
 import com.example.teacherassistantai.config.RagProperties;
 import com.example.teacherassistantai.dto.request.SendChatMessageRequest;
 import com.example.teacherassistantai.dto.response.ChatMessageResponse;
+import com.example.teacherassistantai.dto.response.SourceChunkResponse;
 import com.example.teacherassistantai.entity.AgentLog;
 import com.example.teacherassistantai.entity.ChatMessage;
 import com.example.teacherassistantai.entity.ChatSession;
@@ -23,6 +24,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -165,6 +167,7 @@ public class RagChatService {
                 .tokensUsed(message.getTokensUsed())
                 .responseTimeMs(message.getResponseTimeMs())
                 .sources(extractDistinctDocumentTitles(message.getSourceChunks()))
+                .sourceDetails(toSourceDetails(message.getSourceChunks()))
                 .createdAt(message.getCreatedAt())
                 .build();
     }
@@ -186,5 +189,58 @@ public class RagChatService {
         }
         return new ArrayList<>(titles);
     }
-}
 
+    private List<SourceChunkResponse> toSourceDetails(List<DocumentChunk> chunks) {
+        if (chunks == null || chunks.isEmpty()) {
+            return List.of();
+        }
+
+        List<SourceChunkResponse> details = new ArrayList<>();
+        Set<Long> seenChunkIds = new HashSet<>();
+        for (DocumentChunk chunk : chunks) {
+            Long chunkId = chunk.getId();
+            if (chunkId != null && !seenChunkIds.add(chunkId)) {
+                continue;
+            }
+            details.add(SourceChunkResponse.builder()
+                    .sourceIndex(details.size() + 1)
+                    .chunkId(chunkId)
+                    .documentId(chunk.getDocument() == null ? null : chunk.getDocument().getId())
+                    .documentTitle(chunk.getDocument() == null ? null : chunk.getDocument().getTitle())
+                    .sectionPath(chunk.getSectionPath())
+                    .pageFrom(chunk.getPageFrom())
+                    .pageTo(chunk.getPageTo())
+                    .chunkType(chunk.getChunkType())
+                    .charStart(metadataInt(chunk.getMetadataJsonb(), "charStart"))
+                    .charEnd(metadataInt(chunk.getMetadataJsonb(), "charEnd"))
+                    .snippet(snippet(chunk.getContent()))
+                    .build());
+        }
+        return details;
+    }
+
+    private Integer metadataInt(Map<String, Object> metadata, String key) {
+        if (metadata == null || !metadata.containsKey(key)) {
+            return null;
+        }
+        Object value = metadata.get(key);
+        if (value instanceof Number number) {
+            return number.intValue();
+        }
+        if (value instanceof String stringValue && stringValue.matches("-?\\d+")) {
+            return Integer.parseInt(stringValue);
+        }
+        return null;
+    }
+
+    private String snippet(String content) {
+        if (content == null || content.isBlank()) {
+            return "";
+        }
+        String normalized = content.replaceAll("\\s+", " ").trim();
+        if (normalized.length() <= 320) {
+            return normalized;
+        }
+        return normalized.substring(0, 317) + "...";
+    }
+}

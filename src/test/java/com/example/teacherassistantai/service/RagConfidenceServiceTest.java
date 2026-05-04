@@ -40,5 +40,26 @@ class RagConfidenceServiceTest {
 
         assertTrue(withCitation > withoutCitation);
     }
-}
 
+    @Test
+    void score_shouldIncreaseWhenAnswerContainsSourceIndexCitation() {
+        DocumentChunk chunk = DocumentChunk.builder()
+                .content("Vat chat la pham tru triet hoc dung de chi thuc tai khach quan")
+                .build();
+        chunk.setId(89L);
+
+        double withoutCitation = service.score(
+                "Vat chat la gi",
+                List.of(chunk),
+                "Vat chat la pham tru triet hoc dung de chi thuc tai khach quan"
+        );
+
+        double withCitation = service.score(
+                "Vat chat la gi",
+                List.of(chunk),
+                "Vat chat la pham tru triet hoc dung de chi thuc tai khach quan [Source 1, pages 12-13]"
+        );
+
+        assertTrue(withCitation > withoutCitation);
+    }
+}

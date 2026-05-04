@@ -41,12 +41,32 @@ public class DocumentChunk extends BaseEntity {
     @Column(name = "subject_id", nullable = false)
     Long subjectId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "node_id")
+    DocumentNode node;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_node_id")
+    DocumentNode parentNode;
+
     @Column(nullable = false)
     Integer chunkIndex; // Thứ tự chunk trong document
+
+    @Column(name = "source_order")
+    Integer sourceOrder;
 
     @Column(length = 20, nullable = false)
     @Builder.Default
     String chunkType = "TEXT";
+
+    @Column(name = "section_path", columnDefinition = "TEXT")
+    String sectionPath;
+
+    @Column(name = "page_from")
+    Integer pageFrom;
+
+    @Column(name = "page_to")
+    Integer pageTo;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     String content; // Nội dung đoạn văn bản

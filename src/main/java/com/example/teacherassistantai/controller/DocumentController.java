@@ -3,7 +3,11 @@ package com.example.teacherassistantai.controller;
 import com.example.teacherassistantai.common.enumerate.DocumentStatus;
 import com.example.teacherassistantai.common.response.PageResponse;
 import com.example.teacherassistantai.common.response.ResponseData;
+import com.example.teacherassistantai.dto.response.DocumentChunkDebugResponse;
+import com.example.teacherassistantai.dto.response.DocumentHierarchyDebugResponse;
+import com.example.teacherassistantai.dto.response.DocumentNodeDebugResponse;
 import com.example.teacherassistantai.dto.response.DocumentResponse;
+import com.example.teacherassistantai.service.DocumentDebugService;
 import com.example.teacherassistantai.service.DocumentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,6 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class DocumentController {
 
     private final DocumentService documentService;
+    private final DocumentDebugService documentDebugService;
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
@@ -70,5 +75,29 @@ public class DocumentController {
         documentService.deleteDocumentById(documentId);
         return new ResponseData<>(HttpStatus.OK.value(), "Document deleted");
     }
-}
 
+    @GetMapping("/{documentId}/hierarchy")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
+    @Operation(summary = "Debug document hierarchy", description = "Return document hierarchy tree persisted in document_nodes")
+    public ResponseData<DocumentHierarchyDebugResponse> getDocumentHierarchy(@PathVariable @Min(1) Long documentId) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Document hierarchy",
+                documentDebugService.getHierarchy(documentId));
+    }
+
+    @GetMapping("/{documentId}/nodes")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
+    @Operation(summary = "Debug document nodes", description = "Return flat document_nodes ordered by source order")
+    public ResponseData<java.util.List<DocumentNodeDebugResponse>> getDocumentNodes(@PathVariable @Min(1) Long documentId) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Document nodes",
+                documentDebugService.getNodes(documentId));
+    }
+
+    @GetMapping("/{documentId}/chunks")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
+    @Operation(summary = "Debug document chunks", description = "Return document_chunks with hierarchy metadata")
+    public ResponseData<java.util.List<DocumentChunkDebugResponse>> getDocumentChunks(@PathVariable @Min(1) Long documentId,
+                                                                                     @RequestParam(required = false) String type) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Document chunks",
+                documentDebugService.getChunks(documentId, type));
+    }
+}

@@ -6,7 +6,6 @@ import com.example.teacherassistantai.entity.Document;
 import com.example.teacherassistantai.integration.minio.MinioChannel;
 import com.example.teacherassistantai.integration.minio.MinioProps;
 import com.example.teacherassistantai.integration.tika.TikaMarkdownParser;
-import com.example.teacherassistantai.repository.DocumentChunkRepository;
 import com.example.teacherassistantai.repository.DocumentRepository;
 import io.minio.GetObjectResponse;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +31,8 @@ public class DocumentProcessingService {
     private final TikaMarkdownParser tikaMarkdownParser;
     private final DocumentChunkIngestionService documentChunkIngestionService;
     private final DocumentHierarchyArtifactService documentHierarchyArtifactService;
+    private final DocumentHierarchyArtifactValidationService documentHierarchyArtifactValidationService;
+    private final DocumentHierarchyPersistenceService documentHierarchyPersistenceService;
 
     @Async("documentProcessingExecutor")
     public void processDocumentAsync(Long documentId) {
@@ -62,19 +63,34 @@ public class DocumentProcessingService {
         document.setChunksObjectKey(chunksObjectKey);
         DocumentHierarchyArtifactService.Artifacts artifacts =
                 documentHierarchyArtifactService.buildArtifacts(document, cleanedMarkdown);
+        DocumentHierarchyArtifactValidationService.ValidationReport validationReport =
+                documentHierarchyArtifactValidationService.validate(document, artifacts);
+        log.info("Validated hierarchy artifacts: documentId={}, warnings={}",
+                documentId, validationReport.warningCount());
 
         uploadArtifact(markdownObjectKey, document.getTitle(), "text/markdown", artifacts.normalizedMarkdown());
         uploadArtifact(hierarchyObjectKey, document.getTitle(), "application/json", artifacts.hierarchyJson());
         uploadArtifact(chunksObjectKey, document.getTitle(), "application/x-ndjson", artifacts.chunksJsonl());
 
-//        // Keep skeleton flow explicit so status transitions are visible in DB.
-//        document.setStatus(DocumentStatus.CHUNKING);
-//        documentRepository.save(document);
-//
-//        documentChunkIngestionService.ingest(document, artifacts.normalizedMarkdown());
-//
-//        document.setStatus(DocumentStatus.EMBEDDING);
-//        documentRepository.save(document);
+        document.setStatus(DocumentStatus.CHUNKING);
+        documentRepository.save(document);
+
+        documentChunkIngestionService.deleteExistingChunks(documentId);
+        DocumentHierarchyPersistenceService.HierarchyPersistenceResult persistenceResult =
+                documentHierarchyPersistenceService.persist(document, artifacts.hierarchyDocument());
+        log.info("Persisted document hierarchy nodes: documentId={}, nodeCount={}",
+                documentId, persistenceResult.nodes().size());
+
+        document.setStatus(DocumentStatus.EMBEDDING);
+        documentRepository.save(document);
+
+        var chunks = documentChunkIngestionService.ingest(
+                document,
+                artifacts.hierarchyDocument(),
+                persistenceResult.nodeByKey()
+        );
+        log.info("Persisted document hierarchical chunks and embeddings: documentId={}, chunkCount={}",
+                documentId, chunks.size());
 
         document.setStatus(DocumentStatus.READY);
         documentRepository.save(document);

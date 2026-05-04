@@ -3,6 +3,7 @@ package com.example.teacherassistantai.service;
 import com.example.teacherassistantai.config.RagProperties;
 import com.example.teacherassistantai.entity.Document;
 import com.example.teacherassistantai.entity.DocumentChunk;
+import com.example.teacherassistantai.entity.DocumentNode;
 import com.example.teacherassistantai.exception.InvalidDataException;
 import com.example.teacherassistantai.integration.gemini.GeminiEmbeddingGateway;
 import com.example.teacherassistantai.repository.DocumentChunkRepository;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -25,17 +27,34 @@ public class DocumentChunkIngestionService {
 
     @Transactional
     public List<DocumentChunk> ingest(Document document, String markdown) {
-        List<HierarchicalMarkdownChunk> chunks = markdownChunkingService.chunkHierarchical(markdown);
+        MarkdownChunkingService.HierarchicalMarkdownDocument hierarchyDocument =
+                markdownChunkingService.parseHierarchicalDocument(markdown);
+        return ingest(document, hierarchyDocument, Map.of());
+    }
+
+    @Transactional
+    public List<DocumentChunk> ingest(Document document,
+                                      MarkdownChunkingService.HierarchicalMarkdownDocument hierarchyDocument,
+                                      Map<String, DocumentNode> nodeByKey) {
+        List<HierarchicalMarkdownChunk> chunks = hierarchyDocument.chunks();
         List<DocumentChunk> persisted = new ArrayList<>();
 
         for (int i = 0; i < chunks.size(); i++) {
             HierarchicalMarkdownChunk hierarchicalChunk = chunks.get(i);
             String content = hierarchicalChunk.content();
+            DocumentNode node = resolveNode(nodeByKey, hierarchicalChunk.nodeId(), "nodeId");
+            DocumentNode parentNode = resolveNode(nodeByKey, hierarchicalChunk.parentNodeId(), "parentNodeId");
             DocumentChunk chunk = DocumentChunk.builder()
                     .document(document)
                     .subjectId(document.getSubject().getId())
+                    .node(node)
+                    .parentNode(parentNode)
                     .chunkIndex(i + 1)
+                    .sourceOrder(i + 1)
                     .chunkType(hierarchicalChunk.chunkType())
+                    .sectionPath(String.join(" > ", hierarchicalChunk.breadcrumb()))
+                    .pageFrom(hierarchicalChunk.pageFrom())
+                    .pageTo(hierarchicalChunk.pageTo())
                     .content(content)
                     .tokenCount(Math.max(1, content.length() / 4))
                     .metadataJsonb(chunkMetadataBuilder.buildHierarchicalJsonb(
@@ -61,6 +80,27 @@ public class DocumentChunkIngestionService {
         }
 
         return persisted;
+    }
+
+    @Transactional
+    public void deleteExistingChunks(Long documentId) {
+        documentChunkRepository.deleteMessageSourceLinksByDocumentId(documentId);
+        documentChunkRepository.deleteByDocumentId(documentId);
+    }
+
+    private DocumentNode resolveNode(Map<String, DocumentNode> nodeByKey, String nodeKey, String fieldName) {
+        if (nodeKey == null || nodeKey.isBlank()) {
+            return null;
+        }
+        if (nodeByKey == null || nodeByKey.isEmpty()) {
+            return null;
+        }
+        DocumentNode node = nodeByKey.get(nodeKey);
+        if (node == null) {
+            throw new InvalidDataException("Cannot resolve %s '%s' to persisted document_nodes row"
+                    .formatted(fieldName, nodeKey));
+        }
+        return node;
     }
 
     private void validateEmbeddingDimensions(List<Double> embedding, Long chunkId) {

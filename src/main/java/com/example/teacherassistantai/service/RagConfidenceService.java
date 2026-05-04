@@ -38,8 +38,15 @@ public class RagConfidenceService {
             return 0.0;
         }
         int matched = 0;
-        for (DocumentChunk source : sources) {
-            if (source.getId() != null && answer.contains("[Chunk " + source.getId() + "]")) {
+        String normalizedAnswer = answer.toLowerCase();
+        for (int i = 0; i < sources.size(); i++) {
+            DocumentChunk source = sources.get(i);
+            int sourceIndex = i + 1;
+            boolean sourceCitationMatched = normalizedAnswer.contains("[source " + sourceIndex)
+                    || normalizedAnswer.contains("source " + sourceIndex);
+            boolean legacyChunkCitationMatched = source.getId() != null
+                    && answer.contains("[Chunk " + source.getId() + "]");
+            if (sourceCitationMatched || legacyChunkCitationMatched) {
                 matched++;
             }
         }
@@ -94,4 +101,3 @@ public class RagConfidenceService {
         return tokens;
     }
 }
-

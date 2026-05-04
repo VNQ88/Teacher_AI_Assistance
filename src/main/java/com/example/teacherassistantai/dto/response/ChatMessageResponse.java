@@ -41,7 +41,9 @@ public class ChatMessageResponse {
     @ArraySchema(schema = @Schema(description = "Distinct document titles used as grounding sources", example = "Giao trinh Vat Ly 10 - Chuong 2"))
     private List<String> sources;
 
+    @ArraySchema(schema = @Schema(description = "Detailed source chunks with page/path metadata for citations"))
+    private List<SourceChunkResponse> sourceDetails;
+
     @Schema(description = "Message creation timestamp", example = "2026-04-12T14:32:10")
     private LocalDateTime createdAt;
 }
-

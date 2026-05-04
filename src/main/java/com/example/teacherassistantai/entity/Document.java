@@ -83,4 +83,8 @@ public class Document extends BaseEntity {
     @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     List<DocumentChunk> chunks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    List<DocumentNode> nodes = new ArrayList<>();
 }
