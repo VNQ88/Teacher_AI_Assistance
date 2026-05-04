@@ -7,7 +7,7 @@ import com.example.teacherassistantai.entity.Document;
 import com.example.teacherassistantai.entity.DocumentChunk;
 import com.example.teacherassistantai.entity.Subject;
 import com.example.teacherassistantai.entity.User;
-import com.example.teacherassistantai.integration.gemini.GeminiEmbeddingGateway;
+import com.example.teacherassistantai.integration.ai.AiEmbeddingGateway;
 import com.example.teacherassistantai.repository.DocumentRepository;
 import com.example.teacherassistantai.repository.SubjectRepository;
 import com.example.teacherassistantai.repository.UserRepository;
@@ -125,13 +125,18 @@ class DocumentChunkIngestionServiceMetadataJsonbIntegrationTest {
 
         @Bean
         @Primary
-        GeminiEmbeddingGateway geminiEmbeddingGateway() {
-            return new GeminiEmbeddingGateway(null, null) {
+        AiEmbeddingGateway aiEmbeddingGateway() {
+            return new AiEmbeddingGateway() {
                 @Override
                 public List<Double> embed(String input) {
-                    return IntStream.range(0, 3072)
+                    return IntStream.range(0, 1024)
                             .mapToObj(i -> 0.01d)
                             .toList();
+                }
+
+                @Override
+                public String embeddingModel() {
+                    return "qwen3-embedding-0.6b";
                 }
             };
         }
@@ -140,7 +145,7 @@ class DocumentChunkIngestionServiceMetadataJsonbIntegrationTest {
         @Primary
         RagProperties ragProperties() {
             RagProperties properties = new RagProperties();
-            properties.setEmbeddingDimensions(3072);
+            properties.setEmbeddingDimensions(1024);
             return properties;
         }
 

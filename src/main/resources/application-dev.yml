@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/ai_teaching_assistant
-    username: postgres
-    password: postgres
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
@@ -22,11 +22,11 @@ spring:
   liquibase:
     enabled: false
   mail:
-    from: teacherassistant@gmail.com
-    host: smtp.gmail.com
-    port: 587
-    username: vuong251103
-    password: jutwhpgimrzpzrwo
+    from: ${MAIL_FROM}
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -40,8 +40,8 @@ spring:
           writetimeout: 5000
   data:
     redis:
-      host: localhost
-      port: 6380
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
   cache:
     type: redis
     redis:
@@ -49,18 +49,18 @@ spring:
       cache-null-values: false
   ai:
     openai:
-      api-key: AIzaSyAMaqP-4fvjDFNDy9pUficpyWIeQ50YqOw
+      api-key: ${DIGITALOCEAN_MODEL_ACCESS_KEY}
       chat:
-        base-url: https://generativelanguage.googleapis.com
-        completions-path: /v1beta/openai/chat/completions
+        base-url: ${DIGITALOCEAN_BASE_URL}
+        completions-path: /v1/chat/completions
         options:
-          model: gemini-3.1-flash-lite-preview
+          model: ${DIGITALOCEAN_CHAT_MODEL}
           temperature: 0.2
       embedding:
-        base-url: https://generativelanguage.googleapis.com
-        embeddings-path: /v1beta/openai/embeddings
+        base-url: ${DIGITALOCEAN_BASE_URL}
+        embeddings-path: /v1/embeddings
         options:
-          model: gemini-embedding-2-preview
+          model: ${DIGITALOCEAN_EMBEDDING_MODEL}
     chat:
       memory:
         repository:
@@ -73,28 +73,28 @@ spring:
 
 application:
   encryption:
-    key: 8q9xAmcT1zD4Y5k6P7sA9d2f4g6h8jK1
+    key: ${APP_ENCRYPTION_KEY}
   jwt:
-    signer-key: RGTpEo990czwgYq+8gfA5Z56nVJcjQi25cPKtaJ+hapof7rMtBoZkat9pkqdvWpv
+    signer-key: ${JWT_SECRET_KEY}
     valid-duration: 36000 # in seconds
     refreshable-duration: 360000 # in seconds
   mailing:
     front-end:
       verification-code-length: 6
       verification-code-expiration-minutes: 2 # in minutes
-      activation-url: http://localhost:4200/activate-account
+      activation-url: ${MAIL_ACTIVATION_URL}
   minio:
-    endpoint: http://localhost:9100
-    server-url: http://localhost:9100
-    access-key: minio
-    secret-key: minio123
-    bucket: resources
+    endpoint: ${MINIO_ENDPOINT}
+    server-url: ${MINIO_SERVER_URL}
+    access-key: ${MINIO_ROOT_USER}
+    secret-key: ${MINIO_ROOT_PASSWORD}
+    bucket: ${MINIO_BUCKET}
     key-prefix: uploads/
     presign-expiry-seconds: 7200 # in seconds
     make-bucket-public: false
   google:
     oauth2:
-      client-id: 1029043302518-qpl0getluhhvmlt87f49j8jkj1fqdmqk.apps.googleusercontent.com
+      client-id: ${GOOGLE_CLIENT_ID}
   document:
     max-docx-bytes: 102400
     max-txt-bytes: 102400
@@ -105,13 +105,12 @@ application:
     max-top-k: 8
     candidate-top-k: 24
     min-chunk-chars: 40
-    embedding-dimensions: 3072
+    embedding-dimensions: 1024
     max-history-messages: 5
-    gemini:
-      api-key: AIzaSyAMaqP-4fvjDFNDy9pUficpyWIeQ50YqOw
-      base-url: https://generativelanguage.googleapis.com
-      llm-model: gemini-3.1-flash-lite-preview
-      embedding-model: gemini-embedding-2-preview
+    ai:
+      base-url: ${DIGITALOCEAN_BASE_URL}
+      chat-model: ${DIGITALOCEAN_CHAT_MODEL}
+      embedding-model: ${DIGITALOCEAN_EMBEDDING_MODEL}
       timeout-seconds: 60
 
 logging:

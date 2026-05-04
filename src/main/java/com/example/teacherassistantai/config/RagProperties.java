@@ -26,26 +26,23 @@ public class RagProperties {
     private int minChunkChars = 40;
 
     @Min(1)
-    private int embeddingDimensions = 3072;
+    private int embeddingDimensions = 1024;
 
     @Min(1)
     private int maxHistoryMessages = 5;
 
-    private Gemini gemini = new Gemini();
+    private Ai ai = new Ai();
 
     @Data
-    public static class Gemini {
+    public static class Ai {
         @NotBlank
-        private String apiKey = "";
+        private String baseUrl = "https://inference.do-ai.run";
 
         @NotBlank
-        private String baseUrl = "https://generativelanguage.googleapis.com";
+        private String chatModel = "openai-gpt-oss-120b";
 
         @NotBlank
-        private String llmModel = "gemini-3.1-flash-lite";
-
-        @NotBlank
-        private String embeddingModel = "gemini-embedding-2";
+        private String embeddingModel = "qwen3-embedding-0.6b";
 
         @Min(1)
         private int timeoutSeconds = 60;

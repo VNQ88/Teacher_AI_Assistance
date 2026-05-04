@@ -55,13 +55,13 @@
 │  │  │  │  │classes    │  │  │  └────┬─────┘ │               │    │
 │  │  │  │  └───────────┘  │  │       │       │               │    │
 │  │  │  └─────────────────┘  │  ┌────▼─────┐ │               │    │
-│  │  │                       │  │GPT-4 Gen │ │               │    │
+│  │  │                       │  │DO Chat  │ │               │    │
 │  │  │  ┌─────────────────┐ │  └──────────┘ │               │    │
 │  │  │  │ Question Gen    │ └───────────────┘               │    │
 │  │  │  │ Agent           │                                  │    │
 │  │  │  │ ┌─────────────┐ │                                  │    │
 │  │  │  │ │Extract chunks│ │                                  │    │
-│  │  │  │ │GPT-4 generate│ │                                  │    │
+│  │  │  │ │DigitalOcean chat generate│ │                                  │    │
 │  │  │  │ │questions     │ │                                  │    │
 │  │  │  │ └─────────────┘ │                                  │    │
 │  │  │  └─────────────────┘                                  │    │
@@ -70,9 +70,9 @@
 │  │  ┌───────────────────────────────────────────────────┐  │    │
 │  │  │          INTEGRATION SERVICES                      │  │    │
 │  │  │  ┌──────────┐ ┌──────────┐ ┌──────────┐          │  │    │
-│  │  │  │ OpenAI   │ │  MinIO   │ │  Redis   │          │  │    │
+│  │  │  │ AI       │ │  MinIO   │ │  Redis   │          │  │    │
 │  │  │  │ Service  │ │ Service  │ │ Service  │          │  │    │
-│  │  │  │(Embed+GPT│ │ (Storage)│ │ (Cache)  │          │  │    │
+│  │  │  │(DO API  │ │ (Storage)│ │ (Cache)  │          │  │    │
 │  │  │  └──────────┘ └──────────┘ └──────────┘          │  │    │
 │  │  └───────────────────────────────────────────────────┘  │    │
 │  │                                                           │    │
@@ -109,11 +109,11 @@
 ┌──────────▼───────────────────────▼────────────────────────────────┐
 │                      EXTERNAL SERVICES                             │
 │  ┌──────────────────────────────────────────────────────────┐    │
-│  │                    OpenAI API                             │    │
+│  │                    DigitalOcean Serverless Inference                             │    │
 │  │  ┌────────────────────┐  ┌─────────────────────────┐    │    │
-│  │  │ text-embedding-    │  │    GPT-4 / GPT-3.5      │    │    │
-│  │  │    ada-002         │  │  (Chat Completion)      │    │    │
-│  │  │  (1536 dims)       │  │                         │    │    │
+│  │  │ qwen3-embedding-    │  │    openai-gpt-oss-120b      │    │    │
+│  │  │    0.6b            │  │  (Chat Completion)      │    │    │
+│  │  │  (1024 dims)       │  │                         │    │    │
 │  │  └────────────────────┘  └─────────────────────────┘    │    │
 │  └──────────────────────────────────────────────────────────┘    │
 └───────────────────────────────────────────────────────────────────┘
@@ -167,10 +167,10 @@
        │
        ▼
 ┌────────────────────┐
-│ 4. Generate        │ ──► OpenAI API
-│    embeddings      │     text-embedding-ada-002
+│ 4. Generate        │ ──► DigitalOcean Serverless Inference
+│    embeddings      │     qwen3-embedding-0.6b
 │    (batch)         │     Input: List<String>
-└──────┬─────────────┘     Output: List<float[1536]>
+└──────┬─────────────┘     Output: List<float[1024]>
        │
        ▼
 ┌────────────────────┐
@@ -216,7 +216,7 @@
                                     ▼
                              ┌──────────────────┐
                              │ 1. Embed query   │
-                             │    via OpenAI    │
+                             │    via DigitalOcean    │
                              └────┬─────────────┘
                                   │
                                   ▼
@@ -239,7 +239,7 @@
                                   │
                                   ▼
                              ┌──────────────────────┐
-                             │ 4. GPT-4 generate    │
+                             │ 4. DigitalOcean chat generate    │
                              │    answer            │
                              │    Prompt:           │
                              │    - System: "You    │
@@ -294,7 +294,7 @@
        ▼
 ┌──────────────────────┐
 │ 3. For each chunk:   │
-│    Call GPT-4 with   │
+│    Call DigitalOcean chat with   │
 │    prompt:           │
 │    "Generate 2 MCQ   │
 │     questions from   │
@@ -408,7 +408,7 @@ document_chunks (
     subject_id,     -- IMPORTANT: for filtering
     chunk_index, 
     content, 
-    embedding vector(1536),  -- pgvector
+    embedding vector(1024),  -- pgvector, qwen3-embedding-0.6b
     metadata
 )
 
@@ -490,7 +490,7 @@ agent_logs (
 | **pgvector** | Vector database | Embedded in PostgreSQL, no separate DB needed |
 | **Liquibase** | Database migration | Version control for database schema |
 | **Hibernate/JPA** | ORM | Simplify database operations |
-| **OpenAI API** | AI services | Best-in-class embeddings & LLM |
+| **DigitalOcean Serverless Inference** | AI services | Best-in-class embeddings & LLM |
 | **MinIO** | File storage | S3-compatible object storage |
 | **Redis** | Caching | Fast cache for frequent queries |
 | **Spring Security** | Authentication | JWT-based auth |
@@ -612,4 +612,3 @@ agent_logs (
 ---
 
 This architecture provides a scalable, maintainable foundation for your Multi-Agent Teaching Assistant system! 🎓✨
-

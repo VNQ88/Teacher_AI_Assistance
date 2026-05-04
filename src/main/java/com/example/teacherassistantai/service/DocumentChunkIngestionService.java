@@ -5,7 +5,7 @@ import com.example.teacherassistantai.entity.Document;
 import com.example.teacherassistantai.entity.DocumentChunk;
 import com.example.teacherassistantai.entity.DocumentNode;
 import com.example.teacherassistantai.exception.InvalidDataException;
-import com.example.teacherassistantai.integration.gemini.GeminiEmbeddingGateway;
+import com.example.teacherassistantai.integration.ai.AiEmbeddingGateway;
 import com.example.teacherassistantai.repository.DocumentChunkRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ public class DocumentChunkIngestionService {
 
     private final MarkdownChunkingService markdownChunkingService;
     private final ChunkMetadataBuilder chunkMetadataBuilder;
-    private final GeminiEmbeddingGateway embeddingGateway;
+    private final AiEmbeddingGateway embeddingGateway;
     private final DocumentChunkRepository documentChunkRepository;
     private final RagProperties ragProperties;
 

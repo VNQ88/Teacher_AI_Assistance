@@ -27,6 +27,23 @@ public interface DocumentChunkRepository extends JpaRepository<DocumentChunk, Lo
     List<DocumentChunk> findByDocumentIdAndParentNodeIdInOrderBySourceOrderAsc(Long documentId, List<Long> parentNodeIds);
 
     @Query(value = """
+            WITH RECURSIVE node_tree AS (
+                SELECT id
+                FROM document_nodes
+                WHERE id = :rootNodeId
+                UNION ALL
+                SELECT child.id
+                FROM document_nodes child
+                JOIN node_tree parent ON child.parent_id = parent.id
+            )
+            SELECT dc.*
+            FROM document_chunks dc
+            WHERE dc.node_id IN (SELECT id FROM node_tree)
+            ORDER BY COALESCE(dc.source_order, dc.chunk_index, 2147483647), dc.id
+            """, nativeQuery = true)
+    List<DocumentChunk> findScopeChunksByRootNodeId(@Param("rootNodeId") Long rootNodeId);
+
+    @Query(value = """
             SELECT *
             FROM document_chunks dc
             WHERE dc.subject_id = :subjectId
@@ -55,7 +72,7 @@ public interface DocumentChunkRepository extends JpaRepository<DocumentChunk, Lo
               AND dc.metadata_jsonb IS NOT NULL
               AND (dc.metadata_jsonb ->> 'charCount') ~ '^[0-9]+$'
               AND ((dc.metadata_jsonb ->> 'charCount')::int) >= :minCharCount
-            ORDER BY dc.embedding <=> CAST(:queryEmbedding AS halfvec)
+            ORDER BY dc.embedding <=> CAST(:queryEmbedding AS vector)
             LIMIT :candidateTopK
             """, nativeQuery = true)
     List<DocumentChunk> searchBySubjectVector(@Param("subjectId") Long subjectId,
@@ -66,7 +83,7 @@ public interface DocumentChunkRepository extends JpaRepository<DocumentChunk, Lo
 
     @Query(value = """
             UPDATE document_chunks
-            SET embedding = CAST(:embedding AS halfvec)
+            SET embedding = CAST(:embedding AS vector)
             WHERE id = :chunkId
             """, nativeQuery = true)
     @org.springframework.data.jpa.repository.Modifying

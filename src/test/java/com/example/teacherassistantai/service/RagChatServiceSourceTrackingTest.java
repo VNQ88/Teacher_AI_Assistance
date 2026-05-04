@@ -12,7 +12,7 @@ import com.example.teacherassistantai.entity.Document;
 import com.example.teacherassistantai.entity.DocumentChunk;
 import com.example.teacherassistantai.entity.Subject;
 import com.example.teacherassistantai.entity.User;
-import com.example.teacherassistantai.integration.gemini.GeminiChatGateway;
+import com.example.teacherassistantai.integration.ai.AiChatGateway;
 import com.example.teacherassistantai.repository.AgentLogRepository;
 import com.example.teacherassistantai.repository.ChatMessageRepository;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ class RagChatServiceSourceTrackingTest {
         VectorRetrievalService retrievalService = mock(VectorRetrievalService.class);
         RagPromptBuilderService promptBuilderService = mock(RagPromptBuilderService.class);
         RagConfidenceService confidenceService = mock(RagConfidenceService.class);
-        GeminiChatGateway geminiChatGateway = mock(GeminiChatGateway.class);
+        AiChatGateway aiChatGateway = mock(AiChatGateway.class);
         AgentLogRepository agentLogRepository = mock(AgentLogRepository.class);
 
         RagProperties ragProperties = new RagProperties();
@@ -51,7 +51,7 @@ class RagChatServiceSourceTrackingTest {
                 retrievalService,
                 promptBuilderService,
                 confidenceService,
-                geminiChatGateway,
+                aiChatGateway,
                 agentLogRepository,
                 ragProperties
         );
@@ -75,7 +75,7 @@ class RagChatServiceSourceTrackingTest {
                 .thenReturn(new PageImpl<>(List.of()));
         when(retrievalService.retrieve(session, request.getQuestion(), 1)).thenReturn(List.of(source));
         when(promptBuilderService.buildPrompt(anyString(), anyList(), anyList())).thenReturn("prompt");
-        when(geminiChatGateway.generateAnswer(anyString(), anyDouble()))
+        when(aiChatGateway.generateAnswer(anyString(), anyDouble()))
                 .thenReturn("Vật chất là ... [Source 1, pages 12-13]");
         when(confidenceService.score(anyString(), anyList(), anyString())).thenReturn(0.82);
         when(confidenceService.level(0.82)).thenReturn("HIGH");
@@ -107,7 +107,7 @@ class RagChatServiceSourceTrackingTest {
                 mock(VectorRetrievalService.class),
                 mock(RagPromptBuilderService.class),
                 mock(RagConfidenceService.class),
-                mock(GeminiChatGateway.class),
+                mock(AiChatGateway.class),
                 mock(AgentLogRepository.class),
                 new RagProperties()
         );

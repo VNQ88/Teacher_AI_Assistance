@@ -5,6 +5,7 @@ public enum DocumentStatus {
     PARSING,      // Đang parse nội dung thô
     CHUNKING,     // Đang chia chunk
     EMBEDDING,    // Đang tạo embedding
-    READY,        // Sẵn sàng dùng cho RAG
+    READY,        // Sẵn sàng hỏi đáp RAG
+    FULL_USE,     // Sẵn sàng đầy đủ summary/câu hỏi
     FAILED        // Xử lý lỗi
 }

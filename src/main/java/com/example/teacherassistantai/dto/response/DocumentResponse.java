@@ -1,6 +1,7 @@
 package com.example.teacherassistantai.dto.response;
 
 import com.example.teacherassistantai.common.enumerate.DocumentStatus;
+import com.example.teacherassistantai.common.enumerate.DocumentEnrichmentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,7 +28,15 @@ public class DocumentResponse {
     private String hierarchyObjectKey;
     private String chunksObjectKey;
     private DocumentStatus status;
+    private String statusLabel;
+    private DocumentEnrichmentStatus enrichmentStatus;
+    private String enrichmentStatusLabel;
+    private Boolean ragReady;
+    private Boolean learningMaterialsReady;
     private String processingError;
+    private String enrichmentError;
+    private LocalDateTime enrichmentStartedAt;
+    private LocalDateTime enrichmentCompletedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

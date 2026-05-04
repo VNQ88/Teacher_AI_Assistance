@@ -5,7 +5,7 @@ import com.example.teacherassistantai.entity.Document;
 import com.example.teacherassistantai.entity.DocumentChunk;
 import com.example.teacherassistantai.entity.DocumentNode;
 import com.example.teacherassistantai.entity.Subject;
-import com.example.teacherassistantai.integration.gemini.GeminiEmbeddingGateway;
+import com.example.teacherassistantai.integration.ai.AiEmbeddingGateway;
 import com.example.teacherassistantai.repository.DocumentChunkRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -32,7 +32,7 @@ class DocumentChunkIngestionServiceHierarchyTest {
             return chunk;
         }).when(chunkRepository).save(any(DocumentChunk.class));
 
-        GeminiEmbeddingGateway embeddingGateway = mock(GeminiEmbeddingGateway.class);
+        AiEmbeddingGateway embeddingGateway = mock(AiEmbeddingGateway.class);
         org.mockito.Mockito.when(embeddingGateway.embed(any()))
                 .thenReturn(IntStream.range(0, 4).mapToObj(i -> 0.1d).toList());
 

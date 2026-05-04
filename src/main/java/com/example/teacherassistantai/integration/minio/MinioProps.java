@@ -3,8 +3,10 @@ package com.example.teacherassistantai.integration.minio;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 @Data
+@Validated
 @ConfigurationProperties(prefix = "application.minio")
 public class MinioProps {
 
@@ -36,4 +38,3 @@ public class MinioProps {
      */
     private boolean makeBucketPublic = false;
 }
-

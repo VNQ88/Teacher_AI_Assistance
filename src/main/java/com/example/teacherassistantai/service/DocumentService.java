@@ -1,6 +1,7 @@
 package com.example.teacherassistantai.service;
 
 import com.example.teacherassistantai.common.enumerate.DocumentStatus;
+import com.example.teacherassistantai.common.enumerate.DocumentEnrichmentStatus;
 import com.example.teacherassistantai.common.response.PageResponse;
 import com.example.teacherassistantai.config.DocumentIngestionProps;
 import com.example.teacherassistantai.dto.response.DocumentResponse;
@@ -267,9 +268,52 @@ public class DocumentService {
                 .hierarchyObjectKey(document.getHierarchyObjectKey())
                 .chunksObjectKey(document.getChunksObjectKey())
                 .status(document.getStatus())
+                .statusLabel(statusLabel(document.getStatus()))
+                .enrichmentStatus(document.getEnrichmentStatus())
+                .enrichmentStatusLabel(enrichmentStatusLabel(document.getEnrichmentStatus()))
+                .ragReady(isRagReady(document.getStatus()))
+                .learningMaterialsReady(document.getStatus() == DocumentStatus.FULL_USE
+                        && document.getEnrichmentStatus() == DocumentEnrichmentStatus.ENRICHED)
                 .processingError(document.getProcessingError())
+                .enrichmentError(document.getEnrichmentError())
+                .enrichmentStartedAt(document.getEnrichmentStartedAt())
+                .enrichmentCompletedAt(document.getEnrichmentCompletedAt())
                 .createdAt(document.getCreatedAt())
                 .updatedAt(document.getUpdatedAt())
                 .build();
+    }
+
+    private boolean isRagReady(DocumentStatus status) {
+        return status == DocumentStatus.READY || status == DocumentStatus.FULL_USE;
+    }
+
+    private String statusLabel(DocumentStatus status) {
+        if (status == null) {
+            return null;
+        }
+        return switch (status) {
+            case UPLOADED -> "Đã tải lên";
+            case PARSING -> "Đang đọc";
+            case CHUNKING -> "Đang chia đoạn";
+            case EMBEDDING -> "Đang lập chỉ mục";
+            case READY -> "Sẵn sàng hỏi đáp";
+            case FULL_USE -> "Đủ học liệu";
+            case FAILED -> "Lỗi xử lý";
+        };
+    }
+
+    private String enrichmentStatusLabel(DocumentEnrichmentStatus status) {
+        if (status == null) {
+            return null;
+        }
+        return switch (status) {
+            case NOT_STARTED -> "Chưa tạo học liệu";
+            case QUEUED -> "Đang chờ";
+            case RUNNING -> "Đang tạo học liệu";
+            case ENRICHED -> "Đủ học liệu";
+            case PARTIAL_FAILED -> "Thiếu một phần";
+            case FAILED -> "Lỗi học liệu";
+            case SKIPPED -> "Đã bỏ qua";
+        };
     }
 }

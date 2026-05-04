@@ -1,18 +1,19 @@
-package com.example.teacherassistantai.integration.gemini;
+package com.example.teacherassistantai.integration.ai;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
-public class GeminiChatGateway {
+public class DigitalOceanChatGateway implements AiChatGateway {
 
     private final ChatClient chatClient;
 
-    public GeminiChatGateway(@Qualifier("geminiChatClient") ChatClient chatClient) {
+    public DigitalOceanChatGateway(@Qualifier("ragChatClient") ChatClient chatClient) {
         this.chatClient = chatClient;
     }
 
+    @Override
     public String generateAnswer(String prompt, Double temperature) {
         if (prompt == null || prompt.isBlank()) {
             return "Khong co cau hoi hop le.";

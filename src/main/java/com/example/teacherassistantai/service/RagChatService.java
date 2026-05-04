@@ -10,7 +10,7 @@ import com.example.teacherassistantai.entity.AgentLog;
 import com.example.teacherassistantai.entity.ChatMessage;
 import com.example.teacherassistantai.entity.ChatSession;
 import com.example.teacherassistantai.entity.DocumentChunk;
-import com.example.teacherassistantai.integration.gemini.GeminiChatGateway;
+import com.example.teacherassistantai.integration.ai.AiChatGateway;
 import com.example.teacherassistantai.repository.AgentLogRepository;
 import com.example.teacherassistantai.repository.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ public class RagChatService {
     private final VectorRetrievalService retrievalService;
     private final RagPromptBuilderService promptBuilderService;
     private final RagConfidenceService confidenceService;
-    private final GeminiChatGateway geminiChatGateway;
+    private final AiChatGateway aiChatGateway;
     private final AgentLogRepository agentLogRepository;
     private final RagProperties ragProperties;
 
@@ -57,7 +57,7 @@ public class RagChatService {
 
         List<ChatMessage> history = loadHistory(session.getId(), request.getQuestion(), ragProperties.getMaxHistoryMessages());
         String prompt = promptBuilderService.buildPrompt(request.getQuestion(), history, sources);
-        String answer = geminiChatGateway.generateAnswer(prompt, request.getTemperature());
+        String answer = aiChatGateway.generateAnswer(prompt, request.getTemperature());
 
         double confidenceScore = confidenceService.score(request.getQuestion(), sources, answer);
         String confidenceLevel = confidenceService.level(confidenceScore);

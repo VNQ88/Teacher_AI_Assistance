@@ -7,7 +7,7 @@ import com.example.teacherassistantai.entity.Document;
 import com.example.teacherassistantai.entity.DocumentChunk;
 import com.example.teacherassistantai.entity.DocumentNode;
 import com.example.teacherassistantai.entity.Subject;
-import com.example.teacherassistantai.integration.gemini.GeminiEmbeddingGateway;
+import com.example.teacherassistantai.integration.ai.AiEmbeddingGateway;
 import com.example.teacherassistantai.repository.DocumentChunkRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 class VectorRetrievalServiceTest {
 
     @Mock
-    private GeminiEmbeddingGateway embeddingGateway;
+    private AiEmbeddingGateway embeddingGateway;
 
     @Mock
     private DocumentChunkRepository documentChunkRepository;
@@ -45,13 +45,18 @@ class VectorRetrievalServiceTest {
         ragProperties.setMaxTopK(8);
         ragProperties.setCandidateTopK(24);
         ragProperties.setMinChunkChars(40);
-        ragProperties.setEmbeddingDimensions(3072);
-        service = new VectorRetrievalService(embeddingGateway, documentChunkRepository, ragProperties);
+        ragProperties.setEmbeddingDimensions(1024);
+        service = new VectorRetrievalService(
+                embeddingGateway,
+                documentChunkRepository,
+                ragProperties,
+                new LocalRerankingService()
+        );
     }
 
     @Test
     void retrieve_shouldPreferSectionMatchedChunk_andPassSectionFilterToRepository() {
-        when(embeddingGateway.embed(anyString())).thenReturn(vector3072());
+        when(embeddingGateway.embed(anyString())).thenReturn(vector1024());
 
         DocumentChunk chunkSection3 = DocumentChunk.builder()
                 .content("Phan 3 gioi thieu thi hien tai don.")
@@ -83,7 +88,7 @@ class VectorRetrievalServiceTest {
 
     @Test
     void retrieve_shouldDetectVietnameseAccentedSectionIntent() {
-        when(embeddingGateway.embed(anyString())).thenReturn(vector3072());
+        when(embeddingGateway.embed(anyString())).thenReturn(vector1024());
 
         DocumentChunk chunkSection2 = DocumentChunk.builder()
                 .content("Chương 2 trình bày khái niệm pháp luật.")
@@ -106,7 +111,7 @@ class VectorRetrievalServiceTest {
 
     @Test
     void retrieve_shouldExcludeReviewQuestionsForFactualQuestion_whenTextCandidatesExist() {
-        when(embeddingGateway.embed(anyString())).thenReturn(vector3072());
+        when(embeddingGateway.embed(anyString())).thenReturn(vector1024());
 
         DocumentChunk reviewChunk = chunk(201L, "REVIEW_QUESTIONS",
                 "Cau hoi on tap: Trinh bay khai niem nha nuoc?", null, 1, null);
@@ -124,7 +129,7 @@ class VectorRetrievalServiceTest {
 
     @Test
     void retrieve_shouldPreferReviewQuestionChunksForReviewIntent() {
-        when(embeddingGateway.embed(anyString())).thenReturn(vector3072());
+        when(embeddingGateway.embed(anyString())).thenReturn(vector1024());
 
         DocumentChunk textChunk = chunk(301L, "TEXT",
                 "Noi dung ly thuyet ve vat chat va y thuc.", null, 1, null);
@@ -142,7 +147,7 @@ class VectorRetrievalServiceTest {
 
     @Test
     void retrieve_shouldGroupByParentAndReturnSelectedChildrenInSourceOrder() {
-        when(embeddingGateway.embed(anyString())).thenReturn(vector3072());
+        when(embeddingGateway.embed(anyString())).thenReturn(vector1024());
 
         DocumentNode parent = DocumentNode.builder().nodeKey("n1").build();
         parent.setId(1L);
@@ -165,7 +170,7 @@ class VectorRetrievalServiceTest {
 
     @Test
     void debugRetrieve_shouldReturnCandidatesParentGroupsSelectedChunksAndPromptPreview() {
-        when(embeddingGateway.embed(anyString())).thenReturn(vector3072());
+        when(embeddingGateway.embed(anyString())).thenReturn(vector1024());
 
         Document document = Document.builder().title("Debug document").build();
         document.setId(9L);
@@ -190,8 +195,8 @@ class VectorRetrievalServiceTest {
         assertThat(response.getPromptContextPreview()).contains("Path: Chương 2 > I. Khái niệm");
     }
 
-    private List<Double> vector3072() {
-        return IntStream.range(0, 3072)
+    private List<Double> vector1024() {
+        return IntStream.range(0, 1024)
                 .mapToObj(i -> 0.01d)
                 .toList();
     }

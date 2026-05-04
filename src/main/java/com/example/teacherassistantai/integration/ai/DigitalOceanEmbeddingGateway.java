@@ -1,4 +1,4 @@
-package com.example.teacherassistantai.integration.gemini;
+package com.example.teacherassistantai.integration.ai;
 
 import com.example.teacherassistantai.config.RagProperties;
 import org.springframework.ai.embedding.EmbeddingModel;
@@ -8,17 +8,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class GeminiEmbeddingGateway {
+public class DigitalOceanEmbeddingGateway implements AiEmbeddingGateway {
 
     private final EmbeddingModel embeddingModel;
     private final RagProperties ragProperties;
 
-    public GeminiEmbeddingGateway(EmbeddingModel embeddingModel,
-                                  RagProperties ragProperties) {
+    public DigitalOceanEmbeddingGateway(EmbeddingModel embeddingModel,
+                                        RagProperties ragProperties) {
         this.embeddingModel = embeddingModel;
         this.ragProperties = ragProperties;
     }
 
+    @Override
     public List<Double> embed(String input) {
         if (input == null || input.isBlank()) {
             return List.of();
@@ -36,7 +37,8 @@ public class GeminiEmbeddingGateway {
         return values;
     }
 
+    @Override
     public String embeddingModel() {
-        return ragProperties.getGemini().getEmbeddingModel();
+        return ragProperties.getAi().getEmbeddingModel();
     }
 }

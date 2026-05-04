@@ -1,0 +1,3567 @@
+# Bài giảng Pháp luật đại cương Th.S Lê Thị Bích Ngọc
+
+HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG
+
+- - - - - - - - - - - - - -
+
+BÀI GIẢNG
+
+PHÁP LUẬT ĐẠI CƯƠNG
+
+Biên soạn : Ths. LÊ THỊ BÍCH NGỌC
+
+Lưu hành nội bộ
+
+HÀ NỘI - 2006
+
+<!-- page: 2 -->
+
+Lời nói đầu LỜI NÓI ĐẦU
+
+Đảng và nhà nước đã chủ trương tăng cường giáo dục pháp luật trong các trường đại học thông qua các chương trình môn học, giáo trình, tài liệu học tập đảm bảo đúng tinh thần và nội dung của Hiến pháp và pháp luật hiện hành. Thực hiện chủ trương đó tài liệu hướng dẫn học tập môn Pháp luật đại cương dùng cho sinh viên các ngành thuộc hệ Đào tạo từ xa thuộc Học viện Công nghệ BCVT đã được biên soạn. Đây là môn học thuộc phần kiến thức giáo dục đại cương theo chương trình khung trình độ đại học của Bộ giáo dục và Đào tạo.
+
+Tài liệu đặt mục tiêu hướng dẫn các sinh viên nghiên cứu môn học Pháp luật đại cương nhằm trang bị những kiến thức cơ bản, cần thiết nhất về nhà nước và pháp luật nói chung, nhà nước và pháp luật Việt Nam nói riêng, các ngành luật cơ bản của hệ thống pháp luật Việt Nam đủ làm cơ sở để tiếp tục nghiên cứu các môn học pháp luật khác trong chương trình đào tạo.
+
+Tài liệu được kết cấu gồm 9 chương theo đề cương môn Pháp luật đại cương dành cho chương trình đại học ngành Quản trị kinh doanh của Học viện Công nghệ BCVT.
+
+Trong đó 3 chương đầu đề cập đến một số vấn đề cơ bản về nhà nước và pháp luật. Năm chương sau, mỗi chương đề cập chi tiết một số ngành luật quan trọng như Luật Hiến pháp, luật hành chính, luật Hình sự và tố tụng hình sự, luật dân sự và tố tụng dân sự, luật kinh tế và luật lao động. Đây là những ngành luật điều chỉnh những quan hệ xã hội cơ bản nhất và những quan hệ xã hội phổ biến trong đời sống xã hội.
+
+Tài liệu biên soạn đã cập nhật những quy định mới nhất của hệ thống pháp luật Việt Nam tuy nhiên có thể không tránh khỏi những thiếu sót mong nhận được sự đóng góp để tài liệu được hoàn thiện hơn.
+
+Xin trân trọng cảm ơn.!
+
+Hà Nội, tháng 3 năm 2006
+
+Ths. Lê Thị Bích Ngọc
+
+<!-- page: 3 -->
+
+<!-- page: 4 -->
+
+### Chương 1: Lý Luận Chung Về Nhà Nước
+
+Nội dung của chương 1 trình bày những vấn đề lý luận hết sức cơ bản về Nhà nước với ý nghĩa là một hiện tượng lịch sử xã hội phức tạp. Đứng từ góc độ nghiên cứu theo phương pháp duy vật biện chứng khách quan, khoa học cho học viên thấy được sự phát triển của lịch sử xã hội loài người được tiếp cận từ phương diện nhà nước. Qua những vấn đề chung nhất về lý luận và thực tiễn cho thấy nhà nước có quá trình phát sinh, phát triển và tồn tại trên những cơ sở kinh tế và xã hội nhất định. Qua đó khẳng định sự ra đời của Nhà nước là một tất yếu lịch sử.
+
+Nhà nước được tồn tại dưới những kiểu và được tổ chức dưới những hình thức nhất định. Qua những vấn đề lý luận chung về Nhà nước từ đó liên hệ với nhà nước Cộng hoà xã hội chủ nghĩa Việt Nam cụ thể về đặc trưng, bản chất, tổ chức bộ máy, chức năng của Nhà nước. Học viên có thể biết được địa vị pháp lý của các cơ quan quyền lực, hành pháp, tư pháp trong bộ máy nhà nước được tổ chức như thế nào? Vị trí? thẩm quyền ra sao? Qua những vấn đề lý luận được trình bày trong tài liệu học tập người học có thể tự liên hệ với những gì liên quan đang diễn ra trong đời sống nhà nước bằng những ví dụ thực tế để minh họa. Các vấn đề lý luận về nhà nước Việt Nam đều khẳng định và làm rõ hơn “tính nhân dân” của nhà nước Việt Nam, cho thấy nhà nước Việt Nam là một nhà nước XHCN kiểu mới nhà nước của nhân dân, do nhân dân và vì nhân dân. Tất cả tổ chức và hoạt động của bộ máy nhà nước, từng cơ quan nhà nước cũng như những người làm trong các cơ quan đó đều đặt việc phục vụ lợi ích của nhân dân lên hàng đầu. Nhằm phục vụ tốt hơn nữa quyền lợi của nhân dân, nội dung chương 1 đề cập đến việc cần thiết phải cải cách bộ máy nhà nước - đây là vấn đề mà Đảng, Nhà nước và toàn xã hội rất quan tâm mà chi tiết hơn là những phương hướng và mục tiêu cụ thể. Điều này cũng đáp ứng cho việc hoàn thành mục tiêu xây dựng nhà nước pháp quyền XHCN ở Việt Nam. Ngoài việc cải cách bộ máy nhà nước thì hệ thống chính trị cũng như các nhân tố trong hệ thống đó như Đảng cộng sản, Nhà nước, các tổ chức xã hội cũng cần phải được cải cách, đổi mới và hoàn thiện hơn nữa nhằm xây dựng 1 cơ chế thực sự dân chủ, văn minh đáp ứng ngày càng tốt hơn các nhu cầu của quần chúng nhân dân.
+
+#### 1.1. Bản Chất Nhà Nước, Kiểu Và Hình Thức Nhà Nuớc
+
+##### 1.1.1. Nguồn gốc, bản chất của Nhà nước
+
+###### 1.1.1.1. Nguồn gốc của Nhà nước
+
+Nhà nước là một hiện tượng xã hội đa dạng và phức tạp. Để có nhận thức đúng về bản chất Nhà nước, cũng như những biến động trong đời sống Nhà nước cần lý giải nhiều vấn đề trong đó nhất thiết phải làm sáng tỏ nguồn gốc hình thành Nhà nước, chỉ ra những nguyên nhân đích thực làm xuất hiện Nhà nước.
+
+<!-- page: 5 -->
+
+Có nhiều quan điểm khác nhau giải thích về nguồn gốc của Nhà nước như các học thuyết phi mác-xít (thuyết quyền gia trưởng, thuyết thần quyền, thuyết khế ước xã hội, thuyết bạo lực...) và học thuyết của các nhà sáng lập chủ nghĩa Mác-Lênin. Theo các nhà sáng lập chủ nghĩa Mác-Lênin giải thích nguồn gốc Nhà nước trên cơ sở phương pháp luận duy vật biện chứng và lịch sử, đã chỉ ra rằng Nhà nước không phải là một hiện tượng xã hội vĩnh cữu, bất biến mà là một phạm trù lịch sử có quá trình phát sinh, phát triển và tiêu vong.
+
+Lịch sử xã hội loài người đã trải qua một thời kỳ chưa có Nhà nước đó là chế độ công xã nguyên thuỷ và sẽ phát triển đến giai đoạn không cần đến Nhà nước. Nhà nước nảy sinh từ trong đời sống xã hội, xuất hiện khi xã hội loài người phát triển đến một trình độ nhất định, và khi những điều kiện khách quan của sự tồn tại Nhà nước không còn nữa thì Nhà nước sẽ tiêu vong.
+
+Xã hội loài người phát triển qua nhiều hình thái kinh tế xã hội khác nhau trong đó chế độ công xã nguyên thủy là hình thái kinh tế xã hội đầu tiên không tồn tại giai cấp và Nhà nước. Trong chế độ công xã nguyên thủy do trình độ phát triển của lực lượng sản xuất còn rất thấp kém và tình trạng bất lực của con người trước những hiện tượng thiên nhiên và thú dữ, nên để kiếm sống và tự bảo vệ mình con người buộc phải co cụm lại dựa vào nhau cùng chung sống, cùng lao động và cùng hưởng thụ những thành quả do lao động mang lại. Mọi tư liệu sản xuất và sản phẩm lao động đều thuộc sở hữu chung của mọi thành viên trong cộng đồng. Tính chất xã hội trong chế độ công xã nguyên thủy còn rất đơn giản gồm có tổ chức thị tộc - là tế bào, là cơ sở cấu thành xã hội. Thị tộc được tổ chức theo nguyên tắc huyết thống, lúc đầu huyết thống được xác lập theo dòng mẹ gọi là thị tộc mẫu hệ và về sau được xác lập theo dòng cha gọi là thị tộc phụ hệ. Mỗi thành viên của thị tộc đều bình đẳng về quyền lợi và địa vị xã hội, trong xã hội không tồn tại đặc quyền, đặc lợi không có sự phân hóa giàu nghèo. Hệ thống quản lý của công xã thị tộc là Hội đồng thị tộc và tù trưởng Hội đồng thị tộc hợp thành bởi tất cả các thành viên đã trưởng thành của thị tộc là tổ chức quyền lực cao nhất của thị tộc. Tù trưởng do hội nghị toàn thể thị tộc bầu ra, được lựa chọn từ những người nhiều tuổi, có kinh nghiệm và uy tín trong cộng đồng. Tù trưởng đứng đầu thị tộc song không có đặc quyền so với các thành viên khác của thị tộc, họ cũng phải lao động và được hưởng thụ như mọi người. Quá trình phát triển xã hội công xã nguyên thuỷ đã xuất hiện hình thức tổ chức cao hơn là bào tộc, bộ lạc và liên minh bộ lạc. Xã hội công xã nguyên thủy có sự phân công lao động nhưng mang tính tự nhiên giữa các thành viên của thị tộc để làm những công việc thích hợp khác nhau: giữa đàn ông và đàn bà, người khỏe, người già và trẻ em. Phân công lao động chưa mang tính xã hội nên không tạo ra vị trí khác nhau của con người trong sản xuất và đời sống.
+
+Xã hội công xã nguyên thủy chưa có Nhà nước nhưng quá trình vận động và phát triển của nó đã làm xuất hiện những tiền đề vật chất cho sự tan rã của tổ chức thị tộc - bộ lạc và sự ra đời của Nhà nước. Trong quá trình sống và lao động sản xuất, con người ngày một phát triển hơn về thể chất, trí lực, cấu trúc các giác quan ngày một hoàn thiện, hiểu biết nhiều hơn các quy luật tự nhiên và xã hội, tích lũy được nhiều kinh nghiệm sản xuất, luôn tìm kiếm và cải tiến các công cụ lao động. Tất cả những yếu tố này đưa đến năng suất lao động xã hội tăng lên không ngừng, lực lượng sản xuất có những bước tiến rõ rệt đòi hỏi có sự phân công lao động theo hướng chuyên môn hóa. Vào thời kỳ cuối của chế độ công xã
+
+<!-- page: 6 -->
+
+nguyên thủy đã diễn ra lần lượt 3 lần phân công lao động xã hội: 1. Chăn nuôi tách khỏi trồng trọt; 2. Thủ công nghiệp tách khỏi nông nghiệp; 3. Buôn bán phát triển, thương nghiệp ra đời.
+
+Sự phát triển của công cụ sản xuất, sự phân công lao động xã hội làm cho kinh tế đạt những bước tiến dài, sản phẩm làm ra ngày một nhiều hơn so với yêu cầu của xã hội xuất hiện dầu hiệu của cải dư thừa, phát sinh khả năng chiếm đoạt sản phẩm thừa làm của riêng.
+
+Quá trình phân hóa tài sản bắt đầu nảy sinh, những người có địa vị và uy tín trong xã hội như tù trưởng, thủ lĩnh quân sự lợi dụng ưu thế sẵn có của mình chiếm đoạt tài sản của thị tộc - bộ lạc thành tài sản riêng. Chế độ tư hữu được hình thành. Trước đây do khả năng kinh tế không cho phép và nhu cầu về sức lao động không đặt ra nên tù binh bị bắt trong các cuộc giao tranh giữa các thị tộc - bộ lạc đều bị giết, về sau do sản xuất phát triển, nhu cầu sức lao động tăng tù binh được giữ lại nuôi để bổ sung vào nguồn lao động và những người có địa vị trong thị tộc đã chiếm hữu và khai thác lao động cho cá nhân họ. Chế độ hôn nhân một vợ, một chồng xuất hiện gia đình có cơ cấu nhỏ tách khỏi gia đình phụ hệ cơ cấu lớn và trở thành đơn vị kinh tế tự chủ trong sản xuất, độc lập tài sản, tự định đoạt sản phẩm lao động. Trong quá trình sản xuất, những người có công cụ tốt, có sức khỏe và kinh nghiệm thu được hiệu quả cao, ngày càng giàu có. Một số người giàu có do chiếm được tư liệu sản xuất, do bóc lột lao động tù binh và bóc lột những người nghèo khác, đã giành được vị trí ưu thế trong xã hội và trở thành giai cấp bóc lột. Những người không có tư liệu sản xuất, bị bóc lột ngày càng nghèo khó trở thành giai cấp bị bóc lột. Hai bộ phận dân cư này do quyền lợi đối lập nhau nên mâu thuẫn ngày càng gay gắt và quyết liệt, điều kiện kinh tế - xã hội là cơ sở tồn tại của xã hội công xã nguyên thủy bị phá vỡ, quyền lực xã hội và hệ thống quản lý do toàn thể các thành viên cộng đồng tổ chức ra để bảo vệ lợi ích của các thành viên bình đẳng nay không thích hợp với xã hội đã phân hóa và mâu thuẫn gay gắt về lợi ích. Để duy trì trật tự và quản lý một xã hội đã có những thay đổi rất cơ bản đòi hỏi phải có một tổ chức và một quyền lực mới khác về chất. Tổ chức đó do giai cấp chiếm được ưu thế về kinh tế tổ chức ra để thực hiện sự thống trị giai cấp, dập tắt xung đột công khai giữa các giai cấp, giữ các xung đột ấy trong một vòng trật tự, bảo vệ lợi ích và địa vị của giai cấp thống trị. Đó là Nhà nước chế độ công xã nguyên thủy tan rã, Nhà nước xuất hiện là kết quả của sự vận động, phát triển nội tại của xã hội loài người. Tiền đề kinh tế cho sự ra đời của Nhà nước là chế độ tư hữu tài sản, tiền đề xã hội cho sự ra đời của Nhà nước là sự phân hóa xã hội thành các giai cấp, các tầng lớp có lợi ích đối lập nhau và mâu thuẫn giữa các giai cấp, các tầng lớp ấy gay gắt đến mức không thể điều hòa được.
+
+* Định nghĩa Nhà nước: Nhà nước là một tổ chức đặc biệt của quyền lực chính trị,
+
+một bộ máy chuyên làm nhiệm vụ cưỡng chế và thực hiện các chức năng quản lý đặc biệt nhằm duy trì trật tự xã hội, thực hiện mục đích bảo vệ địa vị của giai cấp thống trị.
+
+* Các dấu hiệu đặc trưng của Nhà nước:
+
+- Nhà nước là một tổ chức quyền lực chính trị công cộng đặc biệt, có bộ máy chuyên
+
+thực hiện cưỡng chế và quản lý những công việc chung của xã hội.
+
+- Nhà nước thực hiện quản lý dân cư theo lãnh thổ.
+
+- Nhà nước có chủ quyền quốc gia.
+
+<!-- page: 7 -->
+
+- Nhà nước ban hành pháp luật và thực hiện quản lý bắt buộc với công dân.
+
+- Nhà nước quy định các loại thuế và thực hiện thu thuế dưới hình thức bắt buộc.
+
+###### 1.1.1.2. Bản chất của Nhà nước
+
+###### a. Tính chất giai cấp của Nhà nước
+
+Đi từ sự phân tích nguồn gốc Nhà nước các nhà kinh điển của chủ nghĩa Mác-Lênin cho rằng nhà nước chỉ xuất hiện và tồn tại trong xã hội có giai cấp và luôn mang tính chất giai cấp sâu sắc. Làm rõ tính chất giai cấp của Nhà nước phải giải đáp được câu hỏi: Nhà nước do giai cấp nào tổ chức ra và lãnh đạo, nhà nước tồn tại và hoạt động trước hết phục vụ lợi ích của giai cấp nào trong xã hội.
+
+Nghiên cứu nguồn gốc ra đời của nhà nước, các nhà tư tưởng khẳng định: “Nhà nước là sản phẩm và biểu hiện của những mâu thuẫn giai cấp không thể điều hòa được”. Nhà nước trước hết là “bộ máy trấn áp đặc biệt của giai cấp này đối với giai cấp khác”, là bộ máy để duy trì sự thống trị giai cấp. Trong xã hội có giai cấp, sự thống trị giai cấp xét về nội dung thể hiện ở 3 mặt: kinh tế, chính trị và tư tuởng. Để thực hiện sự thống trị của mình, giai cấp thống trị phải tổ chức và sử dụng nhà nuớc, củng cố và duy trì quyền lực về chính trị, kinh tế và tư tưởng đối với toàn xã hội. Bằng nhà nước, giai cấp thống trị về kinh tế trở thành giai cấp thống trị về chính trị, ý chí của giai cấp thống trị được thể hiện một cách tập trung và biến thành ý chí nhà nước, bắt buộc mọi thành viên trong xã hội phải tuân theo, các giai cấp, các tầng lớp dân cư phải hành động trong một giới hạn và trật tự phù hợp với lợi ích của giai cấp thống trị.
+
+Nhà nước là một bộ máy cưỡng chế đặc biệt, là công cụ sắc bén nhất duy trì sự thống trị giai cấp, đàn áp lại sự phản kháng của các giai cấp bị thống trị, bảo vệ địa vị và lợi ích của giai cấp thống trị. Do nắm được quyền lực nhà nước, hệ tư tưởng của giai cấp thống trị biến thành hệ tư tưởng thống trị trong xã hội. Trong các xã hội bóc lột, nhà nước có thuộc tính chung là bộ máy đặc biệt duy trì sự thống trị về kinh tế, chính trị, tư tưởng của thiểu số đối với đa số là nhân dân lao động, thực hiện nền chuyên chính của giai cấp bóc lột. Nhà nước XHCN là nhà nước kiểu mới, là công cụ thực hiện nền chuyên chính và bảo vệ lợi ích của giai cấp công nhân và nhân dân lao động. Nhà nước XHCN là một bộ máy thống trị của đa số với thiểu số.
+
+###### b. Vai trò xã hội của nhà nước
+
+Nhà nước ngoài tính cách là công cụ duy trì sự thống trị và bảo vệ lợi ích của giai cấp thống trị, còn phải là một tổ chức quyền lực công, là phương thức tổ chức bảo đảm lợi ích chung của xã hội. Nhà nước không chỉ phục vụ lợi ích của giai cấp thống trị mà còn đứng ra giải quyết những vấn đề nảy sinh từ trong đời sống xã hội, bảo đảm trật tự chung, sự ổn định, bảo đảm các giá trị chung của xã hội để xã hội tồn tại và phát triển. Như vậy nhà nước không chỉ bảo vệ lợi ích của giai cấp cầm quyền mà phải bảo đảm lợi ích của các giai tầng khác trong xã hội khi mà những lợi ích đó không mâu thuẫn căn bản với lợi ích của giai cấp thống trị.
+
+<!-- page: 8 -->
+
+##### 1.1.2. Các kiểu và hình thức nhà nước
+
+###### 1.1.2.1. Kiểu nhà nước
+
+Nhà nước là thực thể xã hội tồn tại trong lịch sử, dưới hình thái kinh tế xã hội nhất định. Do vậy, dựa trên nội dung của phạm trù hình thái kinh tế-xã hội, học thuyết Mác- Lênin đã phân chia các nhà nước trong lịch sử thành các kiểu khác nhau.
+
+Kiểu nhà nước là tổng thể các dấu hiệu cơ bản của nhà nước, thể hiện bản chất, vai trò xã hội, những điều kiện, phát sinh, tồn tại và phát triển của nhà nước trong hình thái kinh tế-xã hội nhất định.
+
+Trong lịch sử tư tưởng chính trị - pháp lí đã có những cách khác nhau trong việc phân chia các kiểu nhà nước. Tuy nhiên, học thuyết Mác-Lênin về hình thái kinh tế - xã hội đem lại cơ sở khoa học để phân biệt các kiểu nhà nước trong lịch sử.
+
+Mỗi hình thái - kinh tế xã hội là một kiểu tổ chức đời sống xã hội tương ứng với một phương thức sản xuất nhất định. Từ khi phân chia thành các giai cấp đến nat, xã hội loài người đã và đang trải qua bốn hình thái kinh tế - xã hội là chiếm hữu nô lệ, phong kiến, tư sản và XHCN. Trong các hình thái kinh tế - xã hội đó, nhà nước - yếu tố thuộc kiến trúc thượng tầng của xã hội phát sinh, tồn tại và phát triển dựa trên và phù hợp với bản chất, đặc điểm của mỗi cơ sở hạ tầng nhất định là các quan hệ sản xuất trong mỗi phương thức sản xuất tương ứng. Theo các hình thái kinh tế - xã hội đã nêu, có bốn kiểu nhà nước là:
+
+- Nhà nước chủ nô;
+
+- Nhà nước phong kiến;
+
+- Nhà nước tư sản;
+
+- Nhà nước XHCN.
+
+Nhà nước là bộ phận quan trọng nhấ trong kiến trúc thượng tầng xã hội, khi hạ tầng cơ sở thay đổi, các quan hệ kinh tế mới tiến bộ hơn thay thế các quan hệ kinh tế cũ đã lạc hậu, kéo theo sự thay đổi kiểu nhà nước thông qua các cuộc cách mạng xã hội. Như vậy, sự thay thế các kiểu nhà nước trong lịch sử gắn liền và là biểu hiện của sự thay đổi các hình thái kinh tế - xã hội.
+
+Trong bốn kiểu nhà nước nêu trên, các nhà nước chủ nô, phong kiến, tư sản đều dựa trên nền tảng kinh tế là chế độ người bóc lột người đồng thời phục vụ và bảo vệ chế độ đó nên người ta gọi kiểu nhà nước bóc lột.
+
+Nhà nước XHCN dựa trên chế độ công hữu về các tư liệu sản xuất nên có bản chất khác hẳn, nó bảo vệvà phục vụ cho lợi ích của đại đa số nhân dân lao động gồm giai cấp công nhân, nông dân và đọi ngũ trí thức.
+
+###### 1.1.2.2. Hình thức nhà nước
+
+###### a. Khái niệm: Hình thức nhà nước là sự biểu hiện ra bên ngoài của việc tổ chức
+
+quyền lực nhà nước ở mỗi kiểu nhà nước trong một hình thái kinh tế xã hội nhất định. Hình thức nhà nước do bản chất và nội dung của nhà nước quy định.
+
+###### b. Phân loại: Có 2 loại hình thức chính thể và hình thức cấu trúc:
+
+<!-- page: 9 -->
+
+- Hình thức chính thể: là hình thức tổ chức các cơ quan quyền lực tối cao, cơ cấu,
+
+trình tự và mối quan hệ giữa chúng với nhau cũng như mức độ tham gia của nhân dân vào việc thiết lập các cơ quan này.
+
+Hình thức chính thể gồm 2 dạng cơ bản là:
+
++ Chính thể quân chủ: quyền lực nhà nước tập trung toàn bộ hay phần lớn trong
+
+tay người đứng đầu nhà nước (Vua, Hoàng đế...) theo nguyên tắc thừa kế.
+
++ Chính thể cộng hòa: quyền lực nhà nước được thực hiện bởi các cơ quan đại
+
+diện do dân bầu ra trong một thời gian nhất định.
+
+- Hình thức cấu trúc: là sự tổ chức nhà nước theo các đơn vị hành chính - lãnh thổ và
+
+tính chất quan hệ giữa các bộ phận cấu thành nhà nước, giữa cơ quan nhà nước trung ương với cơ quan nhà nước địa phương.
+
+Có hai hình thức cấu trúc nhà nước chủ yếu đó là:
+
++ Nhà nước đơn nhất: là nhà nước có lãnh thổ toàn vẹn, thống nhất Các bộ
+
+phận hợp thành nhà nước là các đơn vị hành chính lãnh thổ không có chủ quyền quốc gia và các đặc điểm khác của nhà nước; đồng thời nó có hệ thống các cơ quan nhà nước từ trung ương xuống địa phương.
+
+Ví dụ: Nhà nước Việt Nam, Lào, Trung Quốc...
+
++ Nhà nước liên bang: do nhiều nhà nước hợp lại. Trong nhà nước liên bang thì
+
+không chỉ liên bang có dấu hiệu của nhà nước mà các nhà nước thành viên cũng có.
+
+Có hai hệ thống cơ quan nhà nước và hai hệ thống pháp luật của chung liên bang và từng nhà nước thành viên.
+
+Ví dụ: Nhà nước liên bang Mỹ, Malaixia, Braxin...
+
++ Ngoài ra có một loại hành nhà nước khác nữa là Nhà nước liên minh - chỉ là
+
+sự liên kết tạm thời của các quốc gia để thực hiện những nhiệm vụ và mục tiêu nhất định. Sau khi hoàn thành nhiệm vụ và đạt được mục đích rồi thì nhà nước liên minh tự giải tán, cũng có trường hợp nó phát triển thành nhà nước liên bang.
+
+Ví dụ: Từ năm 1776 đến 1787 Hợp chủng quốc Hoa Kỳ là nhà nước liên minh sau đó phát triển thành nhà nước liên bang.
+
+###### c. Chế độ chính trị
+
+Là toàn bộ các phương pháp, cách thức, phương tiện mà các cơ quan nhà nước sử dụng để thực hiện quyền lực nhà nước. Nói cách khác, chế độ chính trị là phương pháp cai trị và quản lý xã hội của giai cấp cầm quyền nhằm thực hiện những mục tiêu chính trị nhất định. Chế độ chính trị quan hệ chặt chẽ với bản chất, nhiệm vụ, mục tiêu hoạt động của nhà nước và các điều kiện khác về kinh tế, chính trị - xã hội, thể hiện mức độ dân chủ trong một nhà nước.
+
+Từ khi nhà nước xuất hiện cho tới nay các giai cấp cầm quyền đã sử dụng nhiều phương pháp cai trị khác nhau nhưng nhìn chung có hai phương pháp chính là phương pháp dân chủ và phương pháp phản dân chủ. Tương ứng với 2 phương pháp ấy là 2 chế độ nhà nước:
+
+<!-- page: 10 -->
+
+- Chế độ dân chủ: tôn trọng các quyền cơ bản của công dân được đảm bảo trong thực
+
+tế bằng việc được pháp luật bảo vệ. Công dân được tham gia vào việc xây dựng nhà nước, tham gia quản lý và giải quyết những công việc hệ trọng của nhà nước.
+
+Ví dụ: chế độ dân chủ chủ nô, chế độ dân chủ qúy tộc phong kiến, chế độ dân chủ tư sản.
+
+- Chế độ phản dân chủ: chà đạp lên quyền tự do dân chủ của công dân.
+
+Ví dụ: chế độ độc tài chuyên chế chủ nô, chế độ độc tài chuyên chế phong kiến, chế độ độc tài phát xít tư sản.
+
+#### 1.2. Nhà Nước Cộng Hòa Xhcn Việt Nam
+
+##### 1.2.1. Bản chất của nhà nước CHXHCN Việt Nam
+
+Bản chất bao trùm nhất, chi phối mọi lĩnh vực của đời sống nhà nước Việt Nam hiện nay từ tổ chức đến hoạt động thực tiễn là tính nhân dân của nhà nước. Điều 2 Hiến pháp Việt Nam năm 1992 quy định: “Nhà nước công hòa XHCN Việt Nam là nhà nước pháp quyền XHCN của dân, do dân và vì dân. Tất cả quyền lực nhà nước thuộc về nhân dân mà nền tảng là liên minh giai cấp công nhân với giai cấp nông dân và với giới trí thức”. Bản chất này được cụ thể bằng những đặc trưng sau:
+
+###### a. Nhân dân là chủ thể tối cao của quyền lực nhà nước, thực hiện quyền lực nhà nước
+
+dưới nhiều hình thức khác nhau. Hình thức cơ bản nhất là thông qua bầu cử lập ra các cơ quan đại diện quyền lực của mình đó là Quốc hội và Hội đồng nhân dân. Ngoài ra còn thực hiện quyền thông qua các hình thức kiểm tra, giám sát hoạt động của các cơ quan nhà nước hoặc trực tiếp trình bày các yêu cầu, kiến nghị của mình đối với các cơ quan nhà nước...
+
+###### b. Nhà nước cộng hòa XHCN Việt Nam là nhà nước của tất cả các dân tộc trên lãnh thổ Việt Nam, là biểu hiện tập trung của khối đại đoàn kết các dân tộc anh em.
+
+Tính dân tộc của nhà nước Việt Nam là vấn đề có tính lịch sử, truyền thống lâu dài chính là nguồn gốc sức mạnh của nhà nước. Ngày nay đặc tính dân tộc ấy lại được tăng cường và nâng cao nhờ khả năng kết hợp thống nhất giữa tính giai cấp, tính nhân dân, tính dân tộc và tính thời đại.
+
+###### c. Nhà nước cộng hòa XHCN Việt Nam được tổ chức và hoạt động trên cơ sở nguyên
+
+tắc bình đẳng trong các mối quan hệ giữa nhà nước và công dân. Công dân có đầy đủ các quyền tự do, dân chủ trên tất cả các lĩnh vực của đời sống xã hội. Đồng thời công dân cũng phải tự giác thực hiện mọi nghĩa vụ trước nhà nước, về phần mình nhà nước cũng tôn trọng các quyền tự do dân chủ của công dân ghi nhận đảm bảo cho các quyền đó được thực hiện đầy đủ. Mối quan hệ giữa nhà nước và công dân được xác lập trên cơ sở tôn trọng lợi ích giữa các bên.
+
+###### d. Tính chất dân chủ rộng rãi trong lĩnh vực kinh tế - xã hội: chế độ kinh tế được Hiến
+
+pháp Việt Nam năm 1992 quy định là một sự khẳng định pháp lý không chỉ đối với công cuộc cải cách kinh tế hiện nay mà còn là sự biểu hiện cụ thể tính chất dân chủ của nhà nước ta trong lĩnh vực kinh tế: “ Nhà nước phát triển nền kinh tế hàng hóa nhiều thành phần theo cơ chế thị trường có sự quản lý của nhà nước theo định hướng XHCN ”. Thật ra nền kinh tế thị trường không phải là mục đích tự thân của CNXH nhưng đó là phương tiện rất cần thiết
+
+<!-- page: 11 -->
+
+để nhà nước và xã hội đạt được mục tiêu “dân giàu nước mạnh, xã hội công bằng, dân chủ, văn minh ”.
+
+Về chính trị, nhà nước tạo ra cơ sở pháp lý vững chắc bảo đảm các quyền tự do dân chủ của công dân được tôn trọng. Về văn hóa - xã hội, nhà nước thực hiện chủ trương tự do tư tưởng, giải phóng mọi khả năng sáng tạo của con người, quy định các quyền tự do báo chí, hội họp, tín ngưỡng, quyền bất khả xâm phạm về thân thể, nhà ở,… Nhà nước quan tâm giải quyết nhiều vấn đề xã hội như việc làm, thất nghiệp, người già cô đơn, trẻ em mồ côi, đấu tranh chống các tệ nạn xã hội, quan tâm phát triển giáo dục, khoa học công nghệ, bảo vệ sức khỏe nhân dân… Nhà nước kiên quyết trừng trị các hành vi phá hoại, lật đổ, xâm hại đến an ninh quốc gia đồng thời bảo vệ các quyền và lợi ích hợp pháp của công dân, đấu tranh chống các vi phạm pháp luật.
+
+###### e. Nhà nước thực hiện chính sách đối ngoại hòa bình, hữu nghị, mở rộng giao lưu và hợp tác với tất cả các nước trên thế giới không phân biệt chế độ chính trị và xã hội khác
+
+nhau trên cơ sở tôn trọng độc lập, chủ quyền và toàn vẹn lãnh thổ của nhau, không can thiệp vào công việc nội bộ, các bên bình đẳng và cùng có lợi, đồng thời tích cực ủng hộ cuộc đấu tranh của nhân dân thế giới vì hòa bình, độc lập dân tộc, dân chủ và tiến bộ xã hội.
+
+##### 1.2.2. Chức năng của Nhà nước CHXHCN Việt Nam
+
+###### 1.2.2.1. Các chức năng đối nội
+
+Trong điều kiện nền kinh tế tập trung tập trung bao cấp, nhà nước đã tự biến mình thành một tổ chức siêu kinh tế, trực tiếp quản lý mọi mặt của đời sống kinh tế từ sản xuất đến phân phối lưu thông. Với một nền kinh tế tập trung ấy, nhà nước vùă đóng vai trò của người quản lý, người sản xuất, người tiêu thụ sản phẩm và người phân phối sản phẩm.
+
+Ngày nay trong điều kiện của nền kinh tế mới - nền kinh tế thị trường với sự tham gia của nhiều thành phần kinh tế, vai trò và chức năng kinh tế của nhà nước đã căn bản thay đổi. Nền kinh tế thị trường và nhiều thành phần không những không làm yếu đi vai trò kinh tế của nhà nước mà ngược lại nó đang và đã đặt ra trước nhà nước những nhiệm vụ và trách nhiệm hết sức nặng nề đối với sự phát triển của nền kinh tế quốc dân. Trước nhu cầu của cơ chế kinh tế mới, chức năng kinh tế của nhà nước ta nhằm vào việc giải quyết các nhiệm vụ quan trọng sau đây:
+
+- Tạo lập, đảm bảo sự ổn định và bầu không khí xã hội lành mạnh để giải phóng tất cả
+
+các tiềm năng phát triển kinh tế của đất nước, khắc phục các hậu quả do cuộc khủng hoảng của cơ chế kinh tế cũ và kiên quyết chuyển toàn bộ nền kinh tế quốc dân sang cơ chế thị trường có sự điều tiết của nhà nước.
+
+- Xây dựng và đảm bảo các điều kiện chính trị, xã hội, pháp luật, tổ chức cần thiết
+
+cho sự bình đẳng và khả năng phát triển có hiệu quả của tất cả các thành phần kinh tế trong nền kinh tế quốc dân.
+
+- Củng cố phát triển các hình thức sở hữu với phương châm bảo đảm vai trò chủ đạo
+
+của sở hữu quốc doanh và tập thể, trên cơ sở đó tạo điều kiện phát triển lực lượng sản xuất, áp dụng các tiến bộ của khoa học và công nghệ vào sản xuất.
+
+<!-- page: 12 -->
+
+- Tạo lập các tiền đề cần thiết và đảm bảo các điều kiện thuận lợi để các đơn vị kinh
+
+tế thuộc mọi thành phần kinh tế vươn tới các thị trường ngoài nước và tham gia tích cực có hiệu quả vào sự hợp tác kinh tế quốc tế.
+
+Để thực hiện được các nhiệm vụ quan trọng đối với các nhu cầu phát triển của nền kinh tế, nhà nước ta đã và đang tường bước đổi mới hoạt động của mình trên lĩnh vực lãnh đạo và điều tiết nền kinh tế ở tầm vĩ mô. Sự điều tiết vĩ mô của nhà nước đảm bảo cho các dơn vị kinh tế một khả năng độc lập tự giải quyết các vấn đề thuộc lĩnh vực sản xuất kinh doanh, tự chịu trách nhiệm về lỗ, lãi trước cơ chế thị trường và theo luật pháp. Mặt khác nó đảm bảo cho nhà nước khả năng kiểm tra, giám sát đối với toàn bộ quá trình phát triển của kinh tế, chủ động đưa ra kịp thời các giải pháp cụ thể và cần thiết trong các biến động của đời sống kinh tế.
+
+* Chức năng xã hội:
+
+Khi nền kinh tế chuyển sang cơ chế thị trường với nhiều thành phần kinh tế, vai trò chức năng xã hội của nhà nước càng trở nên quan trọng.Bởi lẽ, kinh tế thị trường đặt ra nhiều vấn đề như văn hoá, giáo dục, bảo vệ sức khoẻ, công ăn việc làm, người già cô đơn...
+
+Những vấn đề này cần được giải quyết trong mối quan hệ mật thiết giữa nhu cầu tăng trưởng của nền kinh tế và các nhu cầu nhân đạo của xã hội. Trách nhiệm giải quyết những vấn đề này chiếm vai trò chủ đạo vẫn là nhà nước. Chức năng xã hội của nhà nước Việt Nam nhìn chung có những điểm chính như sau:
+
+- Nhà nước xem giáo dục đào tạo là quốc sách hàng đầu. Nhà nước phát triển giáo
+
+dục nhằm nâng cao dân trí, đào tạo nhân lực và bồi dưỡng nhân tài.
+
+- Nhà nước xác định khoa học và công nghệ giữ vai trò then chốt trong sự nghiệp phát
+
+triển kinh tế xã hội của đất nước. Nhà nước xây dựng và thực hiện một chính sách khoa học và công nghệ quốc gia.
+
+- Nhà nước đầu tư phát triển và thống nhất quản lý sự nghiệp bảo vệ sức khoẻ của
+
+nhân dân.
+
+- Nhà nước tạo mọi điều kiện để mỗi công dân có năng lực lao động được thực hiện
+
+quyền làm việc; thông qua các chính sách kinh tế, tài chính và pháp luật lao động nhà nước khuyến khích các cơ sở kinh tế mở rộng sản xuất để có thể thu hút ngày càng nhiều người lao động vào làm việc; nhà nước tích cực quan tâm giải quyết vấn đề thât nghiệp, nở rộng dịch vụ giới thiệu việc làm.
+
+- Nhà nước xây dựng và thực hiện chính sách thu nhập hợp lý.
+
+- Có chính sách chăm lo giúp đỡ người về hưu, những đối tượng chính sách để giúp
+
+họ giảm bớt những khó khăn về vật chất và tinh thần.
+
+- Chủ động giải quyết các vấn đề xã hội nảy sinh...
+
+* Chức năng đảm bảo sự ổn định an ninh - chính trị, bảo vệ các quyền tự do dân chủ
+
+của công dân, bảo vệ trật tự an toàn xã hội.
+
+Sự phát triển của đất nước trong các điều kiện hiện nay đòi hỏi nhà nước phải ưu tiên áp dụng các biện pháp mạnh mẽ bảo đảm sự ổn định về an ninh chính trị, kiên quyết chống lại mọi ý đồ, hành vi nhằm gây mất ổn định an ninh chính trị cản trở sự nghiệp đổi mới của
+
+<!-- page: 13 -->
+
+đất nước. Thực hiện nhiệm vụ này, nhà nước sử dụng toàn bộ sức mạnh bạo lực của mình để phòng ngừa, ngăn chặn mọi âm mưu gây rối, xâm hại đến nền an ninh quốc gia, đến sự ổn định chính trị trong nước, đồng thời kiên quyết trấn áp mọi hành động của các thế lực thù địch, âm mưu chống phá sự nghiệp cách mạng của nhân dân ta. Hoạt động trấn áp của nhà nước được thực hiện trong những phạm vi, dưới những hình thức và bằng các biện pháp được luật định một cách chặt chẽ. Hoạt động này do vậy không những nhằm hạn chế dân chủ, mà ngược lại là những biện pháp quan trọng để củng cố, bảo vệ và tăng cường các cơ sở dân chủ của đời sống xã hội.
+
+###### 1.2.2.2. Chức năng đối ngoại
+
+- Bảo vệ vững chắc tổ quốc XHCN, ngăn ngừa mọi nguy cơ xâm lăng từ các quốc gia
+
+bên ngoài.
+
+Để thực hiện được nhiệm vụ này, nhà nước ta chăm lo xây dựng và củng cố khả năng quốc phòng của đất nước. Tiềm năng quốc phòng của đất nước là yếu tố đảm bảo cho quốc gia khả năng phòng thủ hiệu quả và chống trả kịp thời mọi âm mưu xâm lược từ các lực lượng thù địch bên ngoài. Do vậy nhà nước phát huy tinh thần yêu nước và chủ nghĩa anh hùng cách mạng của nhân dân, giáo dục quốc phòng và an ninh cho toàn dân, thực hiện chế độ nghĩa vụ quân sự, chính sách hậu phương quân đội; xây dựng công nghiệp quốc phòng.
+
+Bảo đảm trang bị cho lực lượng vũ trang, kết hợp kinh tế với quốc phòng, bảo đảm đời sống vật chất và tinh thần cho cán bộ chiến sỹ, công nhân viên quốc phòng, xây dựng các lực lượng vũ trang nhân dân hùng mạnh, không ngừng tăng cường khả năng bảo vệ đất nước.
+
+- Thiết lập, củng cố và phát triển các mối quan hệ và sự hợp tác với tất cả các nước có
+
+chế độ chính trị - xã hôi khác nhau trên nguyên tắc cùng tồn tại hoà bình, tôn trọng độc lập, chủ quyền của nhau, bình đẳng và cùng có lợi.
+
+Trong bối cảnh quốc tế có nhiều biến đổi nhanh chóng và phức tạp, với sự phát triển mạnh mẽ của lực lượng sản xuất và xu hướng quốc tế hoá nền kinh tế thế giới, hoạt động đối ngoại của nhà nước ngày càng trở nên đa dạng về hình thức, phong phú về nội dung.
+
+Hiện nay, nhà nước ta thực hiện chính sách mở cửa, quan hệ với tất cả các nước, mở rộng quan hệ kinh tế, chính trị, văn hoá theo các nguyên tắc của pháp luật quốc tế.
+
+- Thiết lập và tăng cường các nỗ lực chung trong cuộc đấu tranh vì một trật tự thế giới
+
+mới, vì sự hợp tác bình đẳng và dân chủ, vì hoà bình và tiến bộ xã hội trên toàn thế giới.
+
+Ngày nay nhà nước ta là thành viên chính thức của nhiều tổ chức quốc tế như Liên hiệp quốc, phong trào không liên kết và rất nhiều tổ chức quốc tế khác. Trên diễn đàn quốc tế hoặc khu vực nhà nước ta luôn tỏ rõ thiện chí và nỗ lực hịưp tác để góp phần giải quyết hoà bình nhiều vấn đề quốc tế. Vì vậy, ảnh hưởng và uy tín của nhà nước ta trên trường quốc tế ngày càng được củng cố và tăng cường.
+
+##### 1.2.3. Bộ máy nhà nước CHXHN Việt Nam
+
+###### 1.2.3.1. Địa vị pháp lý của các cơ quan Nhà nước
+
+###### a. Quốc hội
+
+<!-- page: 14 -->
+
+- Quốc hội là cơ quan đại biểu cao nhất của nhân dân, cơ quan quyền lực nhà nước
+
+cao nhất của nước CHXHCN VN.
+
+- Quốc hội là cơ quan duy nhất có quyền lập hiến pháp và lập pháp.
+
+- Quốc hội quyết định những chính sách cơ bản về đối nội và đối ngoại, nhiệm vụ
+
+kinh tế-xã hội, quốc phòng an ninh của đất nước, những nguyên tắc chủ yếu về tổ chức và hoạt động của bộ máy nhà nước, về quan hệ xã hội và hoạt động của công dân.
+
+- Quốc hội thực hiện quyền giám sát tối cao đối với toàn bộ hoạt động của nhà nước.
+
+- Nhiệm kỳ hoạt động của quốc hội là 5 năm, họp thường kỳ mỗi năm 2 lần có thể
+
+họp bất thường.
+
+- Quốc hội là cơ quan quyền lực nhà nước cao nhất do nhân dân trực tiếp bầu ra, thay
+
+mặt cho toàn thể nhân dân Việt Nam quyết định những vấn đề quan trọng nhất của đất nước. Các đại biểu Quốc hội được bầu ra từ các đơn vị bầu cử.
+
+Giữa hai kỳ họp, nhiệm vụ và quyền hạn của Quốc hội do Ủy ban thường vụ Quốc hội đảm nhiệm.
+
+- Tổ chức:
+
++ UBTVQH: là cơ quan thường trực của Quốc hội, chủ tịch quốc hội đồng thời là
+
+Chủ tịch UBTVQH. UBTVQH có nhiệm vụ ban hành pháp lệnh và tổ chức các hoạt động có tính chất chuẩn bị cho Quốc hội hoạt động thay mặt Quốc hội quyết định các vấn đề thuộc nhiệm vụ, quyền hạn của Quốc hội khi cần thiết.
+
++ Các Ủy ban có nhiệm vụ thẩm tra trước các dự án và kiểm tra việc thực hiện các
+
+quyết định của Quốc hội. Có hai loại Ủy ban:
+
+* UB thường xuyên: gồm 7 ủy ban:
+
+- Ủy ban pháp luật.
+
+- Ủy ban kế hoạch và ngân sách.
+
+- Ủy ban quốc phòng và an ninh.
+
+- Ủy ban văn hóa - giáo dục.
+
+- Ủy ban các vấn đề xã hội.
+
+- Ủy ban khoa học, công nghệ và môi trường.
+
+- Ủy ban đối ngoại.
+
+* UB không thường xuyên: UB dự thảo, sửa đổi Hiến pháp, luật …
+
++ Hội đồng dân tộc: có chức năng tham mưu, cố vấn cho Quốc hội về các vấn đề dân
+
+tộc.
+
+###### b. Chủ tịch nước
+
+Chủ tịch nước là người đứng đầu nhà nước, thay mặt nước CHXHCNVN về đối nội và đối ngoại.
+
+Chủ tịch nước do Quốc hội bầu trong số đại biểu Quốc hội. Chủ tịch nước chịu trách nhiệm và báo cáo công tác trước Quốc hội. Nhiệm kỳ của Chủ tịch nước theo nhiệm kỳ của Quốc hội.
+
+<!-- page: 15 -->
+
+Với tư cách là nguyên thủ quốc gia, đứng đầu bộ máy nhà nước Chủ tịch nước có quyền:
+
+- Tiếp nhận đại sứ đặc mệnh toàn quyền nước ngoài.
+
+- Ký kết các điều ước quốc tế.
+
+- Đề nghị Quốc hội bầu, miễn nhiệm, bãi nhiệm Phó chủ tịch nước, Thủ tướng Chính
+
+phủ, Chánh án TANDTC, Viện trưởng VKSNDTC.
+
+- Thống lĩnh các lực lượng vũ trang …
+
+Để thực hiện nhiệm vụ của mình, Chủ tịch nước được quyền ban hành lệnh, quyết định.
+
+###### c. Chính phủ
+
+- Chính phủ là cơ quan chấp hành của Quốc hội, cơ quan hành chính nhà nước cao
+
+nhất của nước CHXHCN Việt Nam.
+
+- Chính phủ thống nhất quản lý việc thực hiện các nhiệm vụ chính trị, kinh tế, văn hóa
+
+xã hội, quốc phòng an ninh và đối ngoại của nhà nước.
+
+- Chính phủ chịu trách nhiệm trước Quốc hội và báo cáo công tác với Quốc hội,
+
+UBTVQH và Chủ tịch nước.
+
+- Chính phủ gồm có: Thủ tướng, các Phó Thủ tướng, các bộ trưởng. Ngoài Thủ tướng,
+
+các thành viên khác của Chính phủ không nhất thiết phải là đại biểu Quốc hội.
+
+- Nhiệm kỳ của Chính phủ theo nhiệm kỳ của Quốc hội.
+
+Với tư cách là cơ quan chấp hành của Quốc hội, Chính phủ tổ chức thực hiện các văn bản luật và nghị quyết của Quốc hội. Với tư cách là cơ quan hành chính nhà nước cao nhất Chính phủ được quyền điều hành toàn bộ bộ máy hành chính nhà nước từ trung ương đến cơ sở.
+
+- Thủ tướng là người lãnh đạo Chính phủ, đứng đầu bộ máy hành pháp.
+
+Trong thành phần của Chính phủ ngoài Thủ tướng, các Phó thủ tướng còn có các bộ trưởng phụ trách các bộ và cơ quan ngang bộ.
+
++ Bộ, các cơ quan ngang bộ là cơ quan của Chính phủ thực hiện chức năng quản lý
+
+nhà nước đối với ngành hoặc lĩnh vực công tác trong phạm vi cả nước.
+
++ Đứng đầu các bộ là Bộ trưởng, đứng đầu các cơ quan ngang bộ là Chủ nhiệm ủy
+
+ban. Bộ trưởng, Chủ nhiệm ủy ban đều là thành viên của Chính phủ, đều là người chịu trách nhiệm quản lý nhà nước về lĩnh vực, ngành phụ trách trong phạm vi cả nước.
+
++ Các cơ quan khác trực thuộc Chính phủ, đứng đầu các cơ quan này là các Trưởng
+
+ban, Tổng cục trưởng, Cục trưởng nhưng không phải là thành viên của Chính phủ như Tổng cục du lịch, hải quan, địa chính…
+
+###### d. Tòa án và Viện kiểm sát nhân dân
+
+Trong cơ cấu tổ chức bộ máy nhà nước Việt Nam, ngoài các cơ quan lập pháp và hành pháp, còn có hệ thống các cơ quan bảo vệ pháp chế XHCN hay còn gọi là hệ thống tư pháp Việt Nam. Hệ thống này được hình thành từ hai cơ quan: Tòa án và Viện kiểm sát.
+
+<!-- page: 16 -->
+
+- Tòa án nhân dân tối cao, các Tòa án nhân dân địa phương, các Tòa án quân sự và
+
+các Tòa án khác do luật định là những cơ quan xét xử của nước CHXHCN VN. Hoạt động xét xử là hoạt động nhân danh nhà nước Việt Nam, căn cứ vào pháp luật Tòa án đưa ra các phán quyết về các vụ việc tranh chấp hoặc hình phạt đối với các hành vi có lỗi và trái pháp luật trong mỗi vụ án. Tòa án nhân dân tối cao là cơ quan xét xử cao nhất của nước Việt Nam.
+
+Việc xét xử ở Tòa án do thẩm phán và hội thẩm nhân dân thực hiện, khi xét xử thẩm phán và hội thẩm nhân dân ngang quyền nhau, độc lập và chỉ tuân theo pháp luật. Trước Tòa mọi công dân đều bình đẳng, Tòa án xét xử công khai trừ những trường hợp đặc biệt.
+
+- Viện kiểm sát có chức năng kiểm sát việc tuân theo pháp luật trong hoạt động tư
+
+pháp, thực hành quyền công tố bảo đảm cho pháp luật được chấp hành nghiêm chỉnh và thống nhất.
+
+Bao gồm: Viện KSNDTC, Viện KSND địa phương, Viện KS quân sự.
+
+###### e. Hội đồng nhân dân
+
+- Hội đồng nhân dân là cơ quan quyền lực nhà nước ở địa phương, đại diện cho ý chí,
+
+nguyện vọng của nhân dân địa phương, do nhân dân địa phương trực tiếp bầu ra chịu trách nhiệm trước nhân dân địa phương và cơ quan cấp trên.
+
+- Hội đồng nhân dân có nhiệm kỳ 5 năm, được thành lập ở các đơn vị hành chính
+
+tỉnh-thành phố trực thuộc TW, quận - huyện - thị xã - thành phố thuộc tỉnh, xã - phường - thị trấn.
+
+- Hình thức hoạt động chủ yếu thông qua các kỳ họp. HĐND gồm có các đại biểu do
+
+nhân dân địa phương bầu ra theo các đơn vị bầu cử.
+
+- Có cơ quan thường trực được tổ chức từ cấp huyện trở lên.
+
+###### g. Ủy ban nhân dân
+
+- Là cơ quan chấp hành và hành chính nhà nước ở địa phương, do HĐND cùng cấp
+
+bầu ra, chịu trách nhiệm chấp hành Hiến pháp, luật, các văn bản của cơ quan nhà nước cấp trên và cácnghị quyết của Hội đồng nhân dân cùng cấp.
+
+- Các ban, ngành trực thuộc UBND thành lập ra có nhiệm vụ quản lý một hoặc một số
+
+ngành, lĩnh vực trong phạm vi lãnh thổ địa phương.
+
+###### 1.2.3.2. Hệ thống chính trị của nước cộng hoà xã hội chủ nghĩa Việt Nam
+
+###### a. Khái niệm, đặc điểm của hệ thống chính trị nước Cộng hoà xã hội chủ nghĩa
+
+Việt Nam Trong các quan hệ xã hội tồn tại ở nước ta, quan hệ chính trị giữ vị trí rất quan trọng.
+
+Quan hệ chính trị là quan hệ giữa các giai cấp, các tầng lớp nhân dân trong xã hội, phản ánh nhu cầu của các giai cấp, các tầng lớp đó. Quan hệ chính trị do các chủ thể nhất định thực hiện. Đó là các chủ thể mang quyền lực, các tổ chức chính trị, các tổ chức xã hội.v.v... Tất cả các tổ chức do các giai cấp, các tầng lớp nhân dân thành lập nên nhằm thực hiện những mục tiêu chính trị hợp thành hệ thống chính trị xã hội.
+
+<!-- page: 17 -->
+
+Hệ thống chính trị của nước Cộng hoà xã hội chủ nghĩa Việt Nam là tổng thể các thiết chế chính trị tồn tại và hoạt động trong mối liên hệ hữu cơ với nhau nhằm tạo ra một cơ chế thực hiện quyền lực của nhân dân dưới sự lãnh đạo của Đảng Cộng sản Việt Nam.
+
+Hệ thống chính trị của nước ta bao gồm Đảng Cộng sản Việt Nam, Nhà nước Cộng hào xã hội Chủ nghĩa Việt Nam, Mặt trận Tổ quốc Việt Nam và các tổ chức chính trị - xã hội như: Tổng Liên đoàn Lao động Việt Nam, Đoàn Thanh niên Cộng sản Hồ Chí Minh, Hội liên hiệp Phụ nữ Việt Nam, Hội Nông dân Việt Nam, Hội Cựu chiến binh Việt Nam.
+
+Hệ thống chính trị của nước ta có những đặc điểm cơ bản sau đây:
+
+- Là một hệ thống tổ chức chặt, khoa học trên cơ sở phân định rõ ràng chức năng,
+
+nhiệm vụ của từng tổ chức. Tính tổ chức cao của hệ thống chính trị nước ta được bảo đảm bởi các nguyên tắc chỉ đạo thống nhất như tất cả quyền lực thuộc về nhân dân, sự lãnh đạo của Đảng Cộng sản, tập trung dân chủ, pháp chế xã hội chủ nghĩa.
+
+- Có sự thống nhất cao về lợi ích lâu dài cũng như mục tiêu hoạt động. Sự thống nhất
+
+đó được quy định bởi sự thống nhất về kinh tế, chính trị, tư tưởng trong xã hội ta dưới sự lãnh đạo của một chính đảng duy nhất. Các thiết chế của hệ chính trị của nước ta tuy có mục tiêu hoạt động cụ thể riêng, có vị trí, chức năng khác nhau nhưng đều nhằm phục vụ cho lợi ích của nhân dân lao động.
+
+###### b. Nhà nước Cộng hoà xã hội chủ nghĩa Việt Nam trong hệ thống chính trị
+
+Nhà nước là thiết chế trung tâm trong hệ thống chính trị, là biểu hiện tập trung quyền lực của nhân dân và là công cụ hữu hiệu nhất để nhân dân và là công cụ hữu hiệu nhất để nhân dân thực hiện quyền lực chính trị của mình. Vai trò, vị trí đó của Nhà nước là do Nhà nước có những điều kiện sau đây:
+
+- Nhà nước là người đại diện chính thức của mọi giai cấp, mọi tầng lớp trong xã hội.
+
+Điều đó cho phép Nhà nước thực hiện triệt để các quyết định, chính sách của mình đối với xã hội.
+
+- Nhà nước là chủ thể của quyền lực chính trị. Nhà nước có một bộ máy chuyên làm
+
+chức năng quản lý, có hệ thống lực hượng vũ trang và bộ máy cưỡng chế để duy trì trật tự xã hội mà không một tổ chức nào có được. Nhà nước sử dụng pháp luật trong việc thực hiện các chủ trương, chính sách, bảo đảm cho các chủ trương, chính sách đó được triển khai rộng rãi và thống nhất trên quy mô toàn xã hội.
+
+- Nhà nước có chủ quyền quốc gia. Đó là quyền tối cao của Nhà nước trong lĩnh vực
+
+đối nội và đối ngoại của đất nước. Điều này giúp cho Nhà nước kết hợp các quan hệ trong nứpc và quan hệ quỗc tế một cách thống nhất.
+
+- Nhà nước là chủ sở hữu lớn nhất đối với các tư liệu sản xuất chủ yếu và quan trọng
+
+cảu đất nước. Với tư cách đó, Nhà nước có sức mạnh vật chất để điều tiết vĩ mô nên kinh tế, tạo điều kiện xã hội hoạt động.
+
+###### c. Đảng Cộng sản Việt Nam trong hệ thống chính trị
+
+Hệ thống chính trị của mỗi nước đều có các đảng chính trị và các tổ chức xã hội hoạt động nhưng thường có một chính đảng cầm quyền, giữ vai trò lãnh đạo. Hệ thống chính trị nước ta chỉ tồn tại một chính đảng, đó là Đảng Cộng sản Việt Nam - lực lượng lãnh đạo duy
+
+<!-- page: 18 -->
+
+nhất đối với nhà nước và xã hội. Đây là điều khác biệt với hệ thống chính trị của nhiều nước trên thế giới, nơi tồn tại chế độ đa đảng. Sự lãnh đạo của Đảng Cộng sản Việt Nam là nhân tố quyết định đối với sự phát triển của hệ thống chính trị, là hạt nhân bảo đảm sự thống nhất của hệ thống đó. Vai trò lãnh đạo của Đảng Cộng sản Việt Nam là một tất yếu lịch sử do:
+
+- Đảng Cộng sản Việt Nam là lực lượng chính trị tiên tiến nhất được vũ trang bằng lý
+
+luận khoa học của Chủ nghĩa Mác-Lênin và tư tưởng Hồ Chí Minh. Với những trí thức khoa học đó, Đảng đề ra những đường lối, chính sách phát triển xã hội phù hợp với quy luật và có đầy đủ khả năng để tổ chức thực hiện thành công đường lối, chính sách đó.
+
+- Bằng thực tiễn đấu tranh kiên cường trong gần ba phần tư thế kỷ qua, với những hy
+
+sinh và những cống hiến lớn lao cho dân tộc, Đảng ta đã củng cố được lòng tin của tuyệt đại đa số nhân dân. Do đó, vai trò lãnh đạo của Đảng đối với hệ thống chính trị có cơ sở vững chắc về tình cảm và tinh thần mà các tổ chức khác không thể nào có được.
+
+Là một chính đảng kiên trì đấu tranh vì sự nghiệp giải phóng dân tộc, chống chủ nghĩa đế quốc, chủ nghĩa thực dân cũ và mới, Đảng Cộng sản Việt Nam đã có uy tín quốc tế lớn và được sự đoàn kết, giúp đỡ của các quốc gia và dân tộc trên thế giới. Điều đó có tác dụng quan trọng trong việc khẳng định vai trò của Đảng đối với hệ thống chính trị nước ta.
+
+Đảng Cộng sản Việt Nam là người lãnh đạo toàn diện và tuyệt đối hệ thống chính trị. Sự lãnh đạo của Đảng thể hiện ở các hình thức chủ yếu sau đây:
+
++ Định ra chiến lược, mục tiêu cơ bản, đường lối chính sách phát triển xã hội, làm
+
+cơ sở định hướng cho các hoạt động của các tổ chức trong hệ thống chính trị;
+
++ Bồi dưỡng cán bộ có phẩm chất, đạo đức và năng lực để giới thiệu vào các cương
+
+vị quan trọng của cơ quan nhà nước, tổ chức chính trị - xã hội, tổ chức xã hội.
+
++ Đảng tiến hành kiểm tra hoạt động của các cơ quan nhà nước trong việc thực hiện
+
+đường lối, chính sách của Đảng. Thông qua công tác kiểm tra mà phát hiện những thiếu sót, khuyết điểm trong quản lý nhà nước để đề ra các biện pháp khắc phục.
+
++ Cán bộ, đảng viên và các tổ chức Đảng gương mẫu trong việc thực hiện đường lối,
+
+chính sách của Đảng và pháp luật của Nhà nước. Đây là hình thức hữu hiệu để bảo đảm cho cán bộ, công chức nhà nước thực hiện tốt chức trách của mình trong quản lý nhà nước.
+
+Đảng thực hiện sự lãnh đạo đối với Nhà nước bằng phương pháp giáo dục, thuyết phục. Thông qua phương pháp đó, Đảng tạo cho cán bộ, công chức nhận thức đúng đắn và thực hiện đầy đủ đường lối chính sách của Đảng và pháp luật của Nhà nước.
+
+###### d. Mặt trận Tổ quốc Việt Nam và các tổ chức chính trị - xã hội trong hệ thống
+
+chính trị Trong hệ thống chính trị nước ta, Mặt trận Tổ quốc Việt Nam và các Tổ chức chính trị - xã hội có vị trí rất quan trọng.
+
+Là tổ chức liên minh chính trị tự nguyện của các tổ chức và cá nhân tiêu biểu trong xã hội, “Mặt trận Tổ quốc Việt Nam là bộ phận của hệ thống chính trị của nước Cộng hoà xã hội chủ nghĩa Việt Nam do Đảng Cộng sản Việt Nam lãnh đạo, là cơ sở chính trị của chính quyền nhân dân, nơi thể hiện ý chí, nguyện vọng, tập hợp khối đại đoàn kết toàn dân, phát huy quyền làm chủ của nhân dân, nơi hiệp thương, phối hợp và thống nhất hành động của
+
+<!-- page: 19 -->
+
+các thành viên, góp phần giữ vững độc lập dân tộc, chủ quyền quốc gia, toàn vẹn lãnh thổ, thực hiện thắng lợi sự nghiệp công nghiệp hoá, hiện đại hoá đất nước vì mục tiêu dân giàu, nước mạnh, xã hội công bằng, dân chủ, văn minh” (Điều 1 Luật Mặt trận Tổ quốc Việt Nam do Quốc hội thông qua ngày 12/6/1999).
+
+Các tổ chức chính trị - xã hội khác như: Tổng Liên đoàn Lao động Việt Nam, Đoàn Thanh niên Cộng sản Hồ Chí Minh, Hội Liên hiệp Phụ nữ Việt Nam, Hội Nông dân Việt Nam, Hội Cựu chiến binh Việt Nam là những tổ chức tập hợp rộng rãi những thành viên trên cơ sở sự đồng nhất về những phương diện nhất định (giới tính, lứa tuổi, nghề nghiệp v.v...) có vai trò quan trọng trong việc tham gia quản lý nhà nước và xã hội, tham gia kiểm tra, giám sát hoạt động của cơ quan nhà nứơc, tổ chức kinh tế, giáo dục các thành viên của tổ chức mình xây dựng và bảo vệ Tổ quốc.
+
+Trong mối quan hệ gữa các tổ chức chính trị - xã hội với Nhà nước thì các tổ chức chính trị - xã hội là chỗ dựa của Nhà nước, là “cơ sở chính trị của chính quyền nhân dân”
+
+(Điều 9 Hiến pháp năm 1992). Nhà nước phải tạo cơ sở pháp lý, điều kiện tài chính v.v... cho các tổ chức chính trị - xã hội hoạt động, định ra những hình thức và phương pháp để các tổ chức chính trị - xã hội tham gia quản lý nhà nước. Về phía mình, các tổ chức chính trị
+
+- xã hội phải giáo dục thành viên của tổ chức mình nghiêm chỉnh chấp hành đường lối,
+
+chính sách của Đảng và pháp luật của Nhà nước, tham gia vào các lĩnh vực xây dựng và hoạt động của bộ máy nhà nước, giám sát hoạt động của cơ quan nhà nước, của cán bộ và công chức nhà nước.
+
+##### 1.2.4. Vấn đề nhà nước pháp quyền ở Việt Nam
+
+Tư tưởng về nhà nước pháp quyền dã xuất hiện từ lâu, được bổ sung và hoàn thiện qua quá trình phát triển lâu dài của lịch sử tư tưởng về nhà nước và pháp luật. Ngày nay, dựa trên các kết quả nghiên cứu đã dược công bố có thể nêu ra những đặc điểm cơ bản của nhà nước pháp quyền như sau:
+
+- Nhà nước pháp quyền phải là nhà nước có một hệ thống pháp luật, đồng bộ, thống
+
+nhất, hoàn chỉnh, phản ánh đúng yêu cầu khách quan của quản lý nhà nước và quản lý xã hội. Các đạo luật phải có vai trò tối thượng trong hệ thống pháp luật Nhà nước và các thiết chế của nó phải dược xác định rõ ràng về mặt pháp luật, tất cả các cơ quan nhà nước, các tổ chức xã hội, viên chức và công dân phải tuân thủ nghiêm chỉnh và triệt để pháp luật.
+
+- Mọi công dân đều bình đẳng trước pháp luật, công dân có trách nhiệm đối với nhà
+
+nước và nhà nước cũng có trách nhiệm đối với công dân. Quan hệ giữa công dân và nhà nước là quan hệ bình đẳng về quyền và nghĩa vụ.
+
+- Là một tổ chức thực hiện công quyền dựa trên nền tảng pháp luật vững chắc, các
+
+quyền tự do, dân chủ, các lợi ích chính đáng của con người phải được pháp luật bảo đảm và bảo vệ, mọi hành vi xâm phạm đến các quyền và lợi ích hợp pháp của công dân do bất kỳ cơ quan nhà nước, người có chức quyền hay công dân nào thực hiện đều phải bị phát hiện và nghiêm trị.
+
+- Quyền lực nhà nước về lập pháp, hành pháp, tư pháp được phân định rõ ràng, hợp lý
+
+cho ba hệ thống các cơ quan nhà nước tương ứng trong một cơ chế kiểm tra, giám sát và
+
+<!-- page: 20 -->
+
+chế ước nhau tạo thành cơ chế đồng bộ bảo đảm sự thống nhất của quyền lực nhà nước, nhân dân thực sự là chủ thể tối cao của quyền lực nhà nước.
+
+Như vậy Nhà nước pháp quyền phải là nhà nước của dân, do dân và vì dân, tất cả quyền lực nhà nước thực sự thuộc về nhân dân, pháp luật có tính pháp lý và công bằng, thể hiện đầy đủ các giá trị cao cả của xã hội và của con người, pháp luật phải giữ vai trò chủ đạo trong mọi hoạt dộng, trong xử sự của các chủ thể và toàn xã hội.
+
+Trong điều kiện đổi mới hiện nay, Đảng ta đặt vấn đề đẩy mạnh cải cách tổ chức và hoạt động của nhà nước theo định hướng xây dựng nhà nước pháp quyền XHCN thực chất là tiếp thu những tư tưởng, quan điểm tích cực, tiến bộ về nhà nước pháp quyền với tính cách là giá trị chung của nhân loại nhằm xây dựng nhà nước Cộng Hoà XHCN Việt Nam thực sự là nhà nước của nhân dân, do nhân dân và vì nhân dân dựa trên nền tảng liên minh giai cấp công nhân với giai cấp nông dân, tầng lớp trí thức và khối đại đoàn kết toàn dân do đảng lãnh đạo.
+
+TÓM TẮT CHƯƠNG 1
+
+##### 1. Nhà nước là một tổ chức đặc biệt của quyền lực chính trị, một bộ máy chuyên làm
+
+nhiệm vụ cưỡng chế và thực hiện các chức năng quản lý đặc biệt nhằm duy trì trật tự xã hội, thực hiện mục đích bảo vệ địa vị của giai cấp thống trị.
+
+* Các dấu hiệu đặc trưng của Nhà nước:
+
+- Nhà nước là một tổ chức quyền lực chính trị công cộng đặc biệt, có bộ máy
+
+chuyên thực hiện cưỡng chế và quản lý những công việc chung của xã hội.
+
+- Nhà nước thực hiện quản lý dân cư theo lãnh thổ.
+
+- Nhà nước có chủ quyền quốc gia.
+
+- Nhà nước ban hành pháp luật và thực hiện quản lý bắt buộc với công dân.
+
+- Nhà nước quy định các loại thuế và thực hiện thu thuế dưới hình thức bắt
+
+buộc.
+
+##### 2. Bằng nhà nước, giai cấp thống trị về kinh tế trở thành giai cấp thống trị về chính trị, ý chí của giai cấp thống trị được thể hiện một cách tập trung và biến thành ý chí nhà
+
+nước, bắt buộc mọi thành viên trong xã hội phải tuân theo, các giai cấp, các tầng lớp dân cư phải hành động trong một giới hạn và trật tự phù hợp với lợi ích của giai cấp thống trị.
+
+Nhà nước ngoài tính cách là công cụ duy trì sự thống trị và bảo vệ lợi ích của giai cấp thống trị, còn phải là một tổ chức quyền lực công, là phương thức tổ chức bảo đảm lợi ích chung của xã hội. Nhà nước không chỉ phục vụ lợi ích của giai cấp thống trị mà còn đứng ra giải quyết những vấn đề nảy sinh từ trong đời sống xã hội, bảo đảm trật tự chung, sự ổn định, bảo đảm các giá trị chung của xã hội để xã hội tồn tại và phát triển.
+
+##### 3. Kiểu nhà nước là tổng thể các dấu hiệu cơ bản của nhà nước, thể hiện bản chất, vai
+
+trò xã hội, những điều kiện, phát sinh, tồn tại và phát triển của nhà nước trong hình thái kinh tế - xã hội nhất định.
+
+<!-- page: 21 -->
+
+##### 4. Hình thức nhà nước là sự biểu hiện ra bên ngoài của việc tổ chức quyền lực nhà
+
+nước ở mỗi kiểu nhà nước trong một hình thái kinh tế xã hội nhất định. Hình thức nhà nước do bản chất và nội dung của nhà nước quy định.
+
+##### 5. Bản chất bao trùm nhất, chi phối mọi lĩnh vực của đời sống nhà nước Việt Nam
+
+hiện nay từ tổ chức đến hoạt động thực tiễn là tính nhân dân của nhà nước. Điều 2 Hiến pháp Việt Nam năm 1992 quy định: “Nhà nước công hòa XHCN Việt Nam là nhà nước pháp quyền XHCN của dân, do dân và vì dân. Tất cả quyền lực nhà nước thuộc về nhân dân mà nền tảng là liên minh giai cấp công nhân với giai cấp nông dân và với giới trí thức”
+
+##### 6. Chức năng của Nhà nước CHXHCN Việt Nam bao gồm hai chức năng chủ yêu là
+
+chức năng đối nội và chức năng đối ngoại.
+
+###### a. Các chức năng đối nội:
+
+* Chức năng xã hội.
+
+* Chức năng đảm bảo sự ổn định an ninh - chính trị, bảo vệ các quyền tự do
+
+dân chủ của công dân, bảo vệ trật tự an toàn xã hội.
+
+###### b. Chức năng đối ngoại:
+
+- Bảo vệ vững chắc tổ quốc XHCN, ngăn ngừa mọi nguy cơ xâm lăng từ các quốc gia
+
+bên ngoài.
+
+- Thiết lập, củng cố và phát triển các mối quan hệ và sự hợp tác với tất cả các nước có
+
+chế độ chính trị - xã hôi khác nhau trên nguyên tắc cùng tồn tại hoà bình, tôn trọng độc lập, chủ quyền của nhau, bình đẳng và cùng có lợi.
+
+- Thiết lập và tăng cường các nỗ lực chung trong cuộc đấu tranh vì một trật tự thế giới
+
+mới, vì sự hợp tác bình đẳng và dân chủ, vì hoà bình và tiến bộ xã hội trên toàn thế giới.
+
+##### 7. Bộ máy nhà nước CHXHN Việt Nam:
+
+* Quốc hội:
+
+Quốc hội là cơ quan đại biểu cao nhất của nhân dân, cơ quan quyền lực nhà nước cao nhất của nước CHXHCN VN.
+
+Quốc hội là cơ quan duy nhất có quyền lập hiến pháp và lập pháp.
+
+* Chủ tịch nước:
+
+Chủ tịch nước là người đứng đầu nhà nước, thay mặt nước CHXHCNVN về đối nội và đối ngoại.
+
+* Chính phủ:
+
+Chính phủ là cơ quan chấp hành của Quốc hội, cơ quan hành chính nhà nước cao nhất của nước CHXHCN Việt Nam.
+
+* Tòa án và Viện kiểm sát nhân dân:
+
+Trong cơ cấu tổ chức bộ máy nhà nước Việt Nam, ngoài các cơ quan lập pháp và hành pháp, còn có hệ thống các cơ quan bảo vệ pháp chế XHCN hay còn gọi là hệ thống tư pháp Việt Nam. Hệ thống này được hình thành từ hai cơ quan: Tòa án và Viện kiểm sát.
+
+* Hội đồng nhân dân:
+
+<!-- page: 22 -->
+
+Hội đồng nhân dân là cơ quan quyền lực nhà nước ở địa phương, đại diện cho ý chí, nguyện vọng của nhân dân địa phương, do nhân dân địa phương trực tiếp bầu ra chịu trách nhiệm trước nhân dân địa phương và cơ quan cấp trên.
+
+* Ủy ban nhân dân:
+
+- Là cơ quan chấp hành và hành chính nhà nước ở địa phương, do HĐND cùng cấp
+
+bầu ra, chịu trách nhiệm chấp hành Hiến pháp, luật, các văn bản của cơ quan nhà nước cấp trên và cácnghị quyết của Hội đồng nhân dân cùng cấp.
+
+##### 8. Hệ thống chính trị của nước cộng hoà xã hội chủ nghĩa Việt Nam
+
+Hệ thống chính trị của nước Cộng hoà xã hội chủ nghĩa Việt Nam là tổng thể các thiết chế chính trị tồn tại và hoạt động trong mối liên hệ hữu cơ với nhau nhằm tạo ra một cơ chế thực hiện quyền lực của nhân dân dưới sự lãnh đạo của Đảng Cộng sản Việt Nam.
+
+Hệ thống chính trị của nước ta bao gồm Đảng Cộng sản Việt Nam, Nhà nước Cộng hào xã hội Chủ nghĩa Việt Nam, Mặt trận Tổ quốc Việt Nam và các tổ chức chính trị - xã hội như: Tổng Liên đoàn Lao động Việt Nam, Đoàn Thanh niên Cộng sản Hồ Chí Minh, Hội liên hiệp Phụ nữ Việt Nam, Hội Nông dân Việt Nam, Hội Cựu chiến binh Việt Nam.
+
+##### 9. Nhà nước pháp quyền phải là nhà nước của dân, do dân và vì dân, tất cả quyền lực
+
+nhà nước thực sự thuộc về nhân dân, pháp luật có tính pháp lý và công bằng, thể hiện đầy đủ các giá trị cao cả của xã hội và của con người, pháp luật phải giữ vai trò chủ đạo trong mọi hoạt dộng, trong xử sự của các chủ thể và toàn xã hội
+
+CÂU HỎI ÔN TẬP CHƯƠNG 1
+
+1. Tại sao nói nhà nước ra đời là một tất yếu lịch sử?
+
+2. Phân tích bản chất của nhà nước?
+
+3. Trình bày các đặc trưng của nhà nước và các kiểu nhà nước? Liên hệ với nhà nước Việt Nam?
+
+4. Nêu nội dung hình thức nhà nước?
+
+5. Nêu bản chất của nhà nước Cộng hoà XHCN Việt Nam? Làm rõ khái niệm “tính nhân dân” của nhà nước Việt Nam? Cho ví dụ thực tế minh họa.
+
+6. Trình bày chức năng đối nội của nhà nước Việt Nam?
+
+7. Trình bày chức năng đối ngoại của nhà nước Việt Nam? Liên hệ với chức năng đối nội?
+
+8. Địa vị pháp lý của các cơ quan nhà nước trong bộ máy nhà nước Việt Nam?
+
+9. Vấn đề cải cách bộ máy nhà nước Việt Nam? Phương hướng? Mục tiêu?
+
+##### 10. Khái niệm hệ thống chính trị? Vị trí của Đảng cộng sản trong hệ thống chính trị
+
+Việt Nam?
+
+11. Vị trí của nhà nước và các tổ chức xã hội trong hệ thống chính trị?
+
+12. Vấn đề đổi mới hệ thống chính trị ở Việt Nam hiện nay?
+
+<!-- page: 23 -->
+
+### Chương 2: Lý Luận Chung Về Pháp Luật
+
+Chương 2 đề cập đến một vấn đề hết sức quan trọng được coi như luôn song hành cùng với nhà nước đó là vấn đề pháp luật. Tại sao pháp luật lại ra đời? Thời điểm? Vai trò, vị trí của pháp luật trong quản lý xã hội? Những câu hỏi này nhằm làm sáng tỏ nguồn gốc ra đời của pháp luật, tính cần thiết của pháp luật trong quản lý xã hội. Pháp luật được coi như là một công cụ quản lý có hiệu quả nhất của nhà nước trong việc quản lý xã hội. Ngoài pháp luật, các quan hệ xã hội còn được điều chỉnh bằng phong tục tập quán, đạo đức, tín điều tôn giáo...
+
+Ngoài các vấn đề chung nhất về pháp luật như khái niệm, bản chất, đặc điểm, các thuộc tính nội dung chương II còn đề cập tới pháp luật của nước Cộng hoà XHCN Việt Nam. Đặc biệt trong giai đoạn hiện nay khi chúng ta đã khẳng định tại Điều 2 Hiến pháp 1992 rằng “Nhà nước Việt Nam là nhà nước pháp quyền XHCN...” thì vị trí, vai trò của pháp luật được đặt lên hàng tối thượng. Chúng ta đã nghiêm túc thực hiện việc quản lý xã hội bằng pháp luật do đó đòi hỏi của giai đoạn hiện nay là hệ thống pháp luật phải không ngừng đổi mới và hoàn thiện cả về số lượng, chất lượng, hình thức cũng như nội dung.
+
+Trong chương này cũng đề cập đến môt số vấn đề cơ bản như quy phạm pháp luật, quan hệ pháp luật, ý thức pháp luật, vi phạm pháp luật, trách nhiệm pháp lý, pháp chế XHCN... đây là những vấn đề hết sức quan trọng nhằm trang bị cho học viên những kiến thức tối thiểu về pháp luật qua đó có những cách ững xử và hành vi phù hợp với các quy định của pháp luật.
+
+Đây cũng là cơ sở phục vụ cho công tác tuyên truyền, phổ biến, giáo dục, giải thích pháp luật nhằm nâng cao ý thức pháp luật và văn hoá pháp lý cho nhân dân.
+
+#### 2.1. Nguồn Gốc Và Bản Chất Của Pháp Luật
+
+##### 2.1.1. Nguồn gốc và bản chất của pháp luật
+
+###### 2.1.1.1. Nguồn gốc của pháp luật
+
+Theo học thuyết Mác-Lênin, nhà nước và pháp luật là hai hiện tượng lịch sử cơ bản nhất của đời sống chính trị xã hội, là hai người bạn đồng hành có số phận lịch sử như nhau cùng xuất hiện, cùng tồn tại và phát triển và cùng tiêu vong khi nhân loại đã tiến tới chủ nghĩa cộng sản.
+
+Những nguyên nhân dẫn đến sự ra đời của nhà nước cũng chính là những nguyên nhân làm xuất hiện pháp luật: một là sự phát triển của nền kinh tế trong xã hội nguyên thủy từ chỗ vô cùng thấp kém, lạc hậu và chế độ sở hữu chung đến chỗ dần dần có của cải dư thừa và xuất hiện chế độ chiếm hữu tư nhân (tư hữu) về tư liệu sản xuất và của cải làm ra; hai là, sự phân hóa xã hội thành những tầng lớp, giai cấp có lợi ích đối kháng nhau và mâu thuẫn giai cấp, đấu tranh giai cấp phát triển đến mức không thể điều hòa được.
+
+<!-- page: 24 -->
+
+###### 2.1.1.2. Bản chất của pháp luật
+
+Cũng giống như bản chất của nhà nước, bản chất của pháp luật thể hiện trước hết ở tính giai cấp. Tính giai cấp của pháp luật phản ánh ý chí nhà nước của giai cấp thống trị trong xã hội, nội dung ý chí đó được quy định bởi điều kiện sinh hoạt vật chất của giai cấp thống trị. Ý chí của giai cấp thống trị được cụ thể hóa trong các văn bản pháp luật do cơ quan nhà nước có thẩm quyền ban hành.
+
+Tính giai cấp của pháp luật còn thể hiện ở mục đích điều chỉnh các quan hệ xã hội, pháp luật là yếu tố điều chỉnh về mặt giai cấp các quan hệ xã hội nhằm định hướng cho các quan hệ xã hội phát triển theo một mục tiêu, một trật tự phù hợp với ý chí của giai cấp thống trị, bảo vệ và củng cố địa vị của giai cấp thống trị. Với ý nghĩa đó pháp luật chính là công cụ thể hiện sự thống trị của giai cấp.
+
+Ví dụ: Pháp luật chủ nô là pháp luật của giai cấp chủ nô do giai cấp này đặt ra trước hết là vì lợi ích của nó. Pháp luật chủ nô quy định công khai quyền lực vô hạn của chủ nô và tình trạng vô quyền của giai cấp nô lệ.
+
+Bên cạnh tính giai cấp, không thể coi nhẹ giá trị xã hội to lớn của pháp luật vì trong cuộc sống hàng ngày các cá nhân và tổ chức có mối quan hệ với nhau rất đa dạng được thể hiện qua những hành vi xử sự khác nhau. Xã hội thông qua nhà nước ghi nhận những cách xử sự hợp lý, khách quan được số đông chấp nhận phù hợp với lợi ích của số đông trong xã hội, cách xử sự này được nhà nước thể chế hóa thành những quy phạm pháp luật. Giá trị xã hội của pháp luật còn được thể hiện ở chỗ một quy phạm pháp luật vừa là thước đo của hành vi con người vừa là công cụ kiểm nghiệm các quá trình, các hiện tượng xã hội, là công cụ để nhận thức xã hội và điều chỉnh các quá trình xã hội.
+
+Ngoài ra pháp luật còn có tính dân tộc, tính mở.
+
+##### 2.1.2. Những đặc điểm chung của pháp luật
+
+Thuộc tính của pháp luật là những tính chất, dấu hiệu riêng biệt đặc trưng của pháp Pháp luật có các thuộc tính sau:
+
+* Tính quy phạm phổ biến (tính bắt buộc chung):
+
+Pháp luật có đối tượng điều chỉnh rộng hơn các quy phạm xã hội khác, pháp luật lại là khuôn mẫu xử sự cho các hành vi nên nó có tính bắt buộc với tất cả mọi người. Điều này tạo nên hiệu lực lớn của pháp luật trong quản lý xã hội. Các quy phạm pháp luật được áp dụng nhiều lần trong không gian và thời gian, tính phổ biến của pháp luật dựa trên ý chí của nhà nước “được đề lên thành luật”, pháp luật làm cho ý chí này có tính chất chủ quyền duy nhất trong một quốc gia.
+
+* Tính xác định chặt chẽ về mặt hình thức
+
+Là sự thể hiện nội dung pháp luật trong những hình thức nhất định, nội dung của pháp luật phải được xác định rõ ràng, chặt chẽ điều này nhằm bảo đảm nguyên tắc “bất cứ ai được đặt vào những điều kiện ấy cũng không thể làm khác được”.
+
+<!-- page: 25 -->
+
+Nội dung của pháp luật phải được quy định rõ ràng, chặt chẽ, khái quát trong các khoản của mọi điều luật, trong các điều luật, trong một văn bản pháp luật và toàn bộ hệ thống pháp luật nói chung. Nếu các quy phạm pháp luật quy định không đủ, không rõ, không chính xác thì sẽ tạo ra những kẽ hở cho sự chuyên quyền, lạm dụng, những hành vi vi phạm pháp luật như tham ô, lãng phí, phá hoại… Như vậy nội dung của pháp luật phải được biểu hiện bằng ngôn ngữ pháp luật rõ ràng, chính xác dưới hình thức nhất định của pháp luật.
+
+* Tính được đảm bảo bằng nhà nước
+
+Khác với các quan hệ xã hội khác pháp luật do nhà nước ban hành hoặc thừa nhận vì vậy được nhà nước bảo đảm thực hiện, điều đó có nghĩa là nhà nước đã trao cho các quy phạm pháp luật tính quyền lực bắt buộc đối với mọi cơ quan, tổ chức và công dân. Pháp luật đã trở thành quy tắc xử sự có tính bắt buộc chung.
+
+Tùy theo các mức độ mà nhà nước áp dụng các biện pháp khác nhau như tổ chức, khuyến khích kể cả biện pháp cưỡng chế cần thiết để đảm bảo cho pháp luật được thực hiện đúng.
+
+##### 2.1.3. Bản chất vai trò của pháp luật Nhà nước Cộng hòa xã hội chủ nghĩa Việt Nam
+
+###### 2.1.3.1. Bản chất của pháp luật Nhà nước Việt Nam
+
+Cũng như mọi Nhà nước khác, bản chất, đặc điểm pháp luật của Nhà nước ta phù hợp với bản chất, đặc điểm của Nhà nước, do bản chất, đặc điểm và những nhiệm vụ của Nhà nước ta trong từng thời kỳ cách mạng quyết định.
+
+Điều 2 Hiến pháp 1992 (sửa đổi) xác định: “Nhà nước Cộng hòa xã hội chủ nghĩa Việt Nam là Nhà nước pháp quyền xã hội chủ nghĩa của nhân dân, do nhân dân, vì nhân dân. Tất cả quyền lực nhà nước thuộc về nhân dân mà nền tảng là liên minh giữa giai cấp công nhân với giai cấp nông dân và đội ngũ trí thức”.
+
+Nhà nước đó đặt dưới sự lãnh đạo của “Đảng Cộng sản Việt Nam, đội tiên phong của giai cấp công nhân, đại bỉểu trung thành quyền lợi của giai cấp công nhân, nhân dân lao động và của cả dân tộc, theo chủ nghĩa Mác-Lênin và tư tưởng Hồ Chí Minh” (Điều 4 Hiến pháp 1992).
+
+Vì lẽ đó, pháp luật của Nhà nước ta về bản chất là pháp luật xã hội chủ nghĩa, nó thể hiện ý chí của giai cấp công nhân, đồng thời phản ánh, thể hiện ý chí, lợi ích của các tầng lớp nhân dân lao động khác và của cả dân tộc. Có sự thống nhất đó là do trong xã hội ta hiện nay có sự thống nhất về cơ bản, lâu dài giữa lợi ích của giai cấp công nhân, giai cấp nông dân, tầng lớp trí thức với lợi ích của cả dân tộc. Đó là mục đích “bảo đảm không ngừng phát huy quyền làm chủ về mọi mặt của nhân dân, thực hiện mục tiêu dân giàu, nước mạnh, xã hội công bằng, dân chủ, văn minh, mọi người có cuộc sống ấm no, tự do, hạnh phúc, có điều kiện phát triển toàn diện” (Điều 3 Hiến pháp 1992).
+
+Nói pháp luật thể hiện ý chí và lợi ích của toàn thể nhân dân lao động không có nghĩa là phủ nhận tính giai cấp của pháp luật của Nhà nước ta, đối với đường lối, chính sách của Đảng của giai cấp công nhân. Vấn đề là ở chỗ, khi pháp luật phản ánh, bảo vệ lợi ích của các giagi cấp, của dân tộc phải đứng trên những quan điểm, thể hiện trong chủ trương,
+
+<!-- page: 26 -->
+
+đường lối, chính sách của Đảng Cộng sản Việt Nam. Đó là một nguyên tắc hàng đầu của pháp luật nước ta trong giai đoạn hiện nay. Trong nền kinh tế nhiều thành phần, đương nhiên còn tồn tại các lợi ích khác nhau của các giai cấp, các tầng lớp xã hội. Pháp luật cũng đương nhiên phải bảo vệ, phản ánh tất cả nhẽng lợi ích chính đáng đó, nhưng phải phù hợp với định hướng phát triển của nền kinh tế nhiều thành phầnm phù hợp với quan điểm của Đảng và Nhà nước ta.
+
+Sự kết hợp chặt chẽ giữa tính giai cấp sâu sắc và tính nhân dân rộng rãi là một đặc điểm đáng chú ý của pháp luật Nhà nước ta hiện nay.
+
+###### 2.1.3.2. Vai trò của pháp luật Nhà nước ta hiện nay
+
+Với mục tỉêu xây dựng một Nhà nước pháp quyền xã hội chủ nghĩa, pháp luật ở nước ta hiện nay có vai trò đặc biệt quan trọng.
+
++ Pháp luật là công cụ thực hiện đường lối chính sách của Đảng.
+
+Sự lãnh đạo của Đảng Cộng sản Việt Nam là nhân tố quyết định đảm bảo thắng lợi của cách mạng nước ta trong công cuộc bảo vệ và xây dựng đất nước trước đây cũng như trong công cuộc đổi mới và tiến lên công nghiệp hóa, hiện đại hóa hiện nay. Đảng lãnh đạo trước hết và chủ yếu bằng cách Đảng vạch ra đường lối, chính sách cho mỗi giai đoạn phát triển của cách mạng trên cơ sở phân tích khoa học tình hình thực tế, vận dụng sáng tạo các nguyên lý của chủ nghĩa Mác-Lênin, tư tưởng Hồ Chí Minh vào thực tiễn Việt Nam. Chính vì thế để thực hiện sự lãnh đạo của Đảng, vấn đề có ý nghĩa quyết định là phải có những phương pháp thích hợp và khoa học làm cho đường lối, chính sách của Đảng đi vào thực tế đời sống, biến thành ý chí, nguyện vọng, thành hành động của Đảng mà là của toàn thể nhân dân, của toàn xã hội. Ngày nay Đảng cầm quyền, trở thành lực lượng lãnh đạo Nhà nước và xã hội thì việc thể hiện cũng như tổ chức thực hiện đường lối, chính sách của Đảng trước hết và chủ yếu phải bằng Nhà nước và thông qua Nhà nước. Đường lối, chính sách của Đảng phải được thể chế hóa, trở thành pháp luật Nhà nước. Trên ý nghĩa đó, pháp luật là sự biểu hiện dưới hình Nhà nước các đường lối, chính sách của Đảng thành hiện thực sinh động trong cuộc sống. Mặt khác, bằng việc thể chế hóa thành pháp luật, đường lối chủ trương chính sách của Đảng biến thành những quyết định quản lý mang tính quyền lực nhà nước, trở thành các quyền và nghĩa vụ pháp lý cụ thể của cá nhân, tổ chức được thực hiện một cách trực tiếp, chính xác, thống nhất trong cả nước, trong từng ngành, từng địa phương, từng đơn vị cơ sở.
+
++ Pháp luật là công cụ thực hiện quyền làm chủ của nhân dân lao động
+
+“Nhà nước bảo đảm và không ngừng phát huy quyền làm chủ về mọi mặt của nhân dân...” (Điều 2 Hiến pháp 1992). Đó là vấn đề thuộc bản chất của Nhà nước ta.
+
+Pháp luật phải quy định cụ thể, bảo đảm đầy đủ, thực tế nguyên tắc: mọi quyền lực trong nước đều thuộc về nhân dân. Nhân dân phải là người thực sự xây dựng nên Nhà nước của mình, tham gia vào các công việc Nhà nước, kiểm tra sự hoạt động của các cơ quan nhà nước. Pháp luật cũng phải quy định rõ nghiẫ vụ trung thành và phục vụ nhân dân một cách tận tụy của các cơ quan nhà nước và cán bộ công chức nhà nước trong việc thực hành công vụ; chống thái độ vô trách nhiệm, hách dịch, cửa quyền, bài trừ nạn quan liêu, tham nhũng,
+
+<!-- page: 27 -->
+
+ngăn ngừa tình trạng một số cán bộ công chức nhà nước biến thành lớp người đặc quyền, đặc lợi.
+
+Mặt khác mỗi công dân khi thực hiện quyền làm chủ, thực hiện các quyền tự do, dân chủ của mình không được làm tổn hại đến lợi ích chung của xã hội, lợi ích và các quyền tự do, dân chủ của công dân khác. Vì vậy, lẽ tự nhiên việc thực thi quyền tự do, dân chủ phải có pháp luật, trong khuôn khổ pháp luật. Pháp luật phải có đủ để bảo đảm thực hiện phương châm công dân được tự do làm những gì mà pháp luật không cấm. Pháp luật phải ghi rõ quyền và nghĩa vụ của công dân, đòi hỏi mỗi công dân phải có thái độ chăm lo đến lợi ích chung của tập thể, của xã hội, làm tròn nghĩa vụ của mình đối với Nhà nước, với Tổ quốc.
+
+Đối với những người không tự giác tuân thủ pháp luật thì phải áp dụng những biện pháp cưỡng chế, bất cứ ai vi phạm cũng phải bị xử lý thích đáng theo đúng pháp luật.
+
++ Pháp luật là công cụ quản lý của Nhà nước
+
+Như trên đã phân tích, pháp luật do nhà nước đặt ra và bảo vệ... Nhưng mặt khác cũng phải thấy rằng, nhà nước nào cũng cần phải có pháp luật để thực hiện vai trò quản lý của mình đối với xã hội. Nhà nước cai trị, quản lý xã hội có thể sử dụng nhiều công cụ, biện pháp khác nhau. Nhưng công cụ có hiệu lực và đặc trưng nhất của nhà nước vẫn là pháp luật. Có thể nói, người ta không thể quan niệm được có một sự quản lý, cai trị của Nhà nước mà lại không có pháp luật.
+
+Nhà nước sử dụng pháp luật không chỉ nhằm trừng trị, trấn áp, cưỡng chế, giữ cho xã hội trong vòng trật tự có lợi cho giai cấp thống trị mà còn là công cụ quan trọng để cải tạo các quan hệ xã hội cũ, lối sống cũ, tổ chức xây dựng và điều hành mọi lĩnh vực kinh tế, văn hóa, xã hội, giáo dục, khoa học, công nghệ, mở đường cho các quan hệ xã hội mới phát triển phù hợp với quy luật kinh tế khách quan.
+
+Vì vậy, ngày nay pháp luật của Nhà nước ta không chỉ bó hẹp ở chức năng cưỡng chế, trừng trị mà điều quan trọng nó còn là công cụ hướng dẫn, khuyến khích, thúc đẩy, điều chỉnh sự phát triển của xã hội, đặc biệt trong sự phát triển của nền kinh tế đất nước.
+
+Nói cách khác, pháp luật còn tạo môi trường cho các quan hệ kinh tế mới phát triển.
+
+Với ý nghĩa đó, pháp luật của Nhà nước ta hiện nay có vai trò vô cùng quan trọng trong việc “phát triển nền kinh tế thị trường định hướng xã hội chủ nghĩa. Cơ cấu kinh té nhiều thành phần với các hình thức tổ chức sản xuất, kinh doanh đa dạng dựa trên chế độ sở hữu tập thể là nền tảng” (Điều 15 Hiến pháp 1992). Để đáp ứng yêu cầu đó, pháp luật phải tạo nên một môi trường pháp lý thuận lợi cho hoạt động tự do kinh doanh phát triển tạo cho mọi người công dân có nhiều cơ hội khác nhau để làm ăn, sinh sống, kinh doanh theo pháp luật, bảo vệ các quyền sở hữu hợp pháp, các nguồn thu thập hợp pháp. Mặt khác, pháp luật cũng tạo cơ sở để Nhà nước có thể thực hiện được vai trò người điều hành nền kinh tế thị trường, hướng nó phát triển theo các mục tiêu đã định, khắc phục, hạn chế những mặt trái vốn có của nền kinh tế thị trường. Pháp luật cũng phải là công cụ để Nhà nước kiểm soát các hoạt động kinh doanh, trừng trị mọi hành vi kinh doanh phi pháp, thực hiện sự công bằng trong sản xuất, phân phối.
+
+Một vai trò quan trọng khác của pháp luật trong quản lý nhà nước là nó xác lập, củng cố và hoàn thiện những cơ sở pháp lý của quản lý nhà nước, đặc biệt là quản lý nhà nước về
+
+<!-- page: 28 -->
+
+kinh tế, nhằm phát huy cao nhất hiệu lực của tất cả các cơ quan trong bộ máy nhà nước.
+
+Muốn vậy, pháp luật phải xác định rõ các nguyên tắc tổ chức và hoạt động, cũng như thẩm quyền của các cơ quan nhà nước và của từng cán bộ, cong chức nhà nước. Vì thế, pháp luật hiện nay cua Nhà nước ta phải là cơ chế quản lý mới, từ hoạt động lập pháp đén hoạt động hành pháp và tư pháp. Trong đó, trọng tâm trước mắt là cải cách một bước nền hành chính quốc gia như Nghị quyết Hội nghị Ban Chấp hành Trung ương Đảng lần thứ 8 (Khóa VII) đã chỉ ra.
+
+Từ sự phân tích ở trên có thể đi đến kết luận là: Nhà nước ta cũng như bất kỳ một nhà nước nào đều phải sử dụng pháp luật như là một công cụ chủ yếu để thực hiện vai trò quản lý của mình và vì vậy, việc quản lý bằng pháp luật cũng là một đặc trưng của việc quản lý nhà nước.
+
+#### 2.2. Quy Phạm Pháp Luật
+
+##### 2.2.1. Khái niệm và những đặc điểm chung của quy phạm pháp luật
+
+###### 2.2.1.1. Khái niệm quy phạm pháp luật
+
+Quy phạm pháp luật là những quy tắc xử sự (quy định khuôn mẫu của hành vi nghĩa là vào trong hoàn cảnh này phải thực hiện hành vi đó như thế nào) chỉ do nhà nước ban hành hoặc thừa nhận.
+
+###### 2.2.1.2. Đặc điểm của quy phạm pháp luật
+
+- Thể hiện ý chí của nhà nước.
+
+- Mang tính bắt buộc chung.
+
+- Được nhà nước ban hành hoặc thừa nhận.
+
+- Được nhà nước bảo đảm thực hiện.
+
+##### 2.2.2. Cơ cấu của quy phạm pháp luật
+
+###### 2.2.2.1. Giả định
+
+Giả định thường nói về địa điểm, thời gian, các chủ thể, các hoàn cảnh thực tế mà trong đó mệnh lệnh của quy phạm được thực hiện tức là xác định môi trường cho sự tác động của quy phạm pháp luật.
+
+Ví dụ: Điều 161 Bộ luật hình sự quy định: “Người nào trốn thuế với số tiền từ 50 triệu đồng đến dưới 150 triệu đồng …”.
+
+Trong quy phạm pháp luật trên bộ phận giả định là “ Người nào trốn thuế …” - nói đến yếu tố chủ thể.
+
+- Bộ phận giả định thường trả lời cho câu hỏi chủ thể nào? khi nào? trong hoàn cảnh,
+
+điều kiện nào?
+
+- Để áp dụng các quy phạm pháp luật một cách chính xác, nhất quán phần giả định
+
+phải mô tả rõ ràng những điều kiện, hoàn cảnh nêu ra phải sát hợp với thực tế. Do đó tính xác định là tiêu chuẩn hàng đầu của một giả định.
+
+<!-- page: 29 -->
+
+###### 2.2.2.2. Quy định
+
+Quy định là bộ phận của quy phạm pháp luật trong đó nêu quy tắc xử sự buộc mọi chủ thể phải xử sự theo khi ở vào hoàn cảnh đã nêu trong phần giả định của quy phạm.
+
+Ví dụ: Điều 4 Thể lệ Bưu phẩm bưu kiện 1999 quy định: “Bưu phẩm bưu kiện chỉ được mở kiểm tra trong các trường hợp: Hội đồng xử lý bưu phẩm bưu kiện vô thừa nhận xác định là bưu phẩm bưu kiện vô thừa nhận …”. Trong quy phạm pháp luật này phần quy định là “BPBK chỉ được mở kiểm tra khi đã có xác nhận của Hội đồng xử lý BPBK vô thừa nhận …”.
+
+- Quy định là yếu tố trung tâm của quy phạm pháp luật bởi vì trong quy định trình bày
+
+ý chí và lợi ích của nhà nước, xã hội và cá nhân con người trong việc điều chỉnh những quan hệ xã hội nhất định.
+
+- Bộ phận quy định trả lời cho câu hỏi phải làm gì? được làm gì? làm như thế nào?
+
+###### 2.2.2.3. Chế tài
+
+Là bộ phận của quy phạm pháp luật nêu lên những biện pháp tác động mà nhà nước dự kiến áp dụng đối với chủ thể không thực hiện đúng mệnh lệnh của nhà nước đã nêu trong bộ phận quy định của quy phạm pháp luật.
+
+Ví dụ: Điều 97 Bộ luật hình sự quy định “Người nào vô ý làm chết người thì bị phạt tù từ 6 tháng đến 5 năm”. Ở quy phạm pháp luật này bộ phận chế tài là “thì bị phạt tù từ 6 tháng đến 5 năm”.
+
+- Chế tài là một trong những phương tiện đảm bảo thực hiện bộ phận quy định của
+
+quy phạm pháp luật. Chế tài chính là những hậu quả bất lợi đối với chủ thể vi phạm pháp
+
+#### 2.3. Quan Hệ Pháp Luật
+
+##### 2.3.1. Khái niệm, bản chất của quan hệ pháp luật
+
+Trong đời sống thực tiễn giữa con người với con người nảy sinh rất nhiều mối quan hệ đa dạng và phong phú được gọi là những quan hệ xã hội. Những quan hệ xã hội được nhiều loại quy tắc xử sự (quy phạm) điều chỉnh như: quy phạm tập quán, đạo đức, tôn giáo, pháp luật… Trong số đó quy phạm pháp luật điều chỉnh những quan hệ xã hội cơ bản và quan trọng nhất, nhằm hướng những quan hệ xã hội ấy - tức là xã hội nói chung, phát triển phù hợp theo hướng mà nhà nước mong muốn. Một quy phạm pháp luật thực hiện vai trò điều chỉnh một quan hệ xã hội bằng cách đặt cơ sở cho sự xuất hiện những quan hệ pháp luật tương ứng với quan hệ xã hội được quy phạm đó điều chỉnh.
+
+Khi xuất hiện những tình huống, hoàn cảnh cùng với những chủ thể nhất định như được quy định trong phần giả định của quy phạm pháp luật thì sẽ xuất hiện quan hệ pháp luật tương ứng với quan hệ xã hội được quy phạm pháp luật đó điều chỉnh. Cần nhấn mạnh rằng, việc ban hành các quy phạm pháp luật chỉ đặt cơ sở cho sự xuất hiện của quan hệ pháp luật, chứ không mặc nhiên sinh ra ngay quan hệ pháp luật tương ứng. Để quan hệ đó xuất hiện, phải có đầy đủ cả hai điều kiện khác là sự kiện pháp lý và chủ thể có năng lực hành vi.
+
+<!-- page: 30 -->
+
+Như vậy có thể định nghĩa quan hệ pháp luật như sau: Quan hệ pháp luật là hình thức pháp lý của các quan hệ xã hội. Hình thức pháp lý này xuất hiện trên cơ sở sự điều chỉnh của quy phạm pháp luật đối với quan hệ xã hội tương ứng và các bên tham gia quan hệ pháp luật đó (tức là các chủ thể của quan hệ pháp luật) đều mang những quyền và nghĩa vụ pháp lý được quy phạm pháp luật nói trên quy định.
+
+* Đặc điểm của quan hệ pháp luật:
+
+- Mang tính ý chí.
+
+- Là một loại quan hệ tư tưởng thuộc kiến trúc thượng tầng xã hội.
+
+- Xuất hiện trên cơ sở quy phạm pháp luật.
+
+- Các bên tham gia (chủ thể) quan hệ pháp luật mang những quyền và nghĩa vụ pháp
+
+lý mà quy phạm pháp luật dự kiến trước.
+
+- Được bảo đảm thực hiện bằng nhà nước.
+
+- Mang tính xác định cụ thể, nghĩa là nó chỉ xuất hiện trong những trường hợp xác
+
+định, giữa những chủ thể cụ thể nhất định khi có đồng thời ba điều kiện sau: có một quy phạm pháp luật nhất định đã được ban hành, tồn tại những chủ thể xác định cụ thể và xuất hiện những sự kiện cụ thể đã được dự kiến trong phần giả định của quy phạm pháp luật (tức là sự kiện pháp lý) nêu trên.
+
+##### 2.3.2. Chủ thể của quan hệ pháp luật
+
+Chủ thể của quan hệ pháp luật là các bên tham gia quan hệ pháp luật (có thể là cá nhân hoặc tổ chức). Các bên phải có năng lực chủ thể, bao gồm năng lực pháp luật và năng lực hành vi.
+
+- Năng lực pháp luật là khả năng của chủ thể có được các quyền chủ thể và nghĩa vụ
+
+pháp lý mà nhà nước thừa nhận (bằng cách quy định trong pháp luật).
+
+- Năng lực hành vi là khả năng của chủ thể được nhà nước thừa nhận bằng các hành
+
+vi của mình thực hiện trên thực tế các quyền chủ thể và nghĩa vụ pháp lý tức là tham gia vào các quan hệ pháp luật.
+
+Chủ thể bao gồm: công dân, người nước ngoài và người không có quốc tịch, các tổ chức …
+
+##### 2.3.3. Nội dung của quan hệ pháp luật
+
+Là các quyền chủ thể và nghĩa vụ pháp lý.
+
+Quyền chủ thể trong quan hệ pháp luật là khả năng xử sự của chủ thể tham gia quan hệ được quy phạm pháp luật quy định trước và được bảo vệ bởi sự cưỡng chế của nhà nước.
+
+- Khả năng được hành động trong khuôn khổ do quy phạm pháp luật xác định trước.
+
+- Khả năng yêu cầu bên kia thực hiện nghĩa vụ của họ (bằng hành động hoặc không
+
+hành động).
+
+- Khả năng yêu cầu các cơ quan nhà nước áp dụng các biện pháp chế tài cần thiết khi
+
+quyền chủ thể bị vi phạm.
+
+<!-- page: 31 -->
+
+Nghĩa vụ pháp lý: là cách xử sự bắt buộc (tức là sự cần thiết phải xử sự) được quy phạm pháp luật xác định trước mà một bên phải thực hiện nhằm đáp ứng việc thực hiện quyền chủ thể của bên kia.
+
+- Bắt buộc có những xử sự nhất định do quy phạm pháp luật xác định trước.
+
+- Cách xử sự này nhằm thực hiện quyền chủ thể của bên kia.
+
+##### 2.3.4. Khách thể của quan hệ pháp luật
+
+Khách thể của quan hệ pháp luật là những lợi ích vật chất, chính trị hoặc tinh thần mà các công dân, tổ chức, cơ quan nhà nước mong muốn đạt được nhằm thỏa mãn những nhu cầu của mình khi tham gia vào các quan hệ pháp luật và thực hiện quyền chủ thể, nghĩa vụ pháp lý.
+
+Muốn đạt được các lợi ích nói trên các chủ thể phải thực hiện thông qua những hành vi (cách xử sự) nhất định.
+
+##### 2.3.5. Sự kiện pháp lý
+
+- Sự kiện pháp lý là nhựng điều kiện, hoàn cảnh, tình huống của đời sống thực tế
+
+được chỉ ra trong phần giả định của quy phạm pháp luật mà nhà làm luật gắn sự xuất hiện, thay đổi và chấm dứt của quan hệ pháp luật với sự tồn tại của nó.
+
+Ví dụ: Sự kiện có người chết để lại tài sản xuất hiện quan hệ pháp luật (quan hệ thừa kế) do quy phạm pháp luật dân sự điều chỉnh. Chủ thể của quan hệ là người để lại thừa kế và người hưởng thừa kế, hai bên đều có những quyền và nghĩa vụ pháp lý nhất định.
+
+#### 2.4. Ý Thức Pháp Luật
+
+##### 2.4.1. Khái niệm ý thức pháp luật
+
+Ý thức pháp luật là một hình thái của ý thức xã hội, là một trong những biểu hiện của trình độ văn hóa xã hội. Có thể định nghĩa ý thức pháp luật là tổng thể những học thuyết, tư tưởng, tình cảm của con người thể hiện thái độ, sự đánh giá về tính công bằng hay không công bằng, đúng đắn hay không đúng đắn của pháp luật hiện hành, pháp luật trong quá khứ và pháp luật cần phải có, về tính hợp pháp hay không hợp pháp trong cách xử sự của con người, trong hoạt động của các cơ quan, tổ chức.
+
+Từ định nghĩa trên có thể thấy rằng về mặt nội dung ý thức pháp luật được cấu thành từ hai bộ phận: tư tưởng pháp luật và tâm lý pháp luật.
+
+Tư tưởng pháp luật là tổng thể những tư tưởng, quan điểm, phạm trù, khái niệm, học thuyết về pháp luật, tức là mọi vấn đề lý luận về pháp luật, về thượng tầng kiến trúc pháp lý của xã hội.
+
+Tâm lý pháp luật được thể hiện qua thái độ, tình cảm, tâm trạng, xúc cảm đối với pháp luật và các hiện tượng pháp lý khác, được hình thành một cách tự phát thông qua giao tiếp và dưới tác động của các hiện tượng pháp lý, là phản ứng trực tiếp và ở cấp độ đầu tiên, phản ứng một cách tự nhiên của con người đối với các hiện tượng đó.
+
+<!-- page: 32 -->
+
+Tư tưởng pháp luật là bộ phận tiên tiến của ý thức pháp luật, có thể vượt lên trước, định hướng cho sự phát triển của pháp luật. Còn tâm lý pháp luật là bộ phận bảo thủ, bền vững hơn, biến đổi chậm chạp vì gắn bó chặt chẽ với thói quen, truyền thống, tập quán xã hội. Nhưng hai bộ phận cũng có quan hệ biện chứng, phụ thuộc vào nhau hoặc là tiền đề của nhau.
+
+- Ngoài ra, theo chủ thể của ý thức pháp luật ta thấy ý thức pháp luật được cấu thành
+
+từ ba bộ phận: ý thức pháp luật cá nhân, ý thức pháp luật nhóm và ý thức pháp luật xã hội.
+
+Ý thức pháp luật nhóm và ý thức pháp luật xã hội có cơ sở là ý thức pháp luật cá nhân, nhưng không nên hiểu một cách máy móc rằng hai dạng ý thức pháp luật nói trên là tổng thể nhãng ý thức pháp luật cá nhân.
+
+Ý thức pháp luật nhóm là ý thức pháp luật của đại đa số cá nhân của nhóm, có những đặc trưng đại diện cho nhóm, ví dụ ý thức pháp luật của nông dân, công nhân, trí thức, của học sinh phổ thông, sinh viên...
+
+Còn ý thức pháp luật xã hội được hiểu là ý thức pháp luật của giai cấp và những tầng lớp nắm quyền lãnh đạo xã hội, đại diện cho cả xã hội, ví dụ: ý thức pháp luật tư sản, ý thức pháp luật xã hội chủ nghĩa...Trọng một xã hội đương nhiên có thể xó những ý thức pháp luật nhóm có nội dung khác nhau. Ví dụ: ý thức pháp luật của giai cấp vô sản khác với ý thức pháp luật của giai cấp tư sản. Mặt khác, ý thức pháp luật xã hội không phải lúc nào cũng đồng nhất với ý thức pháp luật của giai cấp tiên tiến nhất trong xã hội đó, ví dụ, trong xã hội tư sản thì ý thức pháp luật của giai cấp vô sản mới là ý thức pháp luật tiên tiến chứ không phải là ý thức pháp luật của giai cấp tư sản.
+
+- Theo tính chất và mức độ nhận thức ta có thể chia ý thức pháp luật thành hai bộ
+
+phận: ý thức pháp luật thông thường và ý thức pháp luật mang tính lý luận... Bộ phận thứ nhất là bao gồm ý thức pháp luật của những người không có trình độ khoa học pháp lý, bộ phận thứ hai là ý thức pháp luật của những luật gia, những nhà làm luật...
+
+##### 2.4.2. Quan hệ giữa ý thức pháp luật và pháp luật
+
+Mối quan hệ này thể hiện qua ba kênh chủ yếu sau:
+
++ Một là, ý thức pháp luật là tiền đề trực tiếp cho hoạt động xây dựng pháp luật. Nếu
+
+những người có nhiệm vụ trực tiếp saọn thảo và ban hành pháp luật và công dân - những người được hỏi ý kiến hoặc được tham gia hoạt động xây dựng phápluật, đều có tư tưởng pháp luật đúng đắn thì đương nhiên sẽ ban hành được pháp luật tốt; hoặc ngược lại.
+
++ Hai là, ý thức pháp luật là cơ sở cho sự thực hiện pháp luật, đặc biệt là hoạt động áp
+
+dụng pháp luật. Bởi vì, mọi chủ thể, nếu có tư tưởng pháp luật tiên tiến và thái độ, tình cảm (tâm lý) đúng đối với pháp luật, sẽ tự giác và biết chấp hành tốt pháp luật, các cơ quan có thẩm quyền biết áp dụng các quy định của pháp luật vào các trường hợp cụ thể phù hợp với yêu cầu của pháp chế, phát huy hết hiệu quả của quy phạm đó. Nếu ngược lại thì chúng ta sẽ thấy tình trạng vi phạm pháp luật gia tăng, kỷ cương và pháp chế bị buông lỏng, pháp luật trở nên vô hiệu.
+
++ Ba là, pháp luật cũng tác động ngược trở lại tới ý thức pháp luật. Bản thân pháp luật
+
+được xây dựng tốt sẽ chứa đựng trong đó những tư tưởng, quan điểm, nguyên tắc pháp lý
+
+<!-- page: 33 -->
+
+tiên tiến của ý thức pháp luật tiên tiến trong xã hội, những giá trị xã hội cao quý như chủ nghĩa nhân đạo, lẽ công bằng, tự do, bác ái và từ đó, với tư cách là công cụ quản lý có tính bắt buộc chung, nó lan truyền rộng rãi thông qua không chỉ sự tuyên truyền, giải thích pháp luật mà cả hoạt động áp dụng, thực hiện đúng đắn pháp luật, là phương tiện truyền bá hiệu quả ý thức pháp luật xã hội tiên tiến tới từng cá nhân, nâng tầm ý thức pháp luật cá nhân lên ngang tầm ý thức pháp luật xã hội.
+
+#### 2.5 Vi Phạm Pháp Luật Và Trách Nhiệm Pháp Lý
+
+##### 2.5.1. vi phạm pháp luật
+
+###### 2.5.1.1. Bản chất và những dấu hiệu cơ bản của vi phạm pháp luật
+
+Vi phạm pháp luật là một loại sự kiện pháp lý đặc biệt. Tìm hiểu bản chất, nguyên nhân của tình trạng vi phạm pháp luật có ý nghĩa quan trọng để đề ra các biện pháp đấu tranh với chúng một cách có hiệu quả nhằm lập lại trật tự và ổn định xã hội.
+
+Theo lý luận chung về pháp luật, vi phạm pháp luật nói chung là hành vi trái pháp luật xâm hại các quan hệ xã hội được pháp luật bảo vệ do các chủ thể có năng lực hành vi thực hiện nột cách cố ý hoặc vô ý gây hậu quả thiệt hại cho xã hội.
+
+Vi phạm pháp luật có các dấu hiệu cơ bản sau:
+
+- Là hành vi (hành động hoặc không hành động) của con người. Ý nghĩ, tư tưởng
+
+chưa thể hiện thành hành vi bị pháp luật cấm thì chưa thể gọi là vi phạm pháp luật.
+
+- Có tính chất trái pháp luật, tức là trái với yêu cầu cụ thể của các quy phạm pháp luật
+
+hay trái với tinh thần của pháp luật.
+
+- Có lỗi có nghĩa là vi phạm pháp luật là hành vi trái pháp luật được thực hiện bởi
+
+chính những chủ thể có khả năng nhận thức được hành vi trái pháp luật của mình và hậu quả thiệt hại mà hành vi đó có thể gây ra cho xã hội, nhưng vẫn thực hiện hành vi đó. Do đó, lỗi chính là dấu hiệu thể hiện quan hệ, thái độ tâm lý tiêu cực của chủ thể đối với hành vi trái pháp luật của mình và đối với hậu quả của hành vi đó.
+
+Cần lưu ý rằng phải đủ cả ba dấu hiệu nêu trên thì mới tồn tại vi phạm pháp luật, trong đó hành vi đóng vai trò dấu hiệu hình thức, dấu hiệu chung, còn tính trái pháp luật và lỗi là tính chất của hành vi.
+
+###### 2.5.1.2. Cấu thành vi phạm pháp luật
+
+Mọi vi phạm pháp luật đều có cấu thành pháp lý của nó, Tất cả các dấu hiệu trên hợp thành bốn yếu tố của khái niệm “cấu thành vi phạm pháp luật” đó là:
+
+* Mặt khách quan: bao gồm những dấu hiệu
+
+- Vi phạm pháp luật trước hết là hành vi thể hiện bằng hành động hoặc không hành
+
+động.
+
+- Tính chất trái pháp luật của hành vi, tức là hành vi đó phải trái với các yêu cầu của
+
+những quy phạm pháp luật nhất định, dưới hình thức hành động là làm điều pháp luật cấm hoặc làm không đúng điều pháp luật cho phép. Dưới hình thức không hành động là không
+
+<!-- page: 34 -->
+
+thực hiện nghĩa vụ mà pháp luật đã quy định mặc dù cần phải và có thể thực hiện nghĩa vụ đó.
+
+- Hành vi trái pháp luật gây thiệt hại chung cho xã hội hoặc thiệt hại trực tiếp về vật
+
+chất hoặc tinh thần cho từng thành viên cụ thể của xã hội.
+
+- Quan hệ nhân quả giữa hành vi và hậu quả, nói cách khác thiệt hại cho xã hôị xảy ra
+
+là do kết quả tất yếu của hành vi trái pháp luật.
+
+- Thời gian, địa điểm, phương tiện vi phạm.
+
+* Khách thể:
+
+Mọi hành vi trái pháp luật đều xâm hại tới những quan hệ xã hội được pháp luật điều chỉnh và bảo vệ, vì vậy những quan hệ xã hội ấy là khách thể của vi phạm pháp luật. Tính chất của khách thể có ý nghĩa quan trọng xác định mức độ nguy hiểm của hành vi trái pháp
+
+* Mặt chủ quan:
+
+- Một hành vi trái pháp luật phải là một hành vi có lỗi, nếu không có lỗi thì không
+
+phải là vi phạm pháp luật tức là chủ thể của hành vi đó không bị truy cứu trách nhiệm pháp lý. Lỗi được thể hiện dưới hình thức cố ý và vô ý.
+
+- Động cơ là lý do thúc đẩy chủ thể thực hiện hành vi vi phạm pháp luật.
+
+- Mục đích là kết quả mà chủ thể muốn đạt được khi thực hiện hành vi vi phạm.
+
+* Chủ thể:
+
+Đó là cá nhân hoặc tổ chức thực hiện vi phạm pháp luật, chủ thể của vi phạm pháp luật phải là người có năng lực hành vi.
+
+Như vậy vi phạm pháp luật là sự thống nhất của 4 yếu tố. Nhưng trong nhiều trường hợp chỉ cần xác định 3 dấu hiệu: hành vi, tính chất trái pháp luật và có lỗi của hành vi là có đủ căn cứ để khẳng định có vi phạm pháp luật xảy ra, nghĩa là đủ căn cứ để truy cứu trách nhiệm pháp lý.
+
+###### 2.5.1.3. Các loại vi phạm pháp luật
+
+- Vi phạm hình sự (tội phạm) là những hành vi nguy hiểm cho xã hội và được quy
+
+định trong bộ luật hình sự. Những hành vi vi phạm pháp luật không được quy định trong bộ luật hình sự thì không phải là tội phạm.
+
+- Vi phạm hành chính là những hành vi trái pháp luật, có lỗi mức độ nguy hiểm cho
+
+xã hội ít hơn so với vi phạm hình sự. Xâm phạm các quan hệ xã hội do các văn bản pháp luật về hành chính bảo vệ.
+
+- Vi phạm dân sự là hành vi trái pháp luật, có lỗi xâm hại tới các quan hệ tài sản, quan
+
+hệ nhân thân phi tài sản.
+
+- Vi phạm kỷ luật là hành vi có lỗi, trái với các quy tắc kỷ luật lao động, học tập, công
+
+vụ nhà nước… trong các cơ quan, xí nghiệp, trường học trong các ngành và lĩnh vực quản lý nhà nước.
+
+<!-- page: 35 -->
+
+2.5.2.Trách nhiệm pháp lý
+
+###### 2.5.2.1. Khái niệm và đặc điểm của trách nhiệm pháp lý
+
+* Khái niệm: Là sự phản ứng tiêu cực của nhà nước đối với các chủ thể thực hiện vi
+
+phạm pháp luật. Sự phản ứng đó thể hiện ở việc áp dụng đối với chủ thể thực hiện vi phạm pháp luật các biện pháp mang tính chất trừng phạt hoặc khôi phục lại những quyền và lợi ích hợp pháp bị xâm hại gây cho chủ thể vi phạm pháp pháp luật những thiệt hại nhất định về vật chất hoặc tinh thần.
+
+- Cơ sở thực tế của trách nhiệm pháp lý là vi phạm pháp luật.
+
+- Cơ sở pháp lý của việc truy cứu trách nhiệm pháp lý là quyết định do cơ quan nhà
+
+nước hoặc người có thẩm quyền ban hành trên cơ sở xem xét giải quyết vụ việc vi phạm đã có hiệu lực pháp luật.
+
+- Các biện pháp trách nhiệm pháp lý là một loại biện pháp cưỡng chế nhà nước đặc
+
+thù.
+
+###### 2.5.2.2. Các loại trách nhiệm pháp lý
+
+Tương ứng với các dạng vi phạm pháp luật là các dạng trách nhiệm pháp lý.
+
+- Trách nhiệm hình sự: được Tòa án áp dụng đối với những người có hành vi phạm
+
+tội được quy định trong Bộ luật hình sự do Quốc hội ban hành. Các chế tài trách nhiệm hình sự là nghiêm khắc nhất.
+
+- Trách nhiệm hành chính: chủ yếu được các cơ quan quản lý nhà nước áp dụng đối
+
+với cá nhân hoặc tổ chức thực hiện vi phạm hành chính như phạt tiền, cảnh cáo …
+
+- Trách nhiệm dân sự: được Tòa án áp dụng đối với các chủ thể vi phạm dân sự (cá
+
+nhân hoặc pháp nhân), các chế tài trách nhiệm dân sự chủ yếu mang tính chất bồi hoàn thiệt hại.
+
+- Trách nhiệm kỷ luật: do thủ trưởng cơ quan, giám đốc xí nghiệp… áp dụng đối với
+
+cán bộ công nhân viên, người lao động nói chung khi họ vi phạm kỷ luật lao động, kỷ luật nhà nước. Chế tài trách nhiệm kỷ luật thường là: khiển trách, cảnh cáo, hạ bậc lương, cách chức, buộc thôi việc…
+
+- Trách nhiệm vật chất: là biện pháp buộc cán bộ, nhân viên nhà nước bồi hoàn thiệt
+
+hại cho nhà nước (cơ quan, xí nghiệp …) nếu thiệt hại đó do hành vi có lỗi của họ gây ra.
+
+Dạng trách nhiệm này thường đi với trách nhiệm kỷ luật.
+
+#### 2.6. Pháp Chế Xã Hội Chủ Nghĩa
+
+##### 2.6.1. Khái niệm và đặc điểm của pháp chế XHCN
+
+###### 2.6.1.1. Khái niệm
+
+Pháp chế là một khái niệm cơ bản có tầm quan trọng đặc biệt trong lý luận về pháp luật. Nhưng pháp chế và pháp luật là hai khái niệm khác nhau.
+
+<!-- page: 36 -->
+
+Pháp chế là sự yêu cầu, đòi hỏi mọi chủ thể của pháp luật (các cơ quan, công chức, viên chức nhà nước, các tổ chức kinh tế, tổ chức xã hội và mọi công dân) phải thực hiện một cách bình đẳng, nghiêm minh và thống nhất pháp luật.
+
+Pháp luật là hệ thống các quy phạm (các quy tắc xử sự) do nhà nước ban hành hoặc thừa nhận để điều chỉnh các quan hệ xã hội. Như vậy có pháp luật rồi mới có pháp chế: pháp luật là tiền đề của pháp chế. Nhưng có pháp luật chưa phải đã mặc nhiên có pháp chế, vì nếu pháp luật mâu thuẫn và chồng chéo, nội dung phản tiến bộ thì thực hiện pháp luật đó chỉ làm cho xã hội rơi vào tình trạng bất công, trật tự kỷ cương bị đảo lộn. Do đó khi ban hành pháp luật đã phải triệt để tuân thủ các nguyên tắc của pháp chế, để bảo đảm có một hệ thống pháp luật hoàn thiện làm cơ sở, tiền đề vững chắc cho pháp chế. Cũng từ điều nói trên ta hiểu vì sao xã hội chiếm hữu nô lệ, phong kiến có pháp luật mà chưa có pháp chế. Pháp chế xuất hiện đầu tiên trong xã hội tư sản và sẽ càng được tăng cường trong xã hội xã hội chủ nghĩa.
+
+###### 2.6.1.2. Đặc điểm
+
+- Pháp chế là nguyên tắc tổ chức và hoạt động của bộ máy nhà nước nghĩa là toàn bộ
+
+công tác tổ chức và hoạt động của cả bộ máy nhà nước nói chung và của từng cơ quan nhà nước đều phải được tiến hành theo đúng pháp luật. Nó cũng đòi hỏi mọi cán bộ, nhân viên nhà nước phải tôn trọng và thực hiện đúng pháp luật trong khi thực thi công vụ và mọi vi phạm pháp luật đều phải được xử lý nghiêm minh.
+
+- Pháp chế là nguyên tắc tổ chức và hoạt động của các tổ chức chính trị - xã hội và
+
+đoàn thể quần chúng. Phải hoạt động trong khuôn khổ pháp luật, tuân thủ và thực hiện đúng pháp luật trong hoạt động của mình, không vi phạm những điều mà pháp luật cấm.
+
+- Pháp chế là nguyên tắc xử sự của công dân: pháp chế đòi hỏi mọi công dân không
+
+phân biệt địa vị xã hội, dân tộc, tôn giáo, giới tính … đều phải tôn trọng và thực hiện đúng các yêu cầu của pháp luật trong các hành vi xử sự của mình. Đây là điều kiện đảm bảo sự công bằng xã hội, thực hiện nguyên tắc hiến định: mọi công dân đều bình đẳng trước pháp luật. Mặt khác pháp chế cũng đòi hỏi các công dân phải có trách nhiệm kiểm tra, giám sát hoạt động của các cơ quan nhà nước, nhân viên nhà nước, đấu tranh chống lại mọi hành vi vi phạm pháp luật.
+
+##### 2.6.2 Tăng cường pháp chế XHCN ở Nhà nước ta hiện nay
+
+Tăng cường pháp chế là một trong những yêu cầu khách quan và cấp thiết của công cuộc đổi mới toàn diện và sâu sắc trên tất cả các lĩnh vực đời sống xã hội nước ta hiện nay.
+
+Tăng cường pháp chế sẽ tác động trực tiếp tới công cuộc cải cách bộ máy nhà nước và nâng cao hiệu lực quản lý của nhà nước. Để tăng cường pháp chế XHCN cần phải thực hiện tốt một số biện pháp sau:
+
+###### 2.6.2.1. Đẩy mạnh công tác xây dựng pháp luật
+
+Trong xây dựng pháp luật điều hết sức quan trọng là pháp luật phải phản ánh đúng những quy luật và nhu cầu khách quan của sự phát triển xã hội. Tiêu chuẩn đánh giá tính đúng đắn của các văn bản pháp luật là nó có tạo nên những yếu tố tích cực trong đời sống hay không? Mọi văn bản pháp luật gây nên tác động tiêu cực là biểu hiện sự vận dụng
+
+<!-- page: 37 -->
+
+không đúng đắn quy luật khách quan, cần thiết phải sửa đổi hoặc hủy bỏ. Cũng cần chú trọng đến công tác tập hợp hóa và pháp điển hóa pháp luật.
+
+###### 2.6.2.2. Tổ chức tốt công tác thực hiện pháp luật
+
+Đây là một biện pháp quan trọng gồm nhiều mặt hoạt động nhằm đảm bảo cho pháp luật được tôn trọng và thực hiện nghiêm chỉnh. Cụ thể:
+
+- Tăng cường công tác giải thích pháp luật, làm sáng tỏ nội dung ý nghĩa của các quy
+
+định pháp luật để mọi chủ thể đều hiểu đúng và thực hiện tốt chúng. Công tác này đồng thời là cơ sở cho việc tuyên truyền và giáo dục pháp luật.
+
+- Đẩy mạnh công tác thông tin, tuyên truyền giáo dục pháp luật nâng cao ý thức pháp
+
+luật và văn hóa pháp lý cho nhân dân.
+
+- Chú trọng công tác đào tạo, bồi dưỡng cán bộ pháp lý.
+
+- Kiện toàn tổ chức và đổi mới cơ cấu, nhiệm vụ, quyền hạn, nguyên tắc hoạt động
+
+của các cơ quan làm công tác pháp luật.
+
+###### 2.6.2.3. Tiến hành thường xuyên, kiên trì công tác kiểm tra, giám sát xử lý nghiêm minh
+
+những vi phạm pháp luật Mọi hành vi vi phạm pháp luật phải được xử lý nghiêm minh để đảm bảo nguyên tắc “mọi người đều bình đẳng trước pháp luật ”, không để xảy ra hiện tượng bao che, ô dù dân thì chịu hình pháp - quan thì xử theo lệ. Các cơ quan làm công tác bảo vệ pháp luật cần phản ứng nhanh chóng và hiệu quả đối với các vi phạm pháp luật, phát hiện làm sáng tỏ và xử lý các vụ vi phạm đúng đắn kịp thời. Để làm tốt công tác kiểm tra giám sát, xử lý các vi phạm cần kết hợp sức mạnh của các cơ quan bảo vệ pháp luật với sức mạnh của dư luận quần chúng. Cần có những hình thức phong phú để thu hút đông đảo các tầng lớp nhân dân lao động vào hoạt động kiểm tra cũng như phát hiện và xử lý các vi phạm pháp luật.
+
+TÓM TẮT CHƯƠNG 2
+
+##### 1. Những nguyên nhân dẫn đến sự ra đời của nhà nước cũng chính là những nguyên
+
+nhân làm xuất hiện pháp luật: Đó là chế độ tư hữu về tư liệu sản xuất và của cải làm ra và sự phân hóa xã hội thành những tầng lớp, giai cấp có lợi ích đối kháng nhau và mâu thuẫn giai cấp, đấu tranh giai cấp phát triển đến mức không thể điều hòa được.
+
+##### 2. Cũng giống như bản chất của nhà nước, bản chất của pháp luật thể hiện trước hết ở
+
+tính giai cấp. Bên cạnh tính giai cấp, không thể coi nhẹ giá trị xã hội to lớn của pháp luật Ngoài ra pháp luật còn có tính dân tộc, tính mở.
+
+##### 3. Thuộc tính của pháp luật là những tính chất, dấu hiệu riêng biệt đặc trưng của pháp
+
+luật:
+
+- Tính quy phạm phổ biến (tính bắt buộc chung).
+
+- Tính xác định chặt chẽ về mặt hình thức.
+
+- Tính được đảm bảo bằng nhà nước.
+
+<!-- page: 38 -->
+
+##### 4. Bản chất của pháp luật Nhà nước Cộng hòa xã hội chủ nghĩa Việt Nam là pháp luật
+
+xã hội chủ nghĩa, nó thể hiện ý chí của giai cấp công nhân, đồng thời phản ánh, thể hiện ý chí, lợi ích của các tầng lớp nhân dân lao động khác và của cả dân tộc.
+
+Sự kết hợp chặt chẽ giữa tính giai cấp sâu sắc và tính nhân dân rộng rãi là một đặc điểm đáng chú ý của pháp luật Nhà nước ta hiện nay.
+
+5. Vai trò của pháp luật Nhà nước ta hiện nay:
+
+- Pháp luật là công cụ thực hiện đường lối chính sách của Đảng.
+
+- Pháp luật là công cụ thực hiện quyền làm chủ của nhân dân lao động.
+
+- Pháp luật là công cụ quản lý của Nhà nước.
+
+##### 6. Quy phạm pháp luật là những quy tắc xử sự (quy định khuôn mẫu của hành vi
+
+nghĩa là vào trong hoàn cảnh này phải thực hiện hành vi đó như thế nào) chỉ do nhà nước ban hành hoặc thừa nhận.
+
+##### 7. Quan hệ pháp luật: là hình thức pháp lý của các quan hệ xã hội. Hình thức pháp lý
+
+này xuất hiện trên cơ sở sự điều chỉnh của quy phạm pháp luật đối với quan hệ xã hội tương ứng và các bên tham gia quan hệ pháp luật đó (tức là các chủ thể của quan hệ pháp luật) đều mang những quyền và nghĩa vụ pháp lý được quy phạm pháp luật nói trên quy định.
+
+##### 8. Ý thức pháp luật là một hình thái của ý thức xã hội, là một trong những biểu hiện
+
+của trình độ văn hóa xã hội. Ý thức pháp luật là tổng thể những học thuyết, tư tưởng, tình cảm của con người thể hiện thái độ, sự đánh giá về tính công bằng hay không công bằng, đúng đắn hay không đúng đắn của pháp luật hiện hành, pháp luật trong quá khứ và pháp luật cần phải có, về tính hợp pháp hay không hợp pháp trong cách xử sự của con người, trong hoạt động của các cơ quan, tổ chức. Ý thức pháp luật được cấu thành từ hai bộ phận: tư tưởng pháp luật và tâm lý pháp luật. Ngoài ra, theo chủ thể của ý thức pháp luật ta thấy ý thức pháp luật được cấu thành từ ba bộ phận: ý thức pháp luật cá nhân, ý thức pháp luật nhóm và ý thức pháp luật xã hội.
+
+##### 9. Vi phạm pháp luật là hành vi trái pháp luật xâm hại các quan hệ xã hội được pháp
+
+luật bảo vệ do các chủ thể có năng lực hành vi thực hiện nột cách cố ý hoặc vô ý gây hậu quả thiệt hại cho xã hội. Vi phạm pháp luật có các dấu hiệu cơ bản sau:
+
+- Là hành vi cụ thể.
+
+- Có tính chất trái pháp luật.
+
+- Có lỗi.
+
+Mọi vi phạm pháp luật đều có cấu thành pháp lý của nó. Đó là: Mặt khách quan, khách thể, mặt chủ quan, chủ thể.
+
+##### 10. Trách nhiệm pháp lý là sự phản ứng tiêu cực của nhà nước đối với các chủ thể
+
+thực hiện vi phạm pháp luật. Sự phản ứng đó thể hiện ở việc áp dụng đối với chủ thể thực hiện vi phạm pháp luật các biện pháp mang tính chất trừng phạt hoặc khôi phục lại những quyền và lợi ích hợp pháp bị xâm hại gây cho chủ thể vi phạm pháp pháp luật những thiệt hại nhất định về vật chất hoặc tinh thần.
+
+<!-- page: 39 -->
+
+##### 11. Pháp chế xã hội chủ nghĩa là sự yêu cầu, đòi hỏi mọi chủ thể của pháp luật (các cơ quan, công chức, viên chức nhà nước, các tổ chức kinh tế, tổ chức xã hội và mọi công dân)
+
+phải thực hiện một cách bình đẳng, nghiêm minh và thống nhất pháp luật.
+
+Để tăng cường pháp chế XHCN cần phải thực hiện tốt một số biện pháp sau:
+
+##### 1. Đẩy mạnh công tác xây dựng pháp luật.
+
+##### 2. Tổ chức tốt công tác thực hiện pháp luật.
+
+##### 3. Tiến hành thường xuyên, kiên trì công tác kiểm tra, giám sát xử lý
+
+nghiêm minh những vi phạm pháp luật.
+
+CÂU HỎI ÔN TẬP CHƯƠNG 2
+
+1. Nêu nguồn gốc của pháp luật?
+
+2. Tại sao nhà nước cần quản lý xã hội bằng pháp luật?
+
+3. Phân tích bản chất của pháp luật?
+
+4. Khái niệm và những đặc điểm chung của pháp luật?
+
+5. Bản chất của pháp luật nước CHXHCN Việt Nam?
+
+6. Vai trò của pháp luật trong nhà nước Việt Nam?
+
+7. Khái niệm và những đặc điểm của quy phạm pháp luật?
+
+8. Nêu cơ cấu của quy phạm pháp luật. Phân tích một quy phạm pháp luật cụ thể?
+
+9. Khái niệm và bản chất của quan hệ pháp luật?
+
+10. Phân biệt quan hệ pháp luật và quan hệ xã hội?
+
+11. Chủ thể và khách thể của quan hệ pháp luật?
+
+12. Nội dung của quan hệ pháp luật?
+
+13. Khái niệm và ý nghĩa của ý thức pháp luật?
+
+14. Các yếu tố hình thành ý thức pháp luật?
+
+15. Quan hệ giữa ý thức pháp luật và pháp luật?
+
+16. Khái niệm,đặc điểm và những dấu hiệu cơ bản của vi phạm pháp luật?
+
+17. Phân biệt các loại vi phạm pháp luật?
+
+18. Phân tích các yếu tố cấu thành vi phạm pháp luật 19. Khái niệm và đặc điểm của trách nhiệm pháp lý?
+
+20. Phân biệt các loại trách nhiệm pháp lý?
+
+21. Khái niệm, đặc điểm và các nguyên tắc của pháp chế XHCN?
+
+22. Phân tích các biện pháp tăng cường pháp chế trong giai đoạn hiện nay ở Việt Nam?
+
+<!-- page: 40 -->
+
+### Chương 3: Văn Bản Quy Phạm Pháp Luật
+
+Pháp luật được hình thành từ các con đường: tập quán pháp, tiền lệ pháp và văn bản quy phạm pháp luật. Trong đó theo quan điểm của Việt Nam, chúng ta chỉ thừa nhận văn bản quy phạm pháp luật là loại nguồn chính thức, chủ yếu của pháp luật. Như vậy văn bản quy phạm pháp luật có một vai trò hết sức to lớn trong đời sống nhà nước và pháp luật. Để khẳng định sự thừa nhận này Quốc hội Việt Nam đã thông qua và ban hành “Luật ban hành các văn bản quy phạm pháp luật” nhằm hướng dẫn việc soạn thảo, ban hành., thực thi và áp dụng các văn bản pháp luật có tính hiệu quả cao nhất. Như vậy trong chương này chúng tôi chỉ đề cập đến một nội dung đó là văn bản quy phạm pháp luật mà cụ thể là khái niệm và đặc điểm, phân loại... Nhằm làm rõ hơn các vấn đề xung quanh nội dung này chúng tôi đưa ra thẩm quyền ban hành các loại văn bản quy phạm pháp luật của Quốc hội, Ủy ban thường vụ quốc hội, Chủ tịch nước, Chính phủ, Thủ tướng chính phủ, Bộ, cơ ngang Bộ, cơ quan trực thuộc Chính phủ, Toà án nhân dân tối cao, Viện kiểm sát nhân dân tối cao, Hội đồng nhân dân, Ủy ban nhân dân và tác dụng của từng loại văn bản này khi ban hành.
+
+Mặt khác trong chương này cũng đề cập đến vấn đề hiệu lực của văn bản theo thời gian, theo không gian địa lý và đối tượng tác động, tức là mỗi loại văn bản sẽ có những hiệu lực khác nhau đặc biệt về mặt đối tượng tác động. Mặt khác nội dung chương này cũng đưa ra những nguyên tắc trong việc áp dụng các văn bản quy phạm pháp luật.
+
+#### 3.1. Khái Niệm Và Đặc Điểm Của Văn Bản Quy Phạm Pháp Luật
+
+##### 3.1.1. Khái niệm và đặc điểm của văn bản quy phạm pháp luật
+
+###### 3.1.1.1. Khái niệm
+
+Văn bản quy phạm pháp luật là hình thức thể hiện của các quyết định pháp luật do cơ quan nhà nước có thẩm quyền ban hành theo trình tự và dưới hình thức nhất định, có chứa đựng các quy tắc xử sự chung nhằm điều chỉnh một loại quan hệ xã hội nhất định, đước áp dụng nhiều lần trong thực tiễn đời sống và việc thực hiện văn bản đó không làm chấm dứt hiệu lực của nó.
+
+Văn bản quy phạm pháp luật là loại nguồn trực tiếp của pháp luật, do đó nó có ý nghĩa rất lớn trong việc điều chỉnh các quan hệ xã hội tạo lập một trật tự pháp luật vì sự phát triển lành mạnh của cả xã hội và của từng cá nhân. Yêu cầu đặt ra là phải xây dựng được những văn bản quy phạm pháp luật có chất lượng, phù hợp với các đòi hỏi của cuộc sống.
+
+###### 3.1.1.2. Đặc điểm
+
+- Là văn bản do cơ quan Nhà nước có thẩm quyền ban hành.
+
+<!-- page: 41 -->
+
+Không phải tất cả những văn bản do Nhà nước ban hành là văn bản quy phạm pháp luật. Ví dụ những lời tuyên bố, những lời hiệu triệu nhằm giải thích chính sách đối nội, đối ngoại của Nhà nước, tuy mang ý nghĩa pháp lý, nhưng không phải là những văn bản quy phạm pháp luật.
+
+- Là văn bản có chứa đựng các quy tắc xử sự chung mang tính bắt buộc.
+
+- Là văn bản được áp dụng nhiều lần trong đời sống xã hội đối với những trường hợp
+
+khi có những sự kiện pháp lý xảy ra. Sự thực hiện văn bản không làm chấm dứt hiệu lực của nó.
+
+Phân biệt văn bản quy phạm pháp luật với văn bản pháp luật không có tính quy phạm.
+
+Khi giải quyết các vụ việc cụ thể, trên cơ sở các văn bản quy phạm pháp luật, các cơ quan Nhà nước có thẩm quyền ban hành những văn bản áp dụng pháp luật, làm xuất hiện ở những công dân, tổ chức, những quyền và nghĩa vụ pháp lý cụ thể. Ví dụ quyết định đề bạt, bổ nhiệm cán bộ, quyết định của toà án....Những văn bản này gọi là văn bản cá biệt vì chúng chỉ được áp dụng một lần và chỉ trong quan hệ đối với cá nhân, tổ chức cụ thể được ghi đích danh trong văn bản.
+
+- Tên gọi, nội dung, trình tự ban hành được quy định cụ thể trong luật.
+
+##### 3.1.2. Phân loại văn bản quy phạm pháp luật
+
+###### 3.1.2.1. Các văn bản luật
+
+Do Quốc hội - cơ quan đại biểu cao nhất của nhân dân, cơ quan quyền lực nhà nước cao nhất nước ta ban hành. Các văn bản luật có giá trị pháp lý cao nhất, tất cả các văn bản khác khi ban hành phải căn cứ vào văn bản luật, không được trái, không được mâu thuẫn với các quy định trong các văn bản luật.
+
+Văn bản luật có hai hình thức Hiến pháp và các đạo luật.
+
++ Hiến pháp là luật cơ bản, có hiệu lực pháp lý cao nhất trong hệ thống các văn bản
+
+pháp luật. Nó quy định những vấn đề cơ bản nhất của quốc gia như hình thức, bản chất nhà nước, chế độ chính trị, kinh tế, văn hóa xã hội, an ninh quốc phòng …
+
++ Các đạo luật, bộ luật: được ban hành để cụ thể hóa Hiến pháp, điều chỉnh các loại
+
+quan hệ xã hội trong các lĩnh vực đời sống nhà nước và xã hội.
+
+###### 3.1.2.2. Các văn bản dưới luật
+
+Là những văn bản do các cơ quan nhà nước có thẩm quyền ban hành theo trình tự, thủ tục và hình thức được luật quy định và có hiệu lực pháp lý thấp hơn các văn bản luật.
+
+#### 3.2. Thẩm Quyền Ban Hành Văn Bản Quy Phạm Pháp Luật
+
+##### 3.2.1. Văn bản quy phạm pháp luật của Quốc hội và uỷ ban thường vụ quốc hội
+
+* Nghị quyết của Quốc hội: thường được ban hành để giải quyết các vấn đề quan trọng
+
+thuộc thẩm quyền của Quốc hội nhưng thường mang tính chất nhất thời hoặc tính cụ thể.
+
+Ví dụ: Nghị quyết về việc tăng cường chống buôn lậu.
+
+<!-- page: 42 -->
+
+* Pháp lệnh, nghị quyết của Ủy ban thường vụ Quốc hội
+
++ Pháp lệnh được ban hành nhằm mục đích điều chỉnh các quan hệ xã hội cơ bản,
+
+quan trọng nhưng chưa ổn định, lĩnh vực điều chỉnh hẹp hơn so với các bộ luật.
+
+Ví dụ: Pháp lệnh xử phạt vi phạm hành chính.
+
++ Nghị quyết dùng để giải thích luật, pháp lệnh hoặc đề ra các quy định giám sát việc
+
+thi hành pháp luật đó.
+
+##### 3.2.2. Văn bản quy phạm pháp luật của Chủ tịch nước
+
+Lệnh, quyết định của Chủ tịch nước: dùng để công bố tình trạng khẩn cấp như chiến tranh, giới nghiêm hoặc công bố các văn bản pháp luật được Quốc hội thông qua.
+
+##### 3.2.3. Văn bản quy phạm pháp luật của Chính phủ, Thủ tương Chính phủ, các Bộ, cơ quan ngang Bộ
+
+- Nghị quyết, nghị định của Chính phủ
+
++ Nghị quyết: đề ra các chủ trương, chính sách lớn.
+
++ Nghị định: đặt ra một số quy định mới mà luật, pháp lệnh chưa điều chỉnh hoặc để quy
+
+định tổ chức và hoạt động của các cơ quan Bộ, ngang Bộ. Nghị định còn quy định chi tiết việc thi hành văn bản pháp luật của cấp trên như của Quốc hội, Ủy ban thường vụ Quốc hội.
+
+- Quyết định chỉ thị của Thủ tướng Chính phủ là phương tiện pháp luật mà Thủ tướng
+
+sử dụng trong hoạt động điều hành Chính phủ, chỉ đạo, đôn đốc giám sát hoạt động của mọi cơ quan Nhà nước thuộc Chính phủ ở Trung ương và địa phương.
+
+- Quyết định, chỉ thị, thông tư của các Bộ, các cơ quan ngang Bộ và các cơ quan khác
+
+thuộc Chính phủ. Dùng để ban hành các văn bản dưới dạng nội quy, quy định cơ chế hoạt động, đôn đốc giám sát hoạt động của cấp dưới hoặc dùng để giải thích, hướng dẫn việc thực hiện văn bản luật.
+
+##### 3.2.4. Văn bản quy phạm pháp luật của Toà án nhân dân tối cao, Viện kiểm sát nhân dân tối cao
+
+- Nghị quyết của Hội đồng thẩm phán Tòa án Nhân dân tối cao.
+
+- Quyết định chỉ thị, thông tư của Viện trưởng Viện Kiểm sát Nhân dân tối cao.
+
+##### 3.2.5. Văn bản quy phạm pháp luật liên tịch
+
+Nghị quyết, thông tư liên tịch giữa các cơ quan Nhà nước có thẩm quyền hoặc giữa các cơ quan Nhà nước với các tổ chức xã hội.
+
+##### 3.2.6. Văn bản quy phạm pháp luật của Hội đồng nhân dân, Uỷ ban nhân dân
+
+- Nghị quyết của Hội đồng nhân dân các cấp: để điều chỉnh các quan hệ xã hội trên
+
+các lĩnh vực mang tính chất địa phương.
+
+- Quyết định, chỉ thị của UBND các cấp: để thực hiện các văn bản của cơ quan Nhà
+
+nước cấp trên và Hội đồng nhân dân cùng cấp và để điều hành hoạt động quản lý Nhà nước địa phương.
+
+<!-- page: 43 -->
+
+#### 3.3. Hiệu Lực Của Văn Bản Quy Phạm Pháp Luật
+
+Nghiên cứu hiệu lực của văn bản quy phạm pháp luật tức là xem xét giới hạn tác động của nó theo thời gian theo không gian và phạm vi đối tượng thi hành. Xác định chính xác giới hạn của văn bản quy phạm pháp luật là điều kiện quan trọng và cần thiết để thực hiện đúng pháp luật.
+
+##### 3.3.1. Hiệu lực của văn bản quy phạm pháp luật theo thời gian
+
+Là giới hạn xác định thời điểm phát sinh và chấm dứt hiệu lực của văn bản quy phạm pháp luật.
+
+Những văn bản quy phạm pháp luật luôn tồn tại trong thời gian. Chúng có thời điểm bắt đầu hiệu lực và thời điểm hết hiệu lực. Một văn bản quy phạm pháp luật và thời điểm bắt đầu có hiệu lực, tức là từ thời điểm đó các chủ thể pháp luật có liên quan phải chịu sự điều chỉnh của nó phải tiến hành nó một cách bắt buộc.
+
+Trong luật pháp có ba phương thức xác định thời điểm bắt đầu có hiệu lực.
+
+- Thứ nhất, văn bản quy phạm pháp luật bắt đầu có hiệu lực từ thời điểm thông qua
+
+hoặc công bố nó;
+
+- Thứ hai, thời điểm bắt đầu có hiệu lực được xác định là sau một khoảng thời gian
+
+nhất định kể từ khi công bố văn bản;
+
+- Thứ ba, văn bản quy phạm pháp luật bắt đầu có hiệu lực từ thời điểm được chỉ ra
+
+trong bản thân văn bản hoặc bằng một đạo luật khác phê chuẩn văn bản ấy.
+
+Thời hạn hiệu lực của văn bản quy phạm pháp luật được xác định từ thời điểm bắt đầu có hiệu lực tới thời điểm hết hiệu lực của nó.
+
+Văn bản quy phạm pháp luật hết hiệu lực trong ba trường hợp:
+
+- Thứ nhất, trong văn bản mới được thông qua hoặc trong văn bản của cơ quan được
+
+uỷ quyền có sự chỉ dẫn trực tiếp về điều đó.
+
+- Thứ hai, sự ban hành một văn bản mới thay thế văn bản trên.
+
+- Thứ ba, thời hạn hiệu lực được chỉ ra trong bản thân văn bản và thời hạn đó đã hết.
+
+Khi xem xét hiệu lực theo thời gian, cần đề cập đến vấn đề hiệu lực về trước (còn gọi là hiệu lực hồi tố). Nhìn chung pháp luật nước ta không có hiệu lực trở về trước, điều đó có nghĩa là một văn bản quy phạm pháp luật mới được thông qua chỉ điều chỉnh những quan hệ xã hội xuất hiện sau khi văn bản đó bắt đầu có hiệu lực. Trong một số rất ít trường hợp ngoại lệ nếu như sự quan trở về trước phù hợp với lợi ích của xã hội thì ngay trong văn bản ấy quy định trực tiếp có hiệu lực hồi tố. Không được quy định hiệu lực trở về trước trong các trường hợp.
+
++ Quy định trách nhiệm mới đối với mọi hành vi mà vào thời điểm hành vi đó thực
+
+hiện, pháp luật không quy định TNHS.
+
++ Quy định trách nhiệm hình sự nặng hơn.
+
+<!-- page: 44 -->
+
+##### 3.3.2. Hiệu lực của văn bản quy phạm pháp luật theo không gian và đối tượng tác
+
+động
+
+###### 3.3.2.1. Hiệu lực của văn bản quy phạm pháp luật theo không gian
+
+Giới hạn tác động về không gian của văn bản quy phạm pháp luật được xác định bằng lãnh thổ quốc gia hay địa phương hoặc một vùng nhất định.
+
+Nhiều văn bản không chỉ ra hiệu lực theo không gian mà điều đó được mặc nhiên xác định theo giới hạn thẩm quyền của cơ quan ban hành văn bản ấy.
+
+Những văn bản chung nào chỉ có hiệu lực trong một vùng nhất định thì giới hạn luôn chỉ rõ trong văn bản đó. Phần lớn các văn bản do các cơ quan quyền lực và quản lý Nhà nước Trung ương có hiệu lực trên toàn lãnh thổ Việt Nam. Các văn bản do Hội đồng nhân dân và Uỷ ban nhân dân ban hành có hiệu lực trên địa bàn thuộc thẩm quyền của cơ quan ấy.
+
+###### 3.3.2.2. Đối tượng tác động
+
+Hiệu lực theo không gian của văn bản quy phạm pháp luật gắn liền với tác động của nó đối với nhóm người cụ thể.
+
+Thông thường văn bản quy phạm pháp luật có hiệu lực trong một lãnh thổ nhất định cũng có hiệu lực với mọi cá nhân tổ chức thuộc lãnh thổ đó. Tuy nhiên có những văn bản chỉ tác động tới những công chức Nhà nước hoặc những người thuộc những ngành nghề nhất định. Cũng có văn bản chỉ liên quan đến người nước ngoài và người không có quốc tịch v.v... Trong những trường hợp như thế, các văn bản quy phạm pháp luật luôn xác định rõ đối tượng tác động, nghĩa là những người phải tuân theo chấp hành hay được hưởng những quyền nhất định.
+
+#### 3.4. Áp Dụng Văn Bản Quy Phạm Pháp Luật
+
+- Áp dụng từ thời điểm có hiệu lực. Văn bản quy phạm pháp luật được áp dụng đối
+
+với hành vi xảy ra tại thời điểm mà văn bản đó đang có hiệu lực. Trong trường hợp văn bản quy định hiệu lực trở về trước, thì áp dụng theo quy định đó.
+
+- Trường hợp các văn bản quy phạm pháp luật có quy định khác nhau về cùng một
+
+vấn đề, thì áp dụng văn bản có hiệu lực pháp lý cao hơn.
+
+- Trường hợp các văn bản quy phạm pháp luật về cùng một vấn đề do cùng một cơ
+
+quan ban hành mà có quy định khác nhau thì áp dụng quy định văn bản được ban hành sau.
+
+- Trường hợp các văn bản quy phạm pháp luật mới không quy định trách nhiệm pháp
+
+lý hoặc quy định trách nhiệm pháp lý nhẹ hơn đối với hành vi xảy ra trước ngày văn bản có hiệu lực thì áp dụng văn bản mới.
+
+TÓM TẮT CHƯƠNG 3
+
+##### 1. Văn bản quy phạm pháp luật: là hình thức thể hiện của các quyết định pháp luật do
+
+cơ quan nhà nước có thẩm quyền ban hành theo trình tự và dưới hình thức nhất định, có chứa đựng các quy tắc xử sự chung nhằm điều chỉnh một loại quan hệ xã hội nhất định,
+
+<!-- page: 45 -->
+
+được áp dụng nhiều lần trong thực tiễn đời sống và việc thực hiện văn bản đó không làm chấm dứt hiệu lực của nó. Văn bản quy phạm pháp luật bao gồm: Các văn bản luật và các văn bản dưới luật
+
+##### 2. Thẩm quyền ban hành văn bản quy phạm pháp luật
+
+- Văn bản quy phạm pháp luật của Quốc hội và uỷ ban thường vụ quốc hội:
+
++ Nghị quyết của Quốc hội.
+
++ Pháp lệnh, nghị quyết của Ủy ban thường vụ Quốc hội.
+
+- Văn bản quy phạm pháp luật của chủ tịch nước:Lệnh, quyết định của Chủ tịch nước.
+
+- Văn bản quy phạm pháp luật của Chính phủ, Thủ tướng Chính phủ, các Bộ, cơ quan
+
+ngang Bộ:
+
++ Nghị quyết, nghị định của Chính phủ.
+
++ Quyết định chỉ thị của Thủ tướng Chính phủ.
+
++ Quyết định, chỉ thị, thông tư của các Bộ, các cơ quan ngang Bộ và các cơ
+
+quan khác thuộc Chính phủ.
+
+- Văn bản quy phạm pháp luật của Toà án nhân dân tối cao, Viện kiểm sát nhân dân
+
+tối cao:
+
++ Nghị quyết của Hội đồng thẩm phán Tòa án Nhân dân tối cao.
+
++ Quyết định chỉ thị, thông tư của Viện trưởng Viện Kiểm sát Nhân dân tối cao.
+
+- Văn bản quy phạm pháp luật liên tịch:
+
+Nghị quyết, thông tư liên tịch giữa các cơ quan Nhà nước có thẩm quyền hoặc giữa các cơ quan Nhà nước với các tổ chức xã hội.
+
+- Văn bản quy phạm pháp luật của Hội đồng nhân dân, uỷ ban nhân dân:
+
++ Nghị quyết của Hội đồng nhân dân các cấp.
+
++ Quyết định, chỉ thị của UBND các cấp.
+
+##### 3. Hiệu lực của văn bản quy phạm pháp luật:
+
+- Hiệu lực của văn bản quy phạm pháp luật theo thời gian: Là giới hạn xác định thời
+
+điểm phát sinh và chấm dứt hiệu lực của văn bản quy phạm pháp luật.
+
+- Hiệu lực của văn bản quy phạm pháp luật theo không gian: Là giới hạn tác động về
+
+không gian của văn bản quy phạm pháp luật được xác định bằng lãnh thổ quốc gia hay địa phương hoặc một vùng nhất định.
+
+- Hiệu lực theo đối tượng tác động: Hiệu lực theo không gian của văn bản quy phạm
+
+pháp luật gắn liền với tác động của nó đối với nhóm người cụ thể.
+
+Thông thường văn bản quy phạm pháp luật có hiệu lực trong một lãnh thổ nhất định cũng có hiệu lực với mọi cá nhân tổ chức thuộc lãnh thổ đó. Tuy nhiên có những văn bản chỉ tác động tới những công chức Nhà nước hoặc những người thuộc những ngành nghề nhất định. Cũng có văn bản chỉ liên quan đến người nước ngoài và người không có quốc tịch v.v...
+
+##### 4. Áp dụng văn bản quy phạm pháp luật:
+
+<!-- page: 46 -->
+
+- Áp dụng từ thời điểm có hiệu lực.
+
+- Trường hợp các văn bản quy phạm pháp luật có quy định khác nhau về cùng một
+
+vấn đề, thì áp dụng văn bản có hiệu lực pháp lý cao hơn.
+
+- Trường hợp các văn bản quy phạm pháp luật về cùng một vấn đề do cùng một cơ
+
+quan ban hành mà có quy định khác nhau thì áp dụng quy định văn bản được ban hành sau.
+
+- Trường hợp các văn bản quy phạm pháp luật mới không quy định trách nhiệm pháp
+
+lý hoặc quy định trách nhiệm pháp lý nhẹ hơn đối với hành vi xảy ra trước ngày văn bản có hiệu lực thì áp dụng văn bản mới.
+
+CÂU HỎI ÔN TẬP CHƯƠNG 3
+
+1. Khái niệm và đặc điểm của văn bản quy phạm pháp luật?
+
+2. Phân loại văn bản quy phạm pháp luật?
+
+##### 3. Thẩm quyền ban hành văn bản quy phạm pháp luật của Quốc hội và Uỷ ban
+
+thường vụ quốc hội?
+
+4. Thẩm quyền ban hành văn bản quy phạm pháp luật của Chủ tịch nước?
+
+##### 5. Thẩm quyền ban hành văn bản quy phạm pháp luật của Chính phủ, Thủ tướng
+
+chính phủ, Bộ, cơ quan ngang Bộ và cơ quan trực thuộc Chính phủ?
+
+##### 6. Thẩm quyền ban hành văn bản quy phạm pháp luật của Toà án nhân dân tối cao, Viện kiểm sát nhân dân tối cao?
+
+##### 7. Thẩm quyền ban hành văn bản quy phạm pháp luật của Hội đồng nhân dân, Uỷ
+
+ban nhân dân?
+
+8. Vấn đề hiệu lực của văn bản theo thời gian?
+
+9. Vấn đề hiệu lực của văn bản theo không gian và đối tượng tác động?
+
+10. Nguyên tắc áp dụng văn bản quy phạm pháp luật?
+
+<!-- page: 47 -->
+
+### Chương 4: Luật Hiến Pháp
+
+Trong chương này trình bày những vấn đề quan trọng nhất về Hiến pháp với tư cách là đạo luật cơ bản, là đạo luật quan trọng nhất trong hệ thống pháp luật quốc gia. Tính đến nay Việt Nam đã có 4 bản Hiến pháp 1946, Hiến pháp 1959, Hiến pháp 1980 và Hiến pháp 1992 (được sửa đổi năm 2001), sự ra đời của bốn bản Hiến pháp gắn liền với sự phát triển của xã hội Việt Nam, trong đó ghi nhận những thành tựu mà đảng và nhà nước, nhân dân chúng ta đạt được. Hiến pháp là văn bản luật do Quốc hội - cơ quan quyền lực nhà nước cao nhất Việt Nam ban hành.
+
+Chương này chỉ đề cập đến những chế định cơ bản của Luật hiến pháp đó là chế độ chính trị, trong đó đưa ra khái niệm chế độ chính trị, nội dung của chế định được quy định từ Điều 1 - Điều 14 của Hiến pháp 1992 bao gồm bản chất của nhà nước, vị trí, vai trò và ý nghĩa về chính trị pháp lý của sự lãnh đạo của Đảng cộng sản đối với Nhà nước và xã hội, cách thức thực hiện quyền lực nhà nước của nhân dân bằng hai hình thức trực tiếp và gián tiếp, nguyên tắc tổ chức và hoạt động của bộ máy nhà nước là nguyên tắc tập trung dân chủ.
+
+Tất cả các quy định này đều làm rõ cho tính chất tất cả quyền lực nhà nước đều thuộc về nhân dân, mọi hoạt động của bộ máy nhà nước, của cơ quan nhà nước đều phục vụ cho nhân dân.Trong chế định này còn đưa ra đường lối đối ngoại của nhà nước Việt Nam.
+
+Ngoài chế định về chế độ chính trị nội dung chương 4 còn nói tới chế định về chế độ kinh tế trong đó làm rõ các quy định về mục tiêu, chính sách kinh tế của Đảng và nhà nước Quyền và nghĩa vụ cơ bản của công dân là một trong những chế định hết sức cơ bản và quan trọng không những được ghi nhận trong Hiến pháp Việt Nam mà trong Hiến pháp của các nước khác trên thế giới. Quyền và nghĩa vụ cơ bản của công dân liên quan tới khái niệm về nhân quyền cần được các quốc gia tôn trọng và bảo vệ. Ngoài việc đưa ra khái niệm quyền và nghĩa vụ cơ bản của công dân, nhằm làm rõ hơn khái niệm này nên đã cụ thể hoá ra quyền và nghĩa vụ của công dân trong các lĩnh vực như chính trị, kinh tế, văn hoá xã hội...
+
+#### 4.1. Những Khái Niệm Chung Về Luật Hiến Pháp
+
+Kể từ khi xuất hiện trong xã hội loài người, mọi nhà nước đều phải tổ chức theo một thể thức, bản chất nhất định thể hiện ý chí của giai cấp thống trị. Thuở sơ khai những thể thức, bản chất này không được ghi nhận thành văn, chỉ chứa đựng trong những tập tục lâu đời được giai cấp thống trị thừa nhận. Chính việc không ghi nhận, không quy định thành văn là cơ sở cho việc lạm dụng quyền lực nhà nước, biến quyền lực nhà nước của giai cấp chủ nô và phong kiến trở thành vô hạn định. Những thần dân không được hưởng quyền lợi, mà chỉ gánh vác trách nhiệm nặng nề, phải phục vụ lợi ích của giai cấp thống trị, càng không có quyền tham gia vào công việc nhà nước (công việc chính trị). Chỉ mãi sau này với cách mạng tư sản, với sự đấu tranh của đông đảo quần chúng trong đó có cả tầng lớp thị dân
+
+<!-- page: 48 -->
+
+(về sau trở thành giai cấp tư sản), việc tổ chức nhà nước được quy định thành văn. Chính những văn bản quy định việc tổ chức nhà nước này được gọi là “hiến pháp”.
+
+Luật hiến pháp là một ngành luật độc lập trong hệ thống pháp luật Việt Nam do đó nó có đối tượng điều chỉnh riêng, phương pháp điều chỉnh riêng và những chủ thể riêng …
+
+##### 4.1.1. Đối tượng điều chỉnh của Luật hiến pháp
+
+Đối tượng điều chỉnh của ngành luật hiến pháp là những quan hệ xã hội quan trọng liên quan đến việc tổ chức quyền lực nhà nước. Qua việc tổ chức quyền lực nhà nước này mà pháp luật xác lập lên chế độ chính trị của nhà nước. Đó là những quan hệ:
+
+- Nguồn gốc của quyền lực nhà nước, bản chất nhà nước.
+
+- Nguyên tắc tổ chức và hoạt động của các cơ quan, các tổ chức và cá nhân thực hiện
+
+quyền lực nhà nước.
+
+- Mối quan hệ giữa nhà nước và công dân.
+
+So với các ngành luật khác trong hệ thống pháp luật Việt Nam, luật hiến pháp có một vị trí rất quan trọng, làm cơ sở cho các ngành luật khác. Các quy định của luật hiến pháp hầu như trở thành những nguyên tắc của các ngành luật khác.
+
+Nói tóm lại luật hiến pháp Việt Nam là một ngành luật chủ đạo trong hệ thống các ngành luật Việt Nam, bao gồm tổng thể các quy phạm pháp luật điều chỉnh các mối quan hệ xã hội có liên quan đến việc tổ chức quyền lực nhà nước.
+
+##### 4.2.2. Phương pháp điều chỉnh
+
+Quan hệ xã hội có liên quan đến việc tổ chức quyền lực nhà nước là những quan hệ xã hội rất quan trọng, là những quan hệ có tính chất cơ sở cho mọi quan hệ xã hội khác. Do đó ngành luật này thường sử dụng phương pháp định nghĩa, bắt buộc, quyền uy để điều chỉnh các quan hệ xã hội.
+
+#### 4.2. Những Chế Định Cơ Bản
+
+##### 4.2.1. Chế độ chính trị
+
+Chế độ chính trị là hệ thống những nguyên tắc thực hiện quyền lực nhà nước. Chế độ chính trị là chế định của Hiến pháp, là tổng thể các quy định về những vấn đề có tính nguyên tắc chung làm nền tảng cho các chương sau của Hiến pháp như: bản chất nhà nước, nguồn gốc nhà nước, sự lãnh đạo của Đảng Cộng sản đối với hoạt động của Nhà nước và xã hội, nguyên tắc tổ chức và hoạt động của bộ máy nhà nước.
+
+Nội dung cơ bản của chế định chế độ chính trị bao gồm:
+
+##### 1. Khẳng định bản chất của Nhà nước ta là Nhà nước của nhân dân, do nhân dân và vì
+
+nhân dân. Tất cả quyền lực nhà nước thuộc về nhân dân mà nền tảng là liên minh giữa giai cấp công nhân với giai cấp nông dân và đội ngũ trí thức
+
+##### 2. Xác định rõ ràng và dứt khoát mục đích của nhà nước là: Nhà nước bảo đảm và không ngừng phát huy quyền làm chủ về mọi mặt của nhân dân, nghiêm trị mọi hành động
+
+xâm phạm lợi ích của tổ quốc và của nhân dân xây dựng đất nước giàu mạnh; thực hiện
+
+<!-- page: 49 -->
+
+công bằng xã hội; mọi người có cuộc sống ấm no, tự do, hạnh phúc, có điều kiện phát triển toàn diện.
+
+##### 3. Khẳng định vai trò lãnh đạo của Đảng Cộng sản Việt Nam: Đảng Cộng sản Việt
+
+Nam, đội tiên phong của giai - công nhân Việt Nam, đại biểu trung thành cho quyền lợi của giai cấp công nhân, nhân dân lao động và của cả dân tộc, theo chủ nghĩa Mác - Lênin và tư tưởng Hồ Chí Minh, là lực lượng lãnh đạo Nhà nước và xã hội. Tổ chức của Đảng hoạt động trong khuôn khổ Hiến pháp và pháp luật (Điều 4).
+
+##### 4. Nhà nước Cộng hoà xã hội chủ nghĩa Việt Nam là Nhà nước thống nhất của các dân
+
+tộc cùng sinh sống trên đất nước Việt Nam. Nhà nước thực hiện chính sách bình đẳng, đoàn kết, tương trợ giữa các dân tộc, nghiêm cấm mọi hành vi kỳ thị, chia rẽ dân tộc (Điều 5).
+
+##### 5. Quy định phương thức nhân dân sử dụng quyền lực nhà nước thông qua Quốc hội và Hội đồng nhân dân là những cơ quan đại diện cho ý chí và nguyện vọng của nhân dân, do nhân dân bầu ra và chịu trách nhiệm trước nhân dân (Điều 6)
+
+##### 6. Quy định nguyên tắc bầu cử đại biểu Quốc hội và hội đồng nhân dân các cấp theo
+
+nguyên tắc: phổ thông, bình đẳng, trực tiếp và bỏ phiếu kín (Điều 7).
+
+##### 7. Quy định Mặt trận Tổ quốc Việt Nam và các tổ chức thành viên của mặt trận (Hội
+
+Liên hiệp phụ nữ Việt Nam, Thanh niên Cộng sản Hồ Chí Minh, Tổng Liên đoàn lao động Việt Nam...) là cơ sở chính trị của chính quyền nhân dân.
+
+##### 8. Khẳng định đường lối đối ngoại của Nhà nước ta là hữu nghị, mở rộng giao lưu và hợp tác với tất cả trên thế giới.
+
+##### 9. Khẳng định quyền dân tộc cơ bản: Nhà nước Cộng hoà xã hội chủ nghĩa Việt Nam là
+
+một nước độc lập, có chủ quyền, thống nhất và toàn vẹn lãnh thổ, bao gồm đất liền, các hải đảo, vùng biển và vùng trời (Điều l). Đây là quyền đặc biệt là cơ sở phát sinh các quyền khác.
+
+Như vậy Hiến pháp năm 1992 đã khẳng định tính nhân dân của nhà nước ta, quy định nhà nước Việt nam là nhà nước XHCN do Đảng cộng sản - chính đảng duy nhất lãnh đạo.
+
+Khẳng định nguyên tắc tổ chức và hoạt động của nhà nước ta là nguyên tắc tập trung dân chủ, tất cả quyền lực nhà nước đều thuộc về nhân dân, quy định về đường lối phát triển của nhà nước ta.
+
+##### 4.2.2. Chế độ kinh tế
+
+Trong quá trình tồn tại và phát triển, các quan hệ kinh tế luôn chịu sự tác động điều chỉnh từ phía Nhà nước theo định hướng nhất định. Những quan hệ kinh tế chủ yếu tạo thành cơ sở kinh tế của nhà nước, được các quy phạm của Luật hiến pháp điều chỉnh và tổng hợp các quy phạm đó tạo thành chế định chế độ kinh tế. Trong chế độ kinh tế của nhà nước, các vấn đề cơ bản, chủ yếu làm cơ sở để xác định chế độ xã hội bao gồm: chính sách phát triển kinh tế, quan hệ về sở hữu, quan hệ sản xuất, những quan hệ về tổ chức quản lý nền kinh tế quốc dân... trong các quan hệ đó quan hệ về sở hữu đối với tư liệu sản xuất là nền tảng quyết định tính chất chế độ kinh tế.
+
+Trước đây nền kinh tế nước ta được quản lý theo cơ chế tập trung, quan liêu bao cấp, mang nặng tính mệnh lệnh hành chính. Hiện nay nền kinh tế của nước ta là kinh tế hàng hoá nhiều thành phần, theo cơ chế thị trường có sự quản lý của nhà nước theo định hướng xã hội
+
+<!-- page: 50 -->
+
+chủ nghĩa. Vì thế cơ chế quản lý kinh tế có sự thay đổi. Điều 20 Hiến pháp 1992 quy định "Nhà nước thống nhất quản lý nền kinh tế quốc dân bằng pháp luật, kế hoạch, chính sách, phân công trách nhiệm và phân cấp quản lý nhà nước giữa các ngành, các cấp; bảo đảm kết hợp hài hoà giữa lợi ich của cá nhân, tập thể và nhà nước". Quản lý kinh tế bằng pháp luật là nguyên tắc quan trọng trong nền kinh tế thị trường. Với những thuộc tính của mình, pháp luật xác lập các mối quan hệ phức tạp, cơ bản của chế độ kinh tế như quan hệ về sở hữu, quan hệ thừa kế, quan hệ về lao động, phân phối sản phẩm xã hội, quan hệ với các nước và tổ chức quốc tế khác...Bằng pháp luật, Nhà nước xác định chiên lược, mục tiêu phát triển kinh tế cũng như quy hoạch, cơ cấu nền kinh tế quốc dân, đưa ra những bảo đảm vận hành cơ chế quản lý để định hướng, ngăn chặn và xử lý những trường hợp vi phạm pháp luật trong sản xuất, kinh doanh. Hiện tại, hệ thống pháp luật về kinh tế của nước ta còn chưa hoàn thiện để điều chỉnh toàn diện, có hiệu quả đối với các quan hệ kinh tế đa dạng, vì vậy cần phải tiếp tục xây dựng và hoàn thiện.
+
+Để đáp ứng yêu cầu của cơ chế quản lý mới, trên tinh thần Hiến pháp 1992 Nhà nước ta đã ban hành các văn bản pháp luật như Bộ luật dân sự, Bộ luật lao động, Luật môi trường, Luật đầu tư nước ngoài... đồng thời thiết lập Toà án kinh tế và các Toà án khác.
+
+Xuất phát từ bản chất của nhà nước, các chính sách biện pháp phát triển kinh tế của Nhà nước ta đều nhằm phục vụ lợi ích của nhân dân. Tùy thuộc vào điều kiện phát triển kinh tế ở mỗi giai đoạn lịch sử cụ thể Nhà nước đặt ra những mục đích chính sách kinh tế cụ thể. Hiện nay mục đích chính sách kinh tế ở Việt Nam là “làm cho dân giàu, nước mạnh, đáp ứng ngày càng tốt hơn nhu cầu vật chất và tinh thần của nhân dân" (Điều 16 Hiến pháp 1992).
+
+Chế độ sở hữu là yếu tố căn bản trong chế độ kinh yế của nhà nước. Hiến pháp của tất cả các quốc gia trên thế giới đều quy định về chế độ sở hữu. Theo Hiến pháp 1992 hiện nay ở nước ta có các hình thức sở hữu chủ yếu sau: Sở hữu nhà nước (hay sở hữu toàn dân) bao gồm những tư liệu sản xuất chủ yếu, đóng vai trò quyết định cho sự phát triển của nền kinh tế. Nhà nước là chủ thể của sở hữu toàn dân, Nhà nước giao tài sản thuộc sở hữu toàn dân cho các cơ quan, tổ chức quản lý, sử dụng theo quy định của pháp luật.
+
+##### 4.2.3. Quyền hạn và nghĩa vụ cơ bản của công dân
+
+Mối quan hệ giữa nhà nước và công dân chủ yếu được thể hiện qua quy định về quyền và nghĩa vụ cơ bản của công dân. Công dân là những cá nhân mang quốc tịch của một nhà nước. Là công dân của nhà nước sở tại, cá nhân được hưởng đầy đủ các quyền và phải thực hiện các nghĩa vụ mà pháp luật của nhà nước quy định.
+
+Quyền và nghĩa vụ cơ bản của công dân là những quyền, nghĩa vụ được nhà nước quy định trong Hiến pháp. Những quyền và nghĩa vụ này được hiến pháp quy định cho tất cả mọi công dân, hoặc cho cả một tầng lớp, một giai cấp chứ không quy định cho từng con người trong từng điều kiện, hoàn cảnh cụ thể. Những quyền này thường được xuất phát từ quyền được sống, được tự do và được mưu cầu hạnh phúc, không ai có thể xâm phạm và tước đoạt. Quyền và nghĩa vụ cơ bản của công dân là cơ sở chủ yếu xác định địa vị pháp lý của công dân, là cơ sở cho mọi quyền và nghĩa vụ cụ thể của mỗi một công dân, thể hiện trình độ, mức sống, nền văn minh của một nhà nước.
+
+<!-- page: 51 -->
+
+###### 4.2.3.1. Quyền
+
+Được chia theo các lĩnh vực sau
+
+- Quyền trong lĩnh vực chính trị:
+
++ Quyền bầu cử (18 tuổi), quyền ứng cử (21 tuổi) vào Quốc hội và hội đồng
+
+nhân dân.
+
++ Quyền tham gia quản lý nhà nước, biểu quyết khi nhà nước tổ chức trưng cầu
+
+dân ý.
+
+- Quyền trong lĩnh vực kinh tế:
+
++ Quyền tự do kinh doanh.
+
++ Quyền bình đẳng giữa các thành phần kinh tế.
+
+- Quyền tự do cá nhân:
+
++ Quyền tự do đi lại, cư trú.
+
++ Quyền bất khả xâm phạm về tính mạng, tài sản, chỗ ở.
+
++ Quyền bí mật về thư tín, điện thoại, điện tín.
+
++ Quyền biểu tình, tự do lập hội.
+
++ Quyền tự do ngôn luận.
+
+- Quyền trong lĩnh vực văn hóa xã hội:
+
++ Quyền tự do sáng tác, nghiên cứu văn học nghệ thuật.
+
++ Được bảo hộ quyền tác giả, quyền sở hữu công nghiệp.
+
+###### 4.2.3.2. Nghĩa vụ
+
+Bên cạnh quyền luôn luôn phải có nghĩa vụ theo quy định tại Điều 51 Hiến pháp 1992
+
+“Quyền công dân không tách rời nghĩa vụ công dân. Nhà nước bảo đảm các quyền của công dân, công dân phải làm tròn nghĩa vụ của mình đối với nhà nước và xã hội”.
+
+Cụ thể: - Công dân phải có nghĩa vụ tuân theo Hiến pháp và pháp luật.
+
+- Công dân phải có nghĩa vụ đóng thuế …
+
+- Bảo vệ tổ quốc.
+
+Khi công dân không thực hiện đúng nghĩa vụ của mình hoặc lợi dụng các quyền tự do dân chủ của mình để làm những việc trái pháp luật sẽ bị áp dụng các biện pháp chế tài cần thiết.
+
+TÓM TẮT CHƯƠNG 4
+
+##### 1. Luật hiến pháp Việt Nam là một ngành luật chủ đạo trong hệ thống các ngành luật
+
+Việt Nam, bao gồm tổng thể các quy phạm pháp luật điều chỉnh các mối quan hệ xã hội có liên quan đến việc tổ chức quyền lực nhà nước. Luật hiến pháp là một ngành luật độc lập trong hệ thống pháp luật Việt Nam do đó nó có đối tượng điều chỉnh riêng, phương pháp điều chỉnh riêng và những chủ thể riêng.
+
+<!-- page: 52 -->
+
+##### 2. Đối tượng điều chỉnh của Luật hiến pháp: là những quan hệ xã hội quan trọng liên
+
+quan đến việc tổ chức quyền lực nhà nước. Qua việc tổ chức quyền lực nhà nước này mà pháp luật xác lập lên chế độ chính trị của nhà nước.
+
+##### 3. Phương pháp điều chỉnh: Quan hệ xã hội có liên quan đến việc tổ chức quyền lực
+
+nhà nước là những quan hệ xã hội rất quan trọng, là những quan hệ có tính chất cơ sở cho mọi quan hệ xã hội khác. Do đó ngành luật này thường sử dụng phương pháp định nghĩa, bắt buộc, quyền uy để điều chỉnh các quan hệ xã hội.
+
+##### 4. Các chế định cơ bản của luật hiến pháp bao gồm:
+
+- Chế độ chính trị: là hệ thống những nguyên tắc thực hiện quyền lực nhà nước. Chế
+
+độ chính trị là chế định của Hiến pháp, là tổng thể các quy định về những vấn đề có tính nguyên tắc chung làm nền tảng cho các chương sau của Hiến pháp như: bản chất nhà nước, nguồn gốc nhà nước, sự lãnh đạo của Đảng Cộng sản đối với hoạt động của Nhà nước và xã hội.
+
+- Chế độ kinh tế: Những quan hệ kinh tế chủ yếu tạo thành cơ sở kinh tế của nhà
+
+nước, được các quy phạm của Luật hiến pháp điều chỉnh và tổng hợp các quy phạm đó tạo thành chế định chế độ kinh tế. Trong chế độ kinh tế của nhà nước, các vấn đề cơ bản, chủ yếu làm cơ sở để xác định chế độ xã hội bao gồm: chính sách phát triển kinh tế, quan hệ về sở hữu, quan hệ sản xuất, những quan hệ về tổ chức quản lý nền kinh tế quốc dân... trong các quan hệ đó quan hệ về sở hữu đối với tư liệu sản xuất là nền tảng quyết định tính chất chế độ kinh tế.
+
+- Quyền hạn và nghĩa vụ cơ bản của công dân:
+
+Quyền được chia theo các lĩnh vực sau:
+
+- Quyền trong lĩnh vực chính trị.
+
+- Quyền tự do cá nhân.
+
+- Quyền trong lĩnh vực văn hóa xã hội.
+
+Nghĩa vụ:
+
+- Bảo vệ tổ quốc.
+
+- Đóng thuế cho nhà nước.
+
+- Tôn trọng hiến pháp và pháp luật.
+
+CÂU HỎI ÔN TẬP CHƯƠNG 4
+
+1. Khái niệm, đối tượng và phương pháp điều chỉnh của Luật hiến pháp?
+
+2. Nội dung chế định chế độ chính trị được quy định trong Hiến pháp 1992?
+
+3. Nội dung chế định chế độ kinh tế được quy định trong Hiến pháp 1992?
+
+##### 4. Nội dung chế định chế độ quyền và nghĩa vụ cơ bản của công dân được quy định trong Hiến pháp 1992?
+
+<!-- page: 53 -->
+
+### Chương 5: Luật Hành Chính Hoạt động chấp hành và điều hành hay là hoạt động quản lý nhà nước là một loại hoạt
+
+động cơ bản, chủ yếu được thực hiện bởi các cơ quan hành chính Nhà nước. Trong bộ máy nhà nước thì các cơ quan hành pháp, cơ quan quản lý hành chính nhà nước là một bộ phận cấu thành, tiến hành những hoạt động quản lý trên các lĩnh vực. Do vậy trong chương 5 chúng tôi đưa ra những quy định về Luật hành chính Việt Nam như khái niệm, đối tượng điều chỉnh, phương pháp điều chỉnh của Luật hành chính như là những căn cứ nhằm phân biệt với các ngành luật khác.
+
+Trong các quy định của luật hành chính thì chế định về cơ quan quản lý hành chính đã được trình bày một cách chi tiết như khái niệm, đặc điểm, hệ thống các cơ quan ở TW và địa phương. Các cơ quan hành chính được tổ chức một cách chặt chẽ, thống nhất từ trên xuống, có trung tâm chỉ đạo là Chính phủ. Trong các cơ quan hành chính thì hạt nhân cơ bản là cán bộ công chức nhà nước, những người trực tiếp thực hiện các hoạt động quản lý trong lĩnh vực hành chính nhà nước. Khái niệm cán bộ công chức được trình bày một cách chi tiết theo quy định của Pháp lệnh cán bộ công chức trong đó nêu rõ ai là công chức? ai không phải là công chức? các quy định của pháp luật như quyền và nghĩa vụ, chế độ khen thưởng, kỷ luật, tuyển dụng cán bộ công chức để tạo nên địa vị pháp lý cho họ.
+
+Vi phạm hành chính là một loại vi phạm pháp luật diễn ra mang tính phổ biến trên tất cả các lĩnh vực của đời sống nhà nước và xã hội. Nội dung của chương 5 đề cập đến những vấn đề nhằm nhận diện vi phạm hành chính với các dạng vi phạm pháp luật khác bằng khái niệm, đặc điểm và đặc biệt là các dấu hiệu. Quy định việc chủ thể vi phạm hành chính phải chịu trách nhiệm pháp lý đó là trách nhiệm hành chính mà cụ thể là phải chịu các biện pháp xử phạt tùy thuộc vào mức độ vi phạm.
+
+#### 5.1. Khái Niệm Chung Về Luật Hành Chính
+
+##### 5.1.1. Khái niệm
+
+Luật hành chính là hệ thống các quy phạm pháp luật do nhà nước ban hành điều chỉnh những quan hệ xã hội mang tính chất chấp hành và điều hành phát sinh trong hoạt động của các cơ quan nhà nướchoặc tổ chức xã hội khi được nhà nước trao quyền thực hiện chức năng quản lý nhà nước.
+
+Khái niệm “hoạt động chấp hành và điều hành” có thể được hiểu với nội dung và phạm vi gần như các khái niệm “hoạt động hành pháp”, “hoạt động hành chính - nhà nước” hoặc “hoạt động quản lý nhà nước”. Do đó, từ nhận xét chung nhất chúng ta có thể kết luận rằng luật hành chính là ngành luật về quản lý nhà nước và nó có ý nghĩa vô cùng quan trọng trong công cuộc xây dựng đất nước.
+
+<!-- page: 54 -->
+
+##### 5.1.2. Đối tượng điều chỉnh
+
+Đối tượng điều chỉnh của luật hành chính là những quan hệ xã hội mang tính chất chấp hành và điều hành phát sinh giữa các chủ thể tham gia hoạt động của nhà nước trong những trường hợp sau:
+
+- Những quan hệ xã hội mang tính chất chấp hành và điều hành phát sinh trong hoạt
+
+động của các cơ quan quản lý nhà nước.
+
+- Những quan hệ xã hội mang tính chất chấp hành và điều hành phát sinh trong hoạt
+
+động xây dựng, tổ chức công tác nội bộ của các cơ quan nhà nước khác (như Tòa án, Viện kiểm sát).
+
+- Những quan hệ xã hội mang tính chất chấp hành và điều hành phát sinh trong hoạt
+
+động của các cơ quan nhà nước khác hoặc các tổ chức xã hội khi được nhà nước trao quyền thực hiện chức năng quản lý nhà nước.
+
+##### 5.1.3. Phương pháp điều chỉnh
+
+Luật hành chính khi điều chỉnh các quan hệ xã hội mang tính chất chấp hành và điều hành sử dụng phương pháp mệnh lệnh phục tùng. Bởi vì bản thân hoạt động quản lý nhà nước mang bản chất là tính quyền uy do các bên tham gia quan hệ có địa vị không bình đẳng với nhau về ý chí: một bên ra lệnh, bên kia phải phục tùng.
+
+Tuy vậy trong những trường hợp đặc biệt luật hành chính cũng sử dụng phương pháp thỏa thuận, như trong trường hợp ban hành các quyết định liên tịch, ký kết và thực hiện các hợp đồng hành chính. Quan hệ giữa các bên tham gia ký kết là quan hệ bình đẳng, trong quá trình thỏa thuận với nhau để đi đến ký kết không ai có quyền ra lệnh, ép buộc ai.
+
+#### 5.2. Cơ Quan Hành Chính Nhà Nước
+
+##### 5.2.1. Khái niệm, đặc điểm cơ quan hành chính Nhà nước
+
+###### 5.2.1.1. Khái niệm
+
+Cơ quan quản lý hành chính nhà nước là những bộ phận hợp thành của bộ máy quản lý được thành lập để chuyên thực hiện chức năng quản lý nhà nước (hoạt động chấp hành và điều hành, hoạt động hành pháp).
+
+###### 5.2.1.2. Đặc điểm
+
+- Tập hợp những con người có tính độc lập tương đối về cơ cấu-tổ chức.
+
+- Chịu sự giám sát lãnh đạo của các cơ quan quyền lực tương ứng.
+
+- Thực hiện các hoạt động mang tính dưới luật - hoạt động tiến hành trên cơ sở và để
+
+thi hành luật.
+
+- Thẩm quyền chỉ giới hạn trong phạm vi hoạt động chấp hành và điều hành.
+
+- Tất cả các cơ quan có mối quan hệ chặt chẽ (trực thuộc trên - dưới, ngang - trái) có
+
+trung tâm chỉ đạo là Chính phủ.
+
+###### 5.2.1.3. Hệ thống
+
++ Ở Trung ương:
+
+<!-- page: 55 -->
+
+- Chính phủ, Thủ tướng Chính phủ.
+
+- Bộ, các cơ quan ngang Bộ và các cơ quan khác trực thuộc Chính phủ.
+
++ Ở địa phương:
+
+- UBND các cấp, Chủ tịch UBND.
+
+- Các cơ quan chuyên môn của UBND (Sở,phòng…).
+
+- Ban lãnh đạo các xí nghiệp, cơ quan, tổ chức, đơn vị sự nghiệp của nhà nước.
+
+##### 5.2.2. Phân loại
+
+Các cơ quan hành chính nhà nước có thể được phân loại theo nhiều cách khác nhau.
+
+###### 5.2.2.1. Theo cơ sở pháp lý của việc thành lập
+
+Các cơ quan hành chính bao gồm:
+
+- Các cơ quan hành chính mà việc thành lập nó được hiến pháp quy định (cơ quan
+
+hiến định):
+
++ Chính phủ.
+
++ Uỷ ban nhân dân các địa phương.
+
+- Các cơ quan hành chính Nhà nước được thành lập trên cơ sở các đạo luật các văn
+
+bản dưới luật:
+
++ Các bộ, cơ quan ngang bộ.
+
++ Các tổng cục, cục, vụ, các sở, ban thuộc các cơ quan hiến định.
+
++ Các đơn vị hành chính sự nghiệp cơ sở trong các lĩnh vực văn hoá y tế giáo
+
+dục quốc phòng trật tự trị an…
+
+###### 5.2.2.2. Căn cứ vào địa giới hoạt động
+
+Có thể phân thành:
+
+- Các cơ quan hành chính nhà nước trung ương gồm chính phủ, các bộ, các cơ quan
+
+ngang bộ quản lý nhà nước về ngành hay lĩnh vực công tác. Hoạt động quản lý của các cơ quan này bao trùm trong phạm vi toàn quốc.
+
+- Các cơ quan hành chính nhà nước địa phương gồm uỷ ban nhân dân, các sở, phòng,
+
+ban thuộc uỷ ban nhân dân hoạt động quản lý trong phạm vi lãnh thổ địa phương.
+
+###### 5.2.2.3. Căn cứ theo phạm vi thẩm quyền
+
+Các cơ quan hành chính nhà nước được chia thành:
+
+- Cơ quan có thẩm quyền chung: gồm chính phủ và uỷ ban nhân các cấp. Những cơ
+
+quan này, theo quy định của hiến pháp, có thẩm quyền giải quyết mọi vấn đề thuộc các ngành, các lĩnh vực khác nhau trên toàn quốc hoặc trên từng địa phương.
+
+- Cơ quan có thẩm quyền riêng: gồm các bộ, cơ quan ngang bộ, là những cơ quan
+
+quản lý theo ngành hoặc theo chức năng, trực tiếp quản lý một ngành, một lĩnh vực hoặc một số lĩnh vực trên phạm vi cả nước.
+
+<!-- page: 56 -->
+
+###### 5.2.2.4. Căn cứ theo chế độ lãnh đạo
+
+Các cơ quan hành chính nhà nước được chia thành:
+
+- Các cơ quan được tổ chức và hoạt động theo chế độ lãnh đạo tập thể.
+
+- Các cơ quan được tổ chức và hoạt động theo chế độ lãnh đạo một thủ trưởng.
+
+5.3.CHẾ ĐỘ PHÁP LÝ VỀ CÁN BỘ CÔNG CHỨC
+
+##### 5.3.1. Khái niệm, các loại cán bộ công chức
+
+###### 5.3.1.1. Khái niệm cán bộ, công chức
+
+Hoạt động quản lý nhà nước xét đến cùng được thực hiện bởi hành vi của các cá nhân cụ thể, được Nhà nước trao cho việc thực hiện quyền lực nhà nước. Từ đó mà hình thành phạm trù công chức nhà nước, một chủ thể đặc biệt và quan trọng của luật hành chính.
+
+Công chức nhà nước là những người làm việc trong cơ quan nhà nước do tuyển dụng, bầu hoặc bổ nhiệm, giữ một nghĩa vụ nhất định hoặc tiến hành những hoạt động cụ thể nào đó để phục vụ việc thực hiện một chức vụ nhất định do Nhà nước trả lương theo chức vụ hoặc loại hoạt động đó.
+
+Công chức nhà nước có những đặc trưng cơ bản là:
+
++ Công chức nhà nước bao giờ cũng là người thực hiện một công vụ nào đó của Nhà
+
+nước. Họ phải gánh vác một nghĩa vụ nhất định đối với Nhà nước và do vậy họ cũng được trao những quyền hạn nhất định để hoàn thành nghĩa vụ của mình. Trong quá trình thực hiện công cụ của mình, công chức chỉ được hành động trong phạm vi quyền hạn được giao.
+
++ Hoạt động thi hành công vụ của công chức không trực tiếp sản xuất ra của cải vật
+
+chất. Nó là những hoạt động thuộc lĩnh vực quản lý nhà nươc nói chung.
+
++ Công chức được hưởng lương do ngân sách nhà nước trả.
+
+Như vậy cũng có thể nói, công chức là những người có quan hệ lao động với nhà nước. Trong quan hệ này luôn tồn tại hai yếu tố: yếu tố tự nguyện của người lao động và yếu tố ý chí của nhà nước. Sự đồng ý của người lao động là yếu tố cần thiết, là điều kiện bước đầu để quan hệ này hình thành. Song, ý chí của cơ quan nhà nước có thẩm quyền mới là yếu tố quyết định hình thành quan hệ pháp luật giữa hai bên.
+
+Người lao động không có quyền buộc Nhà nước phải trao cho mình một chức vụ hoặc những hoạt động nhất định. Khi đã trở thành công chức nhà nước, họ không có quyền từ chối những công việc được giao. Nhà nước có quyền thay đổi, điều động công tác, thậm chí chấm dứt quan hệ đó, trong các trường hợp nhằm đảm bảo lợi ích của Nhà nước.
+
+###### 5.3.1.2. Các loại công chức nhà nước
+
+Theo quy định tại Điều 1 Pháp lệnh sửa đổi, bổ sung một số điều Pháp lệnh cán bộ, công chức năm 1998 được Uỷ ban Thường vụ Quốc hội thông qua ngày 29/4/2003: Cán bộ, công chức quy định tại Pháp lệnh này là công dân Việt Nam trong biên chế, bao gồm:
+
+###### a. Những người do bầu cử để đảm nhiệm chức vụ theo nhiệm kỳ trong cơ quan nhà
+
+nước, tổ chức chính trị, tổ chức chính trị - xã hội ở trung ương; ở tỉnh, thành phố Trực thuộc
+
+<!-- page: 57 -->
+
+trung ương (gọi chung là cấp tỉnh); ở huyện, quận, thị xã, thành phố thuộc Tỉnh (gọi chung là cấp huyện);
+
+###### b. Những người được tuyển dụng, bổ nhiệm, hoặc giao nhiệm vụ thường xuyên làm
+
+việc trong tổ chức chính trị, tổ chức chính trị - xã hội ở trung ương, cấp tỉnh, cấp huyện;
+
+###### c. Những người được tuyển dụng, bổ nhiệm, vào một ngạch công chức hoặc giao giữ
+
+một công vụ thường xuyên trong các cơ quan nhà nước ở trung ương, cấp Tỉnh, cấp huyện;
+
+###### d. Những người được tuyển dụng, bổ nhiệm, vào một ngạch viên chức hoặc giao giữ
+
+một công vụ thường xuyên trong đơn vị sự nghiệp của nhà nước, tổ chức chính trị, tổ chức chính trị - xã hội;
+
+###### đ. Thẩm phán toà án nhân dân, kiểm sát viên viện kiểm sát nhân dân;
+
+###### e. Người được tuyển dụng, bổ nhiệm, hoặc giao nhiệm vụ thường xuyên làm việc
+
+trong cơ quan, đơn vị thuộc Quân đội nhân dân mà không phải là sĩ quan, quân nhân chuyên nghiệp, công nhân quốc phòng, làm việc trong cơ quan, đơn vị thuộc Công an nhân dân mà không phải là sĩ quan, hạ sĩ quan chuyên nghiệp;
+
+###### g. Những người do bầu cử để đảm nhiệm chức vụ theo nhiệm kỳ trong Thường trực
+
+Hội đồng nhân dân, Uỷ ban nhân dân; Bí thư, Phó bí thư Đảng uỷ; người đứng đầu tổ chức chính trị - xã hội xã, phường, thị trấn (gọi chung là cấp xã);
+
+###### h. Những người được tuyển dụng, giao giữ một chức danh chuyên môn nghiệp vụ
+
+thuộc Uỷ ban nhân dân
+
+##### 5.3.2. Những nội dung chủ yếu của chế độ pháp lý về cán bộ công chức:
+
+###### 5.3.2.1. Nghĩa vụ, quyền lợi
+
+###### a. Nghĩa vụ:
+
+Cán bộ, công chức có những nghĩa vụ sau đây:
+
+- Trung thành với Nhà nước Cộng hoà xã hội chủ nghĩa Việt Nam; bảo vệ sự an toàn,
+
+danh dự và lợi ích quốc gia;
+
+- Chấp hành nghiêm chỉnh đường lối, chủ trương của Đảng và chính sách, pháp luật
+
+của Nhà nước; thi hài nhiệm vụ, công vụ theo đúng quy định của pháp luật;
+
+- Tận tụy phục vụ nhân dân, tôn trọng nhân dân;
+
+- Liên hệ chặt chẽ với nhân dân, tham gia sinh hoạt với cộng đồng dân cư nơi cư trú,
+
+lắng nghe ý kiến và chịu sự giám sát của nhân dân;
+
+- Có nếp sống lành mạnh, trung thực, cần kiệm liêm chính, chí công vô tư; không
+
+được quan liêu, hách dịch, lạm quyền, tham nhũng;
+
+- Có ý thức tổ chức kỷ luật và trách nhiệm trong công tác, thực hiện nghiêm chỉnh nội
+
+quy của cơ quan, tổ chức;
+
+- Giữ gìn và bảo vệ của công, bảo vệ bí mật nhà nước theo quy định của pháp luật;
+
+- Thường xuyên học tập nâng cao trình độ; chủ động, sáng tạo, phối hợp trong công
+
+tác nhằm hoàn thành tốt nhiệm vụ, công vụ được giao;
+
+- Chấp hành sự điều động, phân công công tác của cơ quan, tổ chức có thẩm quyền.
+
+<!-- page: 58 -->
+
+###### b. Cán bộ, công chức có các quyền lợi sau đây:
+
+- Được nghỉ hàng năm, nghỉ các ngày lễ theo quy định và nghỉ việc riêng theo quy
+
+định của Bộ luật lao động;
+
+- Trong trường hợp có lý do chính đáng được nghỉ không hưởng lương sau khi được
+
+sự đồng ý của người đứng đầu cơ quan, tổ chức sử dụng cán bộ, công chức;
+
+- Được hưởng các chế độ trợ cấp bảo hiểm xã hội, ốm tai nạn lao động, bệnh nghề
+
+nghiệp, thai sản, hưu trí, tử tuất theo quy định của Bộ luật lao động;
+
+- Được hưởng chế độ hưu trí, thôi việc theo quy định.
+
+- Cán bộ, công chức là nữ còn được hưởng các quyền lợi quy định tại Bộ luật lao
+
+động;
+
+- Được hưởng các quyền lợi khác do pháp luật quy định.
+
+- Cán bộ công chức được hưởng tiền lương tương xứng với công vụ được giao, chính
+
+sách về nhà ở, các chính sách khác và được bảo đảm các điều kiện làm việc.
+
+- Cán bộ, công chức làm việc ở vùng cao, vùng sâu, vùng xa, hải đảo hoặc làm việc
+
+trong các ngành, nghề độc hại, nguy hiểm được hưởng phụ cấp và chính sách ưu đãi do Chính phủ quy định.
+
+- Cán bộ, công chức có quyền tham gia hoạt động chính trị, xã hội theo quy định của
+
+pháp luật; được tạo điều kiện để học tập nâng cao trình độ, được quyền nghiên cứu khoa học, sáng tác; được khen thưởng khi hoàn thành xuất sắc nhiệm vụ, công vụ được giao.
+
+- Cán bộ, công chức có quyền khiếu nại, tố cáo, khởi kiện về việc làm của cơ quan, tổ
+
+chức, cá nhân mà mình cho là trái pháp luật đến các cơ quan, tổ chức có thẩm quyền theo quy định của pháp luật.
+
+- Cán bộ, công chức khi thi hành nhiệm vụ, công vụ được pháp luật và nhân dân bảo
+
+vệ.
+
+- Cán bộ, công chức hy sinh trong khi thi hành nhiệm vụ công vụ được xem xét để
+
+công nhận là liệt sĩ theo quy định của pháp luật.
+
+- Cán bộ, công chức bị thương trong khi thi hành nhiệm vụ, công vụ thì được xem xét
+
+để áp dụng chính sách, chế độ tương tự như đối với thương binh..
+
+###### c. Những việc cán bộ, công chức không được làm
+
+- Cán bộ, công chức không được chây lười trong công tác, trốn tránh trách nhiệm
+
+hoặc thoái thác nhiệm vụ, công vụ; không được gây bè phái, mất đoàn kết, cục bộ hoặc tự ý bỏ việc.
+
+- Cán bộ, công chức không được cửa quyền, hách dịch, sách nhiễu, gây khó khăn,
+
+phiền hà đối với cơ quan, tổ chức, cá nhân trong khi giải quyết công việc.
+
+- Cán bộ, công chức không được thành lập, tham gia thành lập hoặc tham gia quản lý,
+
+điều hành các doanh nghiệp tư nhân, công ty trách nhiệm hữu hạn, công ty cổ phần, hợp tác xã, bệnh viện tư, trường học tư và tổ chức nghiên cứu khoa học tư.
+
+- Cán bộ, công chức không được làm tư vấn cho các doanh nghiệp, tổ chức kinh
+
+doanh, dịch vụ và các tổ chức, cá nhân khác ở trong nước và nước ngoài về các công việc
+
+<!-- page: 59 -->
+
+có liên quan đến bí mật nhà nước, bí mật công tác, những công việc thuộc thẩm quyền giải quyết của mình và các công việc khác mà việc tư vấn đó có khả năng gây phương hại đến lợi ích quốc gia. Chính phủ quy định cụ thể việc làm tư vấn của cán bộ, công chức.
+
+- Cán bộ, công chức làm việc ở những ngành, nghề có liên quan đến bí mật nhà nước,
+
+thì trong thời hạn ít nhất là năm năm kể từ khi có quyết định hưu trí, thôi việc, không được làm việc cho các tổ chức, cá nhân trong nước, nước ngoài hoặc tổ chức liên doanh với nước ngoài trong phạm vi các công việc có liên quan đến ngành, nghề mà trước đây mình đã đảm nhiệm. Chính phủ quy định cụ thể danh mục ngành, nghề, công việc, thời hạn mà cán bộ, công chức không được làm và chính sách ưu đãi đối với những người phải áp dụng quy định này.
+
+- Người đứng đầu, cấp phó của người đứng đầu cơ quan, vợ hoặc chồng, bố, mẹ, con
+
+của những người đó không được góp vốn vào doanh nghiệp hoạt động trong phạm vi ngành, nghề mà người đó trực tiếp thực hiện việc quản lý nhà nước.
+
+- Người đứng đầu và cấp phó của người đứng đầu cơ quan, tổ chức không được bố trí
+
+vợ hoặc chồng, bố, mẹ, con, anh, chị, em ruột của mình giữ chức vụ lãnh đạo về tổ chức nhân sự, kế toán tài vụ; làm thủ quỹ, thủ kho trong cơ quan, tổ chức hoặc mua bán vật tư, hàng hoá, giao dịch ký kết hợp đồng cho cơ quan, tổ chức đó.
+
+###### 5.3.2.2. Khen thưởng
+
+Khen thưởng danh hiệu, huy hiệu (như: nhà giáo tú, thầy thuốc ưu tú, nhân dân), giấy khen, bằng khen huy chương, huân chương; cán bộ, công chức hy sinh khi làm nhiệm vụ được công nhận là liệt sĩ, bị thương khi là nhiệm vụ được công nhận là thương binh.
+
+###### 5.3.2.3. Kỷ luật:
+
+Cán bộ công chức khi vi phạm kỷ luật phải chịu trách nhiệm kỷ luật với các hình thức (tùy theo mức độ vi phạm) Khiển trách, cảnh cáo, hạ bậc lương, cách chức, buộc thôi việc.
+
+###### 5.3.2.4. Tuyển dụng:
+
+Việc tuyển dụng viên chức vào các cơ quan nhà nước được thực hiện dưới 3 hình thức: bầu, bổ nhiệm, thi cử.
+
+#### 5.4. Vi Phạm Hành Chính Và Trách Nhiệm Hành Chính
+
+##### 5.4.1. Vi phạm hành chính
+
+###### 5.4.1.1. Khái niệm
+
+Vi phạm hành chính là những hành vi (hành động hoặc không hành động) trái pháp luật do các chủ thể của luật hành chính thực hiện một cách cố ý hoặc vô ý, xâm hại tới các quan hệ xã hội do luật hành chính bảo vệ và theo quy định của pháp luật phải bị xử phạt vi phạm hành chính.
+
+###### 5.4.1.2. Các dấu hiệu
+
+- Vi phạm hành chính trước hết là hành vi, nó chỉ được thực hiện bằng hành vi và là
+
+hành vi trái pháp luật. Nghĩa là hành vi được thực hiện ngược lại với quy định của pháp
+
+<!-- page: 60 -->
+
+luật, có thể là hành động bị pháp luật hành chính cấm hoặc không thực hiện hành động mà pháp luật hành chính buộc phải thực hiện.
+
+Ví dụ: Điều khiển xe phân khối lớn mà không có bằng lái
+
+- Hành vi trái pháp luật hành chính là nguy hiểm cho xã hội nhưng ít nguy hiểm hơn
+
+so với vi phạm hình sự (dựa vào tính chất của khách thể bị xâm hại).
+
+- Trong mặt khách quan của vi phạm hành chính, không nhất thiết phải có dấu hiệu
+
+hậu quả có hại của hành vi và quan hệ nhân quả giữa hành vi và hậu quả. Nói cách khác chỉ cần tồn tại dấu hiệu “hình thức” (hành động hay không hành động trái pháp luật).
+
+- Xâm hại tới những quan hệ xã hội do luật hành chính bảo vệ như trật tự nhà nước,
+
+quyền tự do và lợi ích hợp pháp của công dân, trật tự quản lý.
+
+Ví dụ: Các quan hệ xã hội trong lĩnh vực bảo vệ trật tự an toàn giao thông, bảo vệ môi trường.
+
+- Chủ thể thực hiện vi phạm hành chính có thể là cá nhân hoặc tổ chức.
+
++ Cá nhân: phải là người có năng lực hành vi.
+
++ Tổ chức: khi bị xử phạt vi phạm hành chính phải tiến hành xác định lỗi của
+
+những người trực tiếp gây ra vi phạm để truy cứu trách nhiệm kỷ luật, trách nhiệm vật chất.
+
++ Người nước ngoài, người không có quốc tịch, tổ chức nước ngoai đang sinh
+
+sống làm việc trên lãnh thổ Việt Nam khi vi phạm hành chính thì bị xử phạt như đối với công dân hoặc tổ chức theo pháp luật Việt Nam. Nếu thuộc diện được hưởng quyền ưu đãi và miễn trừ thì giải quyết bằng con đường ngoại giao.
+
+- Vi phạm hành chính là hành vi có lỗi được thực hiện dưới hai hình thức cố ý và vô ý.
+
+###### 5.4.1.3. Các hình thức xử lý vi phạm hành chính Trong luật hành chính hiện hành, xử lý vi phạm hành chính bao gồm xử phạt vi phạm
+
+hành chính và các biện pháp xử lý hành chính khác.
+
+* Xử phạt vi phạm hành chính:
+
+Xử phạt vi phạm hành chính là hoạt động của các chủ thể có thẩm quyền theo quy định của pháp luật áp dụng với các tổ chức, cá nhân vi phạm hành chính trong các lĩnh vực quản lý hành chính nhà nước. Các hình thức xử phạt vi phạm hành chính bao gồm các hình thức xử phạt chính (cảnh cáo; phạt tiền) và các hình thức xử phạt bổ sung (tước quyền sử dụng giấy phép, chứng chỉ hành nghề; tịch thu tang vật, phương tiện được sử dụng đẻ vi phạm hành chính; trục xuất).
+
+Đối với mỗi vi phạm hành chính, cá nhân tổ chức vi phạm chỉ phải chịu một trong các hình thức xử phạt chính. Tùy theo tính chất,mức độ vi phạm, cá nhân tổ chức vi phạm hành chính còn có thể bị áp dụng một hoặc các hình thức xử phạt bổ sung.
+
++ Cảnh cáo được áp dụng đối với tổ chức, cá nhân vi phạm hành chính nhỏ, lần đầu,
+
+có tình tiết giảm nhẹ, hoặc đối với mọi hành vi vi phạm hành chính do người chưa thành niên từ đủ 14 tuổi đến dưới 16 tuổi thực hiện.
+
+<!-- page: 61 -->
+
++ Phạt tiền được áp dụng đối với các tổ chức, cá nhân vi phạm hành chính và không
+
+thuộc trường hợp bị xử phạt cảnh cáo. Mức phạt tiền trong xử phạt vi phạm hành chính, tùy theo tính chất và mức độ vi phạm, tối thiểu là 5.000 đồng và tối đa là 500.000.000 đồng.
+
+Tiền xử phạt vi phạm hành chính được đưa vào ngân sách nhà nước.
+
++ Tước quyền sử dụng giấy phép, chứng chỉ hành nghề được áp dụng có thời hạn
+
+hoặc không có thời hạn đối với các tổ chức, cá nhân vi phạm nghiêm trọng quy tắc sử dụng giấy phép.
+
++ Tịch thu tang vật, phương tiện được dùng để vi phạm hành chính. Người có thẩm
+
+quyền xử phạt quyết định biện pháp tịch thu để sung vào công quỹ nhà nước các tài sản, vật dụng, hàng hóa, tiền bạc... dùng để thực hiện vi phạm hành chính hoặc do vi phạm kèm theo hình thức mà có.
+
++ Trục xuất được áp dụng với người nước ngoài có hành vi vi phạm pháp luật Việt
+
+Nam, buộc họ phải rời khỏi lãnh thổ Việt Nam. Trục xuất có thể áp dụng như một biện pháp xử phạt chính hoặc như một biện pháp xử phạt bổ sung khi được áp dụng kèm theo hình thức phạt chính khác.
+
+Đi kèm theo các hình thức xử phạt hành chính, đối với cá nhân tổ chức vi phạm hành chính, cơ quan có thẩm quyền xử phạt hành chính còn có thể áp dụng một hoặc nhiều biện pháp khắc phục hậu quả như sau:
+
+- Buộc khôi phục lại tình trạng ban đầu đã bị thay đổi do vi phạm hành chính gây ra
+
+hoặc buộc tháo dỡ công trình xây dựng trái phép.
+
+- Buộc thực hiện các biện pháp khắc phục tình trangj ô nhiễm môi trường sống, lây
+
+lan dịch bệnh do vi phạm hành chính gây ra.
+
+- Buộc đưa ra khỏi lãnh thổ Việt Nam hoặc buộc tái xuất hàng hóa, vật phẩm, phương
+
+tiện vi phạm.
+
+- Buộc thiêu hủy vật phẩm gây hại cho sức khỏe con người, vật nuôi, cây trồng và văn
+
+hóa phẩm độc hại.
+
+- Các biện pháp khác do Chính phủ quy định.
+
+* Các biện pháp xử lý hành chính khác:
+
+Ngoài các hình thức xử lý vi phạm hành chính nêu trên, việc xử lý vi phạm hành chính còn bao gồm các biện pháp xử lý hành chính khác, chỉ áp dụng đối với các cá nhân:
+
+- Giáo dục tại xã, phường, thị trấn;
+
+- Đưa vào trường giáo dưỡng;
+
+- Đưa vào cơ sở giáo dục;
+
+- Đưa vào cơ sở chữa bệnh;
+
+- Quản chế hành chính.
+
+Các biện pháp xử lý hành chính nói trên nhằm mục đích giáo dục ý thức chấp hành pháp luật của đối tượng vi phạm pháp luật về an ninh, trật tự, an toàn xã hội mà chưa đến mức phải xử lý hình sự, nhằm tạo điều kiện cho những đối tượng này trở thành công dân lương thiện, ngăn ngừa khả năng họ có thể tái phạm.
+
+<!-- page: 62 -->
+
+Các biện pháp ngăn chặn và đảm bảo việc xử phạt vi phạm hành chính.
+
+Bên cạnh các hình thức xử phạt vi phạm hành chính, trong việc xử lý vi phạm hành chính người ta còn có thể áp dụng các biện pháp ngăn chặn và đảm bảo việc xử phạt vi phạm hành chính là:
+
+- Tạm giữ người theo thủ tục hành chính;
+
+- Tạm giữ tang vật, phương tiện vi phạm hành chính;
+
+- Khám người;
+
+- Khám phương tiện vận tải, đồ vật;
+
+- Khám nơi cất giấu tang vật, phương tiện vi phạm hành chính;
+
+- Bảo lãnh hành chính;
+
+- Truy tìm đối tượng phải chấp hành quyết định đưa vào trường giáo dưỡng,
+
+cơ sở giáo dục, cơ sở chữa bệnh trong trường hợp bỏ trốn.
+
+###### 5.4.1.4. Đối tượng áp dụng xử phạt hành chính và các biện pháp xử lý hành chính khác
+
+Xử phạt hành chính được áp dụng đối với tổ chức, cá nhân có hành vi vi phạm hành chính bao gồm cá nhân, tổ chức Việt Nam; cá nhân, tổ chức nước ngoài vi phạm hành chính trên cac lĩnh vực khác nhau của quản lý hành chính trên các lĩnh vực khác nhau của quản lý hành chính nhà nước, chưa đến mức phải truy cứu trách nhiệm hình sự.
+
+Đối với cá nhân, người từ đủ 14 đến dưới 16 tuổi bị xử phạt hành chính về vi phạm hành chính do cố ý; người từ đủ 16 tuổi trở lên bị xử phạt hành chính về mọi vi phạm hành chính do mình gây ra. Người từ đủ 14 tuổi đến dưới 16 tuổi vi phạm hành chính thì bị phạt cảnh cáo. Người từ đủ 16 đến 18 tuổi vi phạm hành chính thì bị áp dụng mọi hình thức xử phạt chính, song mức phạt tiền không quá ½ mức phạt tiền đối với người thành niên; trong trường hợp họ không có tiền nộp phạt thì cha mẹ hoặc người giám hộ phải nộp thay.
+
+Các biện pháp xử lý hành chính khác chỉ được áp dụng đối với cá nhân các đối tượng đã nhiều lần bị xử phạt hành chính nhưng vẫn tái phạm, nhằm mục đích giáo dục ý thức tuân thủ pháp luật và ngăn ngừa khả năng tái phạm ở họ.
+
+###### 5.4.1.5. Thẩm quyền xử phạt vi phạm hành chính Các cơ quan nhà nứoc và người có thẩm quyền xử phạt vi phạm hành chính bao gồm:
+
+- Ủy ban nhân dân các cấp (quy định tại Pháp lệnh Xử lý vi phạm hành chính 2002,
+
+các Điều 28, 29, 30);
+
+- Công an nhân dân (Điều 31 Pháp lệnh);
+
+- Bộ đội biên phòng (Điều 32 Pháp lệnh);
+
+- Cơ quan cảnh sát biển (Điều 33 Pháp lệnh);
+
+- Hải quan (Điều 34 Pháp lệnh);
+
+- Kiểm lâm (Điều 35 Pháp lệnh);
+
+- Thuế vụ (Điều 36 Pháp lệnh);
+
+- Quản lý thị trường (Điều 37 Pháp lệnh);
+
+<!-- page: 63 -->
+
+- Thanh tra chuyên ngành (Điều 38 Pháp lệnh);
+
+- Giám đố cảng vụ hàng hải, Giám đốc cảng vụ thủy nội địa, Giám đốc cảng vụ hàng
+
+không (Điều 39 Pháp lệnh);
+
+- Tòa án nhân dân và cơ quan thi hành án dân sự (Điều 40 Pháp lệnh).
+
+Trên cơ sở các nguyên tắc chung về vi phạm, thẩm quyền xử lý vi phạm hành chính được quy định trong Pháp lệnh Xử lý vi phạm hành chính 2002, các Nghị định của Chính phủ quy định một cách chi tiết việc xử lý vi phạm hành chính trong từng lĩnh vực cụ thể.
+
+##### 5.4.2. Trách nhiệm hành chính
+
+###### 5.4.2.1. Khái niệm
+
+Trách nhiệm hành chính là một dạng của trách nhiệm pháp lý được áp dụng trong hoạt động quản lý - hoạt động hành chính nhà nước theo quy định của luật hành chính. Đó là sự áp dụng những biện pháp cưỡng chế hành chính mang tính chất xử phạt hoặc khôi phục lại những quyền và lợi ích bị xâm hại được quy định trong những chế tài của quy phạm pháp luật hành chính bởi cơ quan nhà nước, người có thẩm quyền đối với những chủ thể thực hiện hành vi vi phạm hành chính.
+
+Do đó trách nhiệm hành chính thể hiện sự phản ứng tiêu cực của nhà nước đối với chủ thể thực hiện hành vi vi phạm hành chính, kết quả là chủ thể đó phải gánh chịu những hậu quả bất lợi, bị thiệt hại về vật chất hoặc tinh thần.
+
+###### 5.4.2.2. Đặc điểm
+
+- Cơ sở của trách nhiệm hành chính là vi phạm hành chính.
+
+- Tính chất của trách nhiệm hành chính ít nghiêm khắc hơn trách nhiệm hình sự,
+
+người chịu trách nhiệm hành chính không mang án tích và được áp dụng chủ yếu bởi các cơ quan quản lý nhà nước chứ không phải Tòa án.
+
+- Trách nhiệm hành chính áp dụng đối với mọi công dân, giữa đối tượng bị xử phạt và
+
+cơ quan có thẩm quyền không tồn tại quan hệ trực thuộc (khác với trách nhiệm kỷ luật - người bị áp dụng trách nhiệm kỷ luật bao giờ cũng trực thuộc cơ quan hoặc người có thẩm quyền áp dụng chế tài đó).
+
+###### 5.4.2.3. Các biện pháp trách nhiệm hành chính
+
+###### a. Biện pháp xử phạt
+
+- Biện pháp xử phạt chính:
+
++ Cảnh cáo: áp dụng với những vi phạm nhỏ chưa gây ra hậu quả, vi phạm lần đầu
+
+có nhiều tình tiết giảm nhẹ.
+
++ Phạt tiền: từ 5.000đ - 100.000.000đ
+
+Đối với mỗi vi phạm hành chính chỉ áp dụng một trong hai hình thức phạt này.
+
+- Biện pháp xử phạt bổ sung:
+
+<!-- page: 64 -->
+
++ Tước quyền sử dụng giấy phép có thời hạn hoặc không có thời hạn. Trong thời gian
+
+bị tước quyền sử dụng giấy phép cá nhân, tổ chức không được tiến hành các hoạt động ghi trong giấy phép.
+
++ Tịch thu tang vật, phương tiện vi phạm được sử dụng để thực hiện vi phạm hành
+
+chính: là việc sung vào qũy của nhà nước vật, tiền, hàng hóa, phương tiện có liên quan trực tiếp đến vi phạm hành chính. Không tịch thu tang vật, tiền, phương tiện bị cá nhân, tổ chức vi phạm hành chính chiếm đoạt mà trả lại cho chủ sở hữu hoặc người quản lý hợp pháp.
+
+###### b. Biện pháp khôi phục pháp luật:
+
+Với tác dụng ngăn chặn vi phạm đang xảy ra, cần khôi phục bồi hoàn thiệt hại do vi phạm gây ra hoặc ngăn chặn hậu quả.
+
+Các biện pháp bao gồm:
+
+- Buộc khôi phục lại tình trạng ban đầu đã bị thay đổi do vi phạm hành chính gây ra
+
+hoặc buộc tháo dỡ công trình xây dựng trái phép.
+
+- Buộc thực hiện các biện pháp khắc phục tình trạng ô nhiễm môi trường sống, lây lan
+
+dịch bệnh do vi phạm hành chính gây ra.
+
+- Buộc bồi thường thiệt hại do vi phạm hành chính gây ra đến 1.000.000đ.
+
+- Buộc thiêu hủy vật phẩm gây hại cho sức khỏe con người, văn hóa phẩm độc hại.
+
+###### 5.4.2.4. Cơ quan có thẩm quyền xử phạt vi phạm hành chính
+
+- UBND các cấp.
+
+- Cơ quan cảnh sát, bộ đội biên phòng, hải quan, kiểm lâm, thuế vụ, quản lý thị
+
+trường và những cơ quan thực hiện chức năng thanh tra nhà nước chuyên ngành.
+
+- Tòa án nhân dân và cơ quan thi hành án dân sự.
+
+TÓM TẮT CHƯƠNG 5
+
+##### 1. Khái niệm chung về luật hành chính: Luật hành chính là hệ thống các quy phạm
+
+pháp luật do nhà nước ban hành điều chỉnh những quan hệ xã hội mang tính chất chấp hành và điều hành phát sinh trong hoạt động của các cơ quan nhà nướchoặc tổ chức xã hội khi được nhà nước trao quyền thực hiện chức năng quản lý nhà nước.
+
+* Đối tượng điều chỉnh: Đối tượng điều chỉnh của luật hành chính là những quan hệ
+
+xã hội mang tính chất chấp hành và điều hành phát sinh giữa các chủ thể tham gia hoạt động của nhà nước.
+
+* Phương pháp điều chỉnh: Luật hành chính khi điều chỉnh các quan hệ xã hội mang
+
+tính chất chấp hành và điều hành sử dụng phương pháp mệnh lệnh phục tùng.
+
+##### 2. Cơ quan hành chính nhà nước: là những bộ phận hợp thành của bộ máy quản lý
+
+được thành lập để chuyên thực hiện chức năng quản lý nhà nước (hoạt động chấp hành và điều hành, hoạt động hành pháp).
+
+<!-- page: 65 -->
+
+##### 3. Cán bộ công chức nhà nước là những người làm việc trong cơ quan nhà nước do
+
+tuyển dụng, bầu hoặc bổ nhiệm, giữ một nghĩa vụ nhất định hoặc tiến hành những hoạt động cụ thể nào đó để phục vụ việc thực hiện một chức vụ nhất định do Nhà nước trả lương theo chức vụ hoặc loại hoạt động đó.
+
+##### 4. Vi phạm hành chính là những hành vi (hành động hoặc không hành động) trái pháp
+
+luật do các chủ thể của luật hành chính thực hiện một cách cố ý hoặc vô ý, xâm hại tới các quan hệ xã hội do luật hành chính bảo vệ và theo quy định của pháp luật phải bị xử phạt vi phạm hành chính.
+
+##### 5. Các hình thức xử lý vi phạm hành chính:
+
+Trong luật hành chính hiện hành, xử lý vi phạm hành chính bao gồm xử phạt vi phạm hành chính và các biện pháp xử lý hành chính khác.
+
+- Xử phạt vi phạm hành chính;
+
+- Các biện pháp xử lý hành chính khác;
+
+Ngoài các hình thức xử lý vi phạm hành chính nêu trên, việc xử lý vi phạm hành chính còn bao gồm các biện pháp xử lý hành chính khác, chỉ áp dụng đối với các cá nhân:
+
+- Giáo dục tại xã, phường, thị trấn;
+
+- Đưa vào trường giáo dưỡng;
+
+- Đưa vào cơ sở giáo dục;
+
+- Đưa vào cơ sở chữa bệnh;
+
+- Quản chế hành chính.
+
+Bên cạnh các hình thức xử phạt vi phạm hành chính, trong việc xử lý vi phạm hành chính người ta còn có thể áp dụng các biện pháp ngăn chặn và đảm bảo việc xử phạt vi phạm hành chính là:
+
+- Tạm giữ người theo thủ tục hành chính;
+
+- Tạm giữ tang vật, phương tiện vi phạm hành chính;
+
+- Khám người;
+
+- Khám phương tiện vận tải, đồ vật;
+
+- Khám nơi cất giấu tang vật, phương tiện vi phạm hành chính;
+
+- Bảo lãnh hành chính;
+
+- Truy tìm đối tượng phải chấp hành quyết định đưa vào trường giáo dưỡng,
+
+cơ sở giáo dục, cơ sở chữa bệnh trong trường hợp bỏ trốn.
+
+##### 6. Đối tượng áp dụng xử phạt hành chính và các biện pháp xử lý hành chính khác:
+
+Xử phạt hành chính được áp dụng đối với tổ chức, cá nhân có hành vi vi phạm hành chính bao gồm cá nhân, tổ chức Việt Nam; cá nhân, tổ chức nước ngoài vi phạm hành chính trên cac lĩnh vực khác nhau của quản lý hành chính trên các lĩnh vực khác nhau của quản lý hành chính nhà nước, chưa đến mức phải truy cứu trách nhiệm hình sự.
+
+##### 7. Thẩm quyền xử phạt vi phạm hành chính:
+
+Các cơ quan nhà nứoc và người có thẩm quyền xử phạt vi phạm hành chính bao gồm:
+
+<!-- page: 66 -->
+
+- Ủy ban nhân dân các cấp (quy định tại Pháp lệnh Xử lý vi phạm hành chính 2002,
+
+các Điều 28, 29, 30);
+
+- Công an nhân dân (Điều 31 Pháp lệnh);
+
+- Bộ đội biên phòng (Điều 32 Pháp lệnh);
+
+- Cơ quan cảnh sát biển (Điều 33 Pháp lệnh);
+
+- Hải quan (Điều 34 Pháp lệnh);
+
+- Kiểm lâm (Điều 35 Pháp lệnh);
+
+- Thuế vụ (Điều 36 Pháp lệnh);
+
+- Quản lý thị trường (Điều 37 Pháp lệnh);
+
+- Thanh tra chuyên ngành (Điều 38 Pháp lệnh);
+
+- Giám đố cảng vụ hàng hải, Giám đốc cảng vụ thủy nội địa, Giám đốc cảng vụ hàng
+
+không (Điều 39 Pháp lệnh);
+
+- Tòa án nhân dân và cơ quan thi hành án dân sự (Điều 40 Pháp lệnh).
+
+##### 8. Trách nhiệm hành chính là một dạng của trách nhiệm pháp lý được áp dụng trong hoạt động quản lý - hoạt động hành chính nhà nước theo quy định của luật hành chính. Đó
+
+là sự áp dụng những biện pháp cưỡng chế hành chính mang tính chất xử phạt hoặc khôi phục lại những quyền và lợi ích bị xâm hại được quy định trong những chế tài của quy phạm pháp luật hành chính bởi cơ quan nhà nước, người có thẩm quyền đối với những chủ thể thực hiện hành vi vi phạm hành chính.
+
+##### 9. Các biện pháp trách nhiệm hành chính:
+
+Biện pháp xử phạt:
+
++ Biện pháp xử phạt chính:
+
+Cảnh cáo: áp dụng với những vi phạm nhỏ chưa gây ra hậu quả, vi phạm lần đầu có nhiều tình tiết giảm nhẹ.
+
+Phạt tiền: từ 5.000đ - 100.000.000đ Đối với mỗi vi phạm hành chính chỉ áp dụng một trong hai hình thức phạt này.
+
++ Biện pháp xử phạt bổ sung:
+
+Biện pháp khôi phục pháp luật.
+
+##### 10. Cơ quan có thẩm quyền xử phạt vi phạm hành chính:
+
+- UBND các cấp.
+
+- Cơ quan cảnh sát, bộ đội biên phòng, hải quan, kiểm lâm, thuế vụ, quản lý thị
+
+trường và những cơ quan thực hiện chức năng thanh tra nhà nước chuyên ngành.
+
+- Tòa án nhân dân và cơ quan thi hành án dân sự.
+
+CÂU HỎI ÔN TẬP CHƯƠNG 5
+
+1.Khái niệm, đối tượng và phương pháp điều chỉnh của Luật hành chính?
+
+<!-- page: 67 -->
+
+2. Khái niệm và đặc điểm của cơ quan hành chính nhà nước?
+
+3. Phân loại cơ quan hành chính nhà nước?
+
+4. Khái niệm cán bộ công chức theo quy định của Pháp lệnh cán bộ công chức Việt Nam?
+
+Các loại công chức?
+
+5. Những nội dung chủ yếu của pháp luật về cán bộ công chức?
+
+6. Khái niệm, đặc điểm và các yếu tố cấu thành của vi phạm hành chính?
+
+7. Các biện pháp xử phạt vi phạm hành chính?
+
+8. Đối tượng áp dụng xử phạt hành chính và thẩm quyền xử phạt hành chính?
+
+##### 9. Khái niệm và các đặc điểm của trách nhiệm hành chính. Phân biệt trách nhiệm hành
+
+chính với các dạng trách nhiệm pháp lý khác?
+
+10. Các biện pháp trách nhiệm hành chính?
+
+<!-- page: 68 -->
+
+### Chương 6: Luật Dân Sự Và Tố Tụng Dân Sự
+
+Quan hệ dân sự là một quan hệ chủ yếu thường xuyên diễn ra trong đời sống xã hội.
+
+Để điều chỉnh nó Quốc hội Việt Nam ban hành Bộ luật dân sự đầu tiên vào năm 1997, sau gần 10 năm thi hành Bộ luật dân sự đã bộc lộ nhiều khuyết điểm nên năm 2005 nó đã được sửa đổi và bổ sung cho phù hợp. Bằng việc điều chỉnh các quan hệ dân sự bằng các văn bản luật đã đưa các quan hệ này vào một vòng trật tự nhất định, ứng xử của các chủ thể trong các giai dịch dân sự đã tuân theo các quy định của pháp luật. Chương 6 chúng tôi đưa ra các khái niệm về Luật dân sự, đối tượng và phương pháp điều chỉnh của Luật dân sự. Do thời lượng chương trình có hạn nên chúng tôi chỉ cung cấp cho người học những chế định quan trọng, cơ bản mà Bộ luật dân sự điều chỉnh như chế định quyền sở hữu trong đó làm rõ khái niệm, nội dung 3 quyền năng chiếm hữu, sử dụng và định đoạt tài sản của chủ sở hữu hoặc người không phải là chủ sở hữu. Chế định về hợp đồng dân sự - đây là một trong những chế định quan trọng nhất của Bộ luật dân sự điều chỉnh những vấn đề liên quan đến việc xác lập, thực hiện và chấm dứt hợp đồng dân sự. Chế định về nghĩa vụ dân sự như khái niệm, các căn cứ làm phát sinh nghĩa vụ và các biện pháp dể bảo đảm thực hiện nghĩa vụ dân sự bao gồm: thế chấp, cầm cố, đặt cọc, ký cược, ký quỹ, bảo lãnh và tín chấp.
+
+Thừa kế là việc dịch chuyển tài sản của người đã chết sang người còn sống. Đây là vấn đề đã phát sinh từ lâu trong đời sống xã hội nay được điều chỉnh bằng pháp luật, ngài việc đưa ra các khái niệm chung về thừa kế trong chế định này còn đưa ra các hình thức thừa kế bao gồm thừa kế theo di chúc và thừa kế theo pháp luật, quy định các điều kiện phát sinh, trình tự, cách thức phân chia di sản, hàng và diện thừa kê... Ngoài các chế định của Bộ luật dân sự còn đưa ra khái niệm Luật tố tụng dân sự (được nâng lên từ Pháp lệnh giải quyết các vụ án dân sự), trình tự giải quyết các vụ án dân sự như thủ tục khởi kiện và thụ lý, thủ tục điều tra và hoà giải, thủ tục áp dụng các biện pháp khẩn cấp tạm thời, thủ tục xét xử, thủ tục thi hành án.
+
+#### 6.1. Luật Dân Sự
+
+##### 6.1.1. Khái niệm chung về luật dân sự
+
+###### 6.1.1.1. Khái niệm
+
+Là ngành luật độc lập trong hệ thống pháp luật Việt Nam, bao gồm tổng thể các qui phạm pháp luật do nhà nước ban hành điều chỉnh các quan hệ về tài sản và quan hệ nhân thân phát sinh trong quá trình sản xuất, phân phối, lưu thông, tiêu dùng nhằm thoả mãn nhu cầu của cá nhân dựa trên nguyên tắc bình đẳng về mặt lợi ích, quyền tự định đoạt của các bên, tự chịu trách nhiệm về tài sản.
+
+###### 6.1.1.2. Đối tượng điều chỉnh
+
+Bao gồm các nhóm quan hệ sau:
+
+<!-- page: 69 -->
+
+- Nhóm quan hệ tài sản: Là quan hệ giữa người với người thông qua 1 tài sản dưới
+
+dạng 1 Tư liệu sản xuất, 1 Tư liệu tiêu dùng hoặc dịch vụ tạo ra 1 tài sản nhất định.
+
+Tài sản trong luật dân sự được hiểu theo nghĩa rộng bao gồm cả tài sản, quyền tài sản và nghĩa vụ về tài sản.
+
+- Nhóm quan hệ nhân thân: Là quan hệ giữa người với người không mang tính kinh
+
+tế, không tính được thành tiền. Nó phát sinh do 1 giá trị tinh thần gắn liền với 1 người hoặc 1 tổ chức nhất định và không dịch chuyển được.
+
+Ví dụ: Quyền được đứng tên trên các tác phẩm văn học nghệ thuật, công trình... mà người đó là tác giả hay quyền bất khả xâm phạm về nhãn hiệu hàng hoá của 1 doanh Có 2 loại quan hệ nhân thân là:
+
++ Quan hệ nhân thân không liên quan đến tài sản: Là những quan hệ giữa người với
+
+người về những lợi ích tinh thần không liên quan đến tài sản như quan hệ về tên gọi, danh dự, nhân phẩm, uy tín của công dân hoặc tổ chức nhất định.
+
++ Quan hệ nhân thân có liên quan đến tài sản: Là những quan hệ nhân thân là cơ sở
+
+làm phát sinh quan hệ tài sản tiếp sau.
+
+Ví dụ: Trong lĩnh vực quyền tác giả (ở đây quan hệ nhân thân là cơ sở khẳng định rằng người sáng tạo ra tác phẩm có quyền đứng tên là tác giả của tác phẩm. Quyền này là quyền nhân thân không thể tách rời chuyển dịch của người sáng tạo. Nhưng đồng thời với việc được thừa nhận là tác giả của tác phẩm người đó còn được hưởng thù lao như nhuận bút theo luật định.
+
+###### 6.1.1.3. Phương pháp điều chỉnh
+
+Luật dân sự sử dụng song song 3 phương pháp điều chỉnh sau: Bình đẳng, thoả thuận và tự chịu trách nhiệm bằng tài sản.
+
+##### 6.1.2. Một số chế định cơ bản của luật dân sự
+
+###### 6.1.2.1. Chế định về quyền sở hữu
+
+###### a. Khái niệm
+
+Quyền sở hữu là phạm trù pháp lý gồm tổng hợp các quy phạm pháp luật điều chỉnh những quan hệ về sở hữu đối với các quan hệ vật chất trong xã hội.
+
++ Theo nghĩa khách quan, quyền sở hữu được hiểu là hệ thống các quy phạm pháp
+
+luật do nhà nước đặt ra nhằm điều chỉnh các quan hệ xã hội trong lĩnh vực chiếm hữu, sử dụng và định đoạt các tư liệu sản xuất và tư liệu tiêu dùng trong xã hội.
+
++ Theo nghĩa chủ quan, quyền sở hữu là cách xử sự của chủ sở hữu trong việc chiếm
+
+hữu, sử dụng và định đoạt tài sản trong phạm vi luật định. Những quyền này xuất hiện dựa trên cơ sở các quy phạm pháp luật khách quan nói trên và do các quy phạm đó quyết định.
+
+Như vậy quyền sở hữu bao gồm quyền chiếm hữu, quyền sử dụng, quyền định đoạt tài sản của chủ sỏ hữu theo quy định của pháp luật
+
+###### b. Nội dung của quyền sở hữu
+
+<!-- page: 70 -->
+
++ Quyền chiếm hữu: Là quyền của chủ sở hữu tự mình nắm giữ hoặc quản lý tài sản
+
+thuộc sở hữu của mình.
+
+Người không phải là chủ sở hữu cũng có quyền chiếm hữu tài sản trong trường hợp được chủ sở hữu chuyển giao hoặc do pháp luật quy định.
+
++Quyền sử dụng: Là quyền của chủ sở hữu tự mình khai thác công dụng, hưởng hoa lợi hoặc lợi tức có được từ tài sản.
+
+Người không phải là chủ sở hữu cũng có quyền sử dụng tài sản trong trường hợp được chủ sở hữu chuyển giao quyền sử dụng hoặc do pháp luật quy định
+
++ Quyền định đoạt: Là quyền của chủ sở hữu tự mình định đoạt tài sản thông qua việc
+
+chuyển giao quyền sở hữu của mình cho người khác hoặc từ bỏ quyền sở hữu đó.
+
+Chủ sở hữu có quyền tự mình bán, trao đổi, tặng cho, cho vay, để thừa kế, từ bỏ hoặc thực hiện các hình thức định đoạt khác đối với tài sản.
+
+###### 6.1.2.2. Chế định về thừa kế
+
+###### a. Khái niệm: Thừa kế là việc chuyển dịch tài sản của người chết cho những người
+
+còn sống.
+
+###### b. Những qui định chung về thừa kế
+
+Người để lại di sản thừa kế: là người mà sau khi chết có tài sản để lại cho người khác theo trình tự thừa kế theo di chúc hoặc theo pháp luật Di sản thừa kế: Bao gồm những tài sản riêng và phần tài sản của người chết trong khối tài sản chung đối với người khác trong đó bao gồm cả những quyền về tài sản của người chết.
+
+Người thừa kế:
+
+- Nếu là cá nhân phải là người còn sống vào thời điểm mở thừa kế hoặc sinh
+
+ra và còn sống sau thời điểm mở thừa kế nhưng đã thành thai trước khi người để lại di sản chết.
+
+- Nếu là tổ chức thì phải tồn tại vào thời điểm mở thừa kế
+
+- Người thừa kế nhận di sản của người chết thì phải thực hiện những nghĩa vụ
+
+tài sản của người chết để lại.
+
+Thời điểm mở thừa kế: là thời điểm mà người có tài sản để lại chết.
+
+Địa điểm mở thừa kế: Là nơi cư trú cuối cùng của người để lại di sản, nếu không xác định được nơi cư trú cuối cùng thì địa điểm mở thừa kế là nơi có toàn bộ hoặc phần lớn di sản thừa kế.
+
+###### c. Các loại thừa kế:
+
+* Thừa kế theo di chúc: Là việc chuyển di sản thừa kế của người đã chết cho những
+
+người còn sống theo sự định đoạt của người đó khi còn sống
+
+- Di chúc: Là sự thể hiện ý chí của cá nhân nhằm chuyển tài sản của mình cho người
+
+khác sau khi chết
+
+<!-- page: 71 -->
+
+- Hiệu lực của di chúc: Di chúc muốn được coi là hợp pháp phải có đủ các điều kiện
+
+sau:
+
++ Người lập di chúc minh mẫn sáng suốt trong khi lập di chúc; không bị đe doạ
+
+lừa dối hoặc cưỡng ép; Có năng lực hành vi
+
++ Nội dung trong di chúc không trái pháp luật, đạo đức xã hội
+
++ Hình thức di chúc không trái với qui định của pháp luật
+
+- Hình thức của di chúc
+
++ Di chúc phải được lập thành văn bản
+
++ Nếu không lập được di chúc bằng văn bản thì có thể di chúc bằng miệng: Chỉ
+
+được áp dụng trong trường hợp tính mạng của người để lại di chúc bi cái chết đe doạ mà không thể lập di chúc bằng văn bản được.
+
+Di chúc bằng miệng được coi là hợp pháp nếu người để lại di chúc thể hiện ý chí cuối cùng của mình trước mặt ít nhất 2 người làm chứng và ngay sau đó những người làm chứng ghi chép lại cùng ký tên hoặc điểm chỉ. Sau 3 tháng kể từ thời điểm lập di chúc miệng mà người lập di chúc vẫn còn sống thì di chúc miệng bị huỷ bỏ Lưu ý: Thừa kế không phụ thuộc vào di chúc: Con chưa thành niên, cha mẹ vợ chồng hoặc con đã thành niên nhưng không có khă năng lao động của người lập di chúc được hưởng
+
+## phần di sản bằng 2/3 xuất của 1 người thừa kế theo pháp luật nếu di sản được chia theo
+
+pháp luật trong trường hợp họ không được người lập di chúc cho hưởng di sản hoặc chỉ hưởng phần di sản ít hơn 2/3 suất đó.
+
+* Thừa kế theo pháp luật: Là việc chuyển dịch di sản của người chết cho người còn
+
+sống theo các qui định của pháp luật.
+
+- Thừa kế theo pháp luật được áp dụng trong các trường hợp:
+
++ Người có di sản không để lại di chúc hoặc di chúc không có hiệu lực pháp luật
+
++ Người được chỉ định trong di chúc chết trước người có di sản, bị tước quyền thừa
+
+kế hoặc khước từ hưởng thừa kế.
+
+- Pháp luật quy định việc thừa kế theo pháp luật dựa trên cơ sở diện thừa kế và hàng
+
+thừa kế
+
++ Diện thừa kế: Là phạm vi những người có quyền hưởng thừa kế theo quy
+
+định của pháp luật và được xác định theo quan hệ hôn nhân, quan hệ huyết thống và quan hệ nuôi dưỡng giữa người thừa kế và những người để lại thừa kế.
+
++ Hàng thừa kế: Diện thừa kế được chia thành các hàng thừa kế
+
+Hàng thừa kế thứ nhất gồm: Vợ, chồng, cha mẹ đẻ, cha mẹ nuôi, con đẻ, con nuôi của người chết Hàng thừa kế thứ 2 gồm: Ông bà nội, ông bà ngoại, anh chị em ruột của người chết, cháu ruột của người chết mà người chết là ông nội,bà nội, ông ngoại, bà ngoại.
+
+Hàng thừa kế thứ 3 gồm: Cụ nội, ngoại, bác, chú, cô, dì, cậu, cháu ruột của người chết, chắt ruột của người chết mà người chết là cụ nội, cụ ngoại
+
+<!-- page: 72 -->
+
+- Di sản thừa kế được chia theo nguyên tắc: Những người thừa kế cùng hàng được
+
+hưởng phần di sản bằng nhau. Những người ỏ hàng thừa kế sau chỉ được hưởng thừa kế nếu không còn ai ở hàng thừa kế trước, không có quyền hưởng di sản bị truất quyền hưởng di sản hoặc từ chối nhận di sản.
+
+- Thừa kế thế vị được áp dụng trong trường hợp con của người để lại di sản chất trước
+
+người để lại di sản thì cháu được hưởng phần di sản mà cha hoặc mẹ của cháu được hưởng nếu còn sống
+
+###### 6.1.2.3. Chế định về hợp đồng dân sự và nghĩa vụ dân sự
+
+###### a. Hợp đồng dân sự:
+
+* Khái niệm: Hợp đồng dân sự là sự thoả thuận giữa các bên về việc xác lập, thay đổi
+
+hoặc chấm dứt quyền và nghĩa vụ dân sự.
+
+* Nguyên tắc giao kết:
+
+- Tự do giao kết hợp đồng và không được trái pháp luật, đạo đức xã hội
+
+- Tự nguyện, bình đẳng, thiện chí, hợp tác, trung thực và ngay thẳng
+
+* Chủ thể giao kết hợp đồng
+
+Cá nhân:
+
++ Cá nhân từ đủ 6 tuổi đến dưới 15 tuổi chỉ được phép tham gia quan hệ hợp đồng
+
+dân sự nhưng phải được sự đồng ý của bố mẹ hoặc nhứng người giám hộ trừ hợp đồng có giá trị nhỏ phục vụ cho nhu cầu thiết yếu hàng ngày thì không cần sự đồng ý.
+
++ Người từ đủ 15 tuổi đến chưa đủ 18 tuổi có tài sản riêng đủ để thanh toán nghĩa
+
+vụ thì được giao kết hợp đồng mà không cần phải được người đại diện theo pháp luật đồng ý, trừ trường hợp pháp luật quy định phải đủ 18 tuổi.
+
++ Người từ đủ 18 tuổi trở lên có quyền giao kết hợp đồng dân sự và tự chịu trách
+
+nhiệm về việc thực hiện nghĩa vụ.
+
+Pháp nhân và các chủ thể khác: Trong quan hệ hợp đồng dân sự các chủ thể này phải thông qua những đại diện hợp pháp của mình.
+
+* Hình thức hợp đồng:
+
+Hợp đồng dân sự có thể được giao kết bằng:
+
+- Lời nói (miệng);
+
+- Văn bản;
+
+- Hành vi cụ thể.
+
+Trừ trường hợp pháp luật có quy định hợp đồng phải được thể hiện bằng văn bản, phải được chứng nhận của công chứng nhà nước, chứng thực đăng ký hoặc xin phép thì phải tuân theo quy định này.
+
+* Nội dung chủ yếu của hợp đồng dân sự:
+
+Là những điều khoản mà thiếu những điều khoản đó thì hợp đồng không thể giao kết được.
+
+<!-- page: 73 -->
+
+Những nội dung này do pháp luật quy định nếu pháp luật không quy định thì theo thoả thuận của các bên. Tuỳ từng loại hợp đồng các bên có thể thoả thuận về những nội dung sau đây:
+
+- Đối tượng của hợp đồng: Tài sản phải giao, công việc được làm hoặc không
+
+được làm;
+
+- Số lượng chất lượng;
+
+- Giá, phương thức thanh toán;
+
+- Thời hạn, phương thức, địa điểm thực hiện hợp đồng;
+
+- Quyền và nghĩa vụ của các bên;
+
+- Trách nhiệm do vi phạm hợp đồng.
+
+###### b. Nghĩa vụ dân sự
+
+* Khái niệm: Nghĩa vụ dân sự là việc mà theo đó, một hoặc nhiều chủ thể (gọi chung
+
+là bên có nghĩa vụ) phải chuyển giao vật, chuyển giao quyền, trả tiền hoặc giấy tờ có giá, thực hiện công việc khác hoặc không được thực hiện công việc nhất định vì lợi ích của một hoặc nhiều chủ thể khác (bên có quyền).
+
+* Căn cứ phát sinh nghĩa vụ dân sự:
+
+- Hợp đồng dân sự;
+
+- Hành vi pháp lý đơn phương;
+
+- Thực hiện công việc không có uỷ quyền;
+
+- Chiếm hữu, sử dụng tài sản hoặc được lợi về tài sản không có căn cứ pháp
+
+luật;
+
+- Gây thiệt hại do hành vi trái pháp luật;
+
+- Những căn cứ khác do pháp luật quy định.
+
+* Các biện pháp đảm bảo thực hiện nghĩa vụ dân sự:
+
+- Cầm cố tài sản: Là việc bên có nghĩa vụ giao tài sản là động sản thuộc sở hữu của
+
+mình cho bên có quyền để đảm bảo thực hiện nghĩa vụ dân sự. Nếu tài sản cầm cố có đăng ký quyền sở hữu thì các bên có thể thoả thuận bên nhận tài sản cầm cố giữ đăng ký quyền sở hữu còn bên cầm cố vẫn có thể giữ tài sản cầm cố hoặc giao cho người thứ 3 giữ. Cầm cố tài sản phải được lập thành văn bản (có thể lập riêng hoặc ghi trong hợp đồng chính).
+
+- Thế chấp tài sản: là việc bên có nghĩa vụ giao giấy tờ chứng nhận quyền sở hữu bất
+
+động sản của mình cho bên có quyền để bảo đảm thực hiện nghĩa vụ đối với bên có quyền.
+
+Thế chấp tài sản phải được lập thành văn bản.
+
+- Đặt cọc: Là việc 1 bên giao cho bên kia 1 khoản tiền hoặc kim khí quí, đá quý hoặc
+
+các vật có giá trị khác trong 1 thời hạn để bảo đảm giao kết hoặc thực hiện hợp đồng dân sự.
+
+- Ký cược: Là việc bên thuê tài sản là động sản giao cho bên cho thuê 1 khoản tiền
+
+hay kim khí quý đá quý hoặc các vật có giá trị khác (gọi là tài sản ký cược) trong 1 thời hạn để bảo đảm việc trả lại tài sản cho thuê.
+
+<!-- page: 74 -->
+
+- Ký quỹ: Là việc bên có nghĩa vụ gửi 1 khoản tiền hoặc kim khí quý đá quý hoặc các
+
+giấy tờ có giá trị khác vào tài khoản phong toả tại ngân hàng để đảm bảo việc thực hiện nghĩa vụ.
+
+- Bảo lãnh: Là việc người thứ 3 (gọi là người bảo lãnh) cam kết với các bên có quyền
+
+(gọi là người nhận bảo lãnh) sẽ thực hiện nghĩa vụthay cho bên có nghĩa vụ (gọi là bên được bảo lãnh) nếu khi đến thời hạn mà người được bảo lãnh không thực hiện hoặc thực hiện không đúng nghĩa vụ. Việc bảo lãnh phải được lập thành văn bản.
+
+- Tín chấp: Là việc các tổ chức chính trị xã hội tại cơ sở có thể đản bảo bằng tín chấp
+
+cho các cá nhân, hộ gia đình nghèo vây một khoản tiền tại ngân hàng hoặc tổ chức tín dụng khác để sản xuất, kinh doanh, làm dịch vụ theo quy định của chính phủ. Việc cho vay có bảo đảm bằng tính phải được lập thành văn bản có ghi rõ số tiền, mục đích vay, thời hạn vay, lãi suất, quyền, nghĩa vụ và trách nhiệm của người vay, ngân hàng, tổ chức tín dụng cho vay và tổ chức bảo đảm.
+
+#### 6.2. Luật Tố Tụng Dân Sự
+
+##### 6.2.1. Khái niệm
+
+Khái niệm luật tố tụng dân sự là tổng hợp tất cả các quy phạm pháp luật điều chỉnh các quan hệ xã hội phát sinh giữa toà án, viện kiểm sát với những người tham gia tố tụng trong quá trình toà án giải quyết án dân sự và thi hành án dân sự.
+
+##### 6.2.2. Chủ thể của luật tố tụng dân sự
+
+###### 6.2.2.1. Tòa án nhân dân:
+
+Toà án nhân dân là chủ thể đặc biệt của luật tố tụng dân sự, có nhiệm vụ giải quyết các vụ án dân sự để bảo vệ lợi ích của Nhà nước, của tập thể và của công dân.
+
+* Tòa án nhân dân có thẩm quyền giải quyết theo thủ tục tố tụng dân sự các việc sau:
+
++ Những việc về dân sự
+
++ Những việc về quan hệ hôn nhân và gia đình
+
++ Một số việc về quan hệ pháp luật hành chính và một số việc khác do pháp
+
+luật quy định Khi xét xử vụ án dân sự, tòa án có quyền huỷ quyết định rõ ràng trái pháp luật của cơ quan, tổ chức khác xâm phạm quyền lợi hợp pháp của đương sự trong vụ án mà tòa án có nhiệm vụ giải quyết
+
+* Thẩm quyền của các tòa án các cấp:
+
++ Tòa án cấp huyện giải quyết theo thủ tục sơ thẩm các vụ án thuộc thẩm quyền
+
+giải quyết của tòa án nhân dân, trừ những vụ án thuộc thẩm quyền của tòa án cấp tỉnh
+
++ Tòa án cấp tỉnh giải quyết theo thủ tục sơ thẩm các vụ án có đương sự là
+
+người nước ngoài hoặc người Việt Nam ở nước ngoài; Các tranh chấp về quyền sở hữu công nghiệp, quyền tác giả;
+
+<!-- page: 75 -->
+
++ Tòa án nhân dân tối cao trong trường hợp đặc biệt giải quyết theo thủ tục sơ
+
+thẩm đồng thời chung thẩm những vụ án thuộc thẩm quyền của tòa án cấp dưới mà Tòa án nhân dân tối lấy lên để giải quyết.
+
+* Thẩm quyền của tòa án theo lãnh thổ:
+
++ Tòa án có thẩm quyền giải quyết vụ án dân sự là tòa án nơi cư trú hoặc nơi
+
+làm việc của bị đơn; Nếu bị đơn là pháp nhân thì đó là tòa án nơi pháp nhân có trụ sở.
+
+Các đương sự có thể thoả thuận yêu cầu tòa án nơi cư trú của nguyên đơn giải quyết;
+
++ Tranh chấp bất dộng sản do tòa án nơi có bất động sản giải quyết;
+
++ Trong một số trường hợp nguyên đơn được lựa chọn toà giải quyết.
+
+###### 6.2.2.2. Người tham gia tố tụng
+
+Người tham gia tố tụng gồm có: đương sự, người đại diện, bảo vệ quyền lợi của đương sự, viện kiểm sát khởi tố, tổ chức xã hội khởi kiện vì lợi ích chung; người làm chứng, người giám định, người phiên dịch.
+
+* Đương sự: là cá nhân, pháp nhân hoặc chủ thể khác có quyền, nghĩa vụ liên quan
+
+đến vụ án tham gia tố tụng để bảo vệ quyền lợi của mình. Đương sự bao gồm: nguyên đơn, bị đơn người có quyền lợi, nghĩa vụ liên quan.
+
++ Nguyên đơn là người khởi kiện yêu cầu tòa án bảo vệ quyền lợi của mình.
+
+Trong trường hợp viện kiểm sát khởi tố, tổ chức xã hội khởi kiện vì lợi ích chung thì người có quyền lợi được bảo vệ có thể tham gia tố tụng với tư cách nguyên đơn.
+
++ Bị đơn là người bị yêu cầu tham gia tố tụng để trả lời về việc kiện.
+
++ Người có quyền lợi, nghĩa vụ liên quan là người tham gia vào vụ án đã xuất
+
+hiện giữa nguyên đơn và bị đơn để bảo vệt quyền lợi của mình.
+
+Đương sự có các quyền và nghĩa vụ tố tụng dân sự. Nguyên đơn có quyền thay đổi yêu cầu của mình. Bị đơn có quyền phản đối yêu cầu của nguyên đơn và có quyền đề đạt yêu cầu liên quan đến yêu cầu của nguyên đơn. Các đương sự có quyền bình đẳng trong việc cung cấp chứng cứ, yêu cầu tòa án tiến hành các biện pháp điều tra cần thiết, tham gia hòa giải, tham gia phiên tòa, v.v. Các đương sự có nghĩa vụ cung cấp chứng cứ, thi hành quyết định, thực hiện yêu cầu của tòa án; phải có mặt theo giấy triệu tập của tòa án. Để thực hiện được các quyền và nghĩa vụ tố tụng dân sự đương sự phải có năng lực hành vi tố tụng dân sự. Theo pháp luật hiện hành, cá nhân từ đủ 18 tuổi trở lên không có nhược điểm về thể chất hoặc tâm thần được thừa nhận là có năng lực hành vi tố tụng dân sự. Người chưa thành niên, người có nhược điểm về thể chất hoặc tâm thần không thể tham gia tố tụng được là người không có năng lực hành vi tố tụng dân sự và phải có người đại diện tham gia tố tụng.
+
+Người đại điện của đương sự là người thay mặt đương sự bảo vệ quyền lợi của họ. Người đại diện của đương sự gồm có: đại điện đương nhiên, đại điện do tòa án cử và đại điện do đương sự ủy quyền.
+
+* Người bảo vệ quyền lợi của đương sự là người tham gia tố tụng để giúp đỡ đương
+
+sự về mặt pháp lý nhằm bảo vệ quyền lợi của họ. Người bảo vệ quyền lợi của đương sự tham gia tố tụng từ khi khởi kiện, có quyền đề nghị thay đổi những người tiến hành tố tụng,
+
+<!-- page: 76 -->
+
+cung cấp chứng cứ đề đạt yêu cầu, có nghĩa vụ sử dụng các biện pháp do luật định để góp phần làm rõ sự thật về vụ án, giúp đương sự về mặt pháp lý để bảo vệ quyền lợi của họ
+
+* Viện kiểm sát: tham gia tố tụng thực hiện chức năng kiểm sát việc tuân theo pháp
+
+luật trong quá trình tòa án giải quyết vụ án. Viện kiểm sát chỉ tham gia vào vụ án nếu xét thấy cần thiết. Viện kiểm sát tham gia tố tụng bằng các hình thức chủ yếu sau: khởi tố vụ án, điều tra, tham gia phiên tòa, kháng nghị các bản án, quyết định của tòa án.
+
+* Tổ chức xã hội khởi kiện vì lợi ích chung: bao gồm ủy ban, Mặt trận tổ quốc, các
+
+tổ chức thành viên của Mặt trận tổ quốc. Tổ chức xã hội khởi kiện vì lợi ích chung có quyền và nghĩa vụ như nguyên đơn, trừ quyền hòa giải.
+
+* Người làm chứng: là người biết được bất cứ tình tiết nào liên quan đến vụ án được
+
+tòa án, viện kiểm sát triệu tập đến làm chứng. Người làm chứng có nghĩa vụ khai trung thực tất cả những gì mà mình biết về vụ án.
+
+* Người giám định: là người có kiến thức cần thiết về lĩnh vực cần giám định mà tòa
+
+án hay viện kiểm sát trưng cầu.
+
+Người giám định có quyền tìm hiểu tài liệu của vụ án liên quan đến đối tượng giám định, yêu cầu cơ quan trưng cầu giám định cung cấp những tài liệu cần thiết cho việc giám định, tham dự vào việc xét hỏi và được đặt câu hỏi về những vấn đề có liên quan đến đối tượng giám định.
+
+* Người phiên dịch: do tòa án, viện kiểm sát yêu cầu trong trường hợp có người
+
+tham gia tố tụng không sử dụng được tiếng
+
+##### 6.2.3. Trình tự Thủ tục giải quyết vụ án dân sự
+
+###### 6.2.3.1. Khởi kiện và khởi tố vụ án dân sự
+
+Khởi kiện, khởi tố là giai đoạn đầu của tố tụng dân sự thông qua việc khởi kiện, khởi tố phát sinh vụ án dân sự tại tòa án.
+
+Quyền khởi kiện vụ án dân sự thuộc về cá nhân, pháp nhân hoặc chủ thể khác có quyền lợi bị xâm phạm. Tổ chức xã hội được khởi kiện một số vụ án dân sự để bảo vệ lợi ích chung, như việc vi phạm pháp luật gây thiệt hại tài sản xã hội chủ nghĩa, việc kết hôn trái pháp luật, việc xác định cha mẹ cho con chưa thành niên ngoài giá thú, v.v Quyền khởi tố vụ án dân sự thuộc về viện kiểm sát. Viện kiểm sát cũng có quyền khởi tố một số vụ án dân sự trên để bảo vệ lợi ích chung nếu không có ai khởi kiện.
+
+Người khởi kiện phải làm đơn ghi rõ: họ tên, địa chỉ của mình và của bị đơn, người có quyền lợi nghĩa vụ liên quan; nội dung sự việc; yêu cầu của mình và những tài liệu, lý lẽ chứng minh cho yêu cầu đó.
+
+Viện kiểm sát khởi tố hoặc tổ chức xã hội khởi kiện vì lợi ích chung bằng văn bản gửi cho tòa án.
+
+###### 6.2.3.2. Thụ lý vụ án
+
+Toà án sau khi nhận được đơn khởi kiện và tài liệu chứng cứ kèm theo nếu xét thấy vụ án thuộc thẩm quyền của mình thì phải thông báo ngay cho người khởi kiện đến toà án làm thủ tục nộp tạm ứng án phí. Toà án thụ lý vụ án khi người khởi kiện nộp cho toà án
+
+<!-- page: 77 -->
+
+biên lai nộp tiền tạm ứng án phí. Trong trường hợp người khởi kiện được miễn hoặc không phải nộp tiền tạm ứng án phí thì toà án phải thụ lý vụ án khi nhận được đơn khởi kiện và tài liệu chứng cứ kèm theo.
+
+###### 6.2.3.3. Lập hồ sơ vụ án
+
+Lập hồ sơ vụ án thuộc trách nhiệm của thẩm phán được phân công giải quyết vụ án.
+
+Để lập hồ sơ vụ án thẩm phán có thể tiến hành các biện pháp điều tra sau:
+
++ Lấy lời khai của các đương sự, người làm chứng về những vấn đề cần thiết
+
++ Yêu cầu cơ quan nhà nước, tổ chức xã hội hữu quan hoặc công dân cung cấp
+
+bằng chứng có ý nghĩa cho việc giải quyết vụ án
+
++ Xem xét tại chỗ
+
++ Trưng cầu giám định
+
++ Yêu cầu cơ quan chuyên môn định giá hoặc lập hội đồng định giá tài sản có
+
+tranh chấp.
+
+Nếu cần điều tra ở ngoài địa hạt của mình thì tòa án có thể ủy thác cho tòa án nơi cần phải điều tra thực hiện việc điều tra.
+
+Viện kiểm sát cũng có quyền yêu cầu tòa án hoặc tự minh tiến hành điều tra xác minh những vấn đề cần làm sáng tỏ trong vụ án.
+
+###### 6.2.3.4. Hòa giải vụ án
+
+Hòa giải là một thủ tục của tố tụng dân sự. Trong quá trình giải quyết vụ án tòa án tiến hành hòa giải để giúp các đương sự thỏa thuận với nhau về giải quyết vụ án, trừ những việc sau:
+
++ Huỷ việc kết hôn trái pháp luật;.
+
++ Đòi bồi thường thiệt hại tài sản của nhà nước;
+
++ Những việc phát sinh từ giao dịch trái pháp luật
+
++ Những việc xác định công dân mất tích hoặc đã chết
+
++ Những việc khiếu nại cơ quan hộ tịch
+
++ Những việc khiếu nại về danh sách cử tri
+
+Khi hòa giải nguyên đơn, bị đơn, người có quyền lợi nghĩa vụ liên quan phải có mặt.
+
+Nếu đương sự thoả thuận được với nhau về các vấn đề giải quyết trong vụ án thì toà án lập biên bản hoà giải thành. Bản sao biên bản được gửi ngay cho viện kiểm sát cùng cấp, tổ chức xã hội khởi kiện vì lợi ích chung. Trong thời hạn 15 ngày kể từ ngày lập biên bản hoà giải thành mà có đương sự thay đổ ý kiến hoặc viện kiểm sát, tổ chức xã hội khởi kiện vì lợi ích chung phản đối sự thỏa thuận đó thì toà đưa vụ án đó ra xét xử. Nếu trong thời hạn đó không có sự thay đổi ý kiến hoặc phản đối thì toà ra quyết định công nhận sự thỏa thuận của các đương sự. Quyết định này có hiệu lực pháp luật. Nếu đương sự không thoả thuận được với nhau thì tòa án lập biên bản hòa giải không thành và đưa vụ án ra xét xử.
+
+<!-- page: 78 -->
+
+###### 6.2.3.5. Thủ tục xét xử
+
+* Phiên toà sơ thẩm:
+
+Sau khi điều tra, hoà giải không thành toà án quyết định đưa vụ án ra xét xử. Phiên tòa được tiến hành với sự có mặt của các đương sự, người đại diện, người bảo vệ quyền lợi của đương sự, người làm chứng, người giám định, người phiên địch. Nếu viện kiểm sát khởi tố, tổ chức xã hội khởi kiện vì lợl ích chung thì đại diện Viện Kiểm sát, đại diện tổ chức xã hội phải có mặt tại phiên tòa.
+
++ Thủ tục bắt đầu phiên tòa:
+
+Chủ tọa phiên tòa đọc quyết định đưa vụ án ra xét xử, kiểm tra căn cước của những người được triệu tập đến phiên tòa đã có mặt và giải thích quyền và nghĩa vụ của họ tại phiên toà; Giới thiệu các thành viên của hội đồng xét xử, kiểm sát viên, thư ký phiên toà, người giám định, người phiên dịch. Người giám định, người phiên dịch cam đoan làm tròn nhiệm vụ, người làm chứng cam đoan không khai gian dối.
+
+Hội đồng xét xử giải quyết các yêu cầu thay đổi các thành viên của hội đồng xét xử, kiểm sát viên, thư ký phiên tòa, người giám định, người phiên dịch; yêu cầu triệu tập thêm người làm chứng hoặc cung cấp thêm chứng cứ mới.
+
++ Thủ tục xét hỏi tại phiên tòa:
+
+Hội đồng xét xử phải xác định đầy đủ các tình tiết của vụ án bằng cách nghe lời trình bày của những người tham gia tố tụng, xem xét vật chứng.
+
+Khi xét hỏi, Hội đồng xét xử hỏi trước, rồi đến kiểm sát viên, người bảo vệ quyền lợi của đương sự. Những người tham gia tố tụng có quyền đề xuất với Hội đồng xét xử những vấn đề cần được hỏi thêm.
+
++ Tranh luận tại phiên tòa:
+
+Kết thúc việc xét hỏi, các đương sự, người đại diện của đương sự, người bảo vệ quyền lợi của đương sự, người đại diện tổ chức xã hội khởi kiện vì lợi ích chung trình bày ý kiến của mình về đánh giá chứng cứ và đề xuất hướng giải quyết vụ án. Sau đó kiểm sát viên trình bày ý kiến về hướng giải quyết.
+
++ Nghị án và tuyên án:
+
+Hội đồng xét xử nghị án tại phòng riêng. Các thành viên của hội đồng xét xử thảo luận và quyết định giải quyết vụ án theo đa số.
+
+Khi tuyên án chủ tọa phiên tòa đứng đọc nguyên văn bản án hoặc quyết định, sau đó chủ tọa phiên tòa cần giải thích thêm cho các đương sự quyền kháng cáo của họ.
+
+* Thủ tục phúc thẩm
+
+Thủ tục phúc thẩm dân sự là thủ tục của tố tụng dân sự, trong đó tòa án áp trên xét lại vụ án mà bản án hoặc quyết định chưa có hiệu lực pháp luật của tòa án cấp dưới bị kháng cáo, kháng nghị.
+
+Người có quyền kháng cáo gồm có: các đương sự, người đại diện của đương sự, tổ chức xã hội khởi kiện vì lợi ích chung.
+
+<!-- page: 79 -->
+
+Viện kiểm sát cùng cấp hoặc trên một cấp với toà đã xét xử vụ án dân sự có quyền kháng nghị. Trước và trong phiên tòa phúc thẩm, người kháng cáo, kháng nghị hoặc rút kháng cáo, kháng nghị.
+
+Bản án, quyết định phúc thẩm là chung thẩm, có hiệu lực thi hành ngay.
+
+* Thủ tục giám đốc thẩm
+
+Thủ tục giám đốc thẩm là thủ tục đặc biệt của tố tụng dân sự, trong đó tòa án có thẩm quyền xét lại vụ án mà bản án hoặc quyết định đã có hiệu lực pháp luật bị kháng nghị vì phát hiện có vi phạm pháp luật trong quá trình giải quyết vụ án.
+
+Các bản án, quyết định của tòa án đã có hiệu lực bị kháng nghị khi có một trong những căn cứ sau:
+
++ Việc điều tra không đầy đủ;
+
++ Kết luận trong bản án, quyết định không phù hợp với những tình tiết khách
+
+quan của vụ án;
+
++ Có vi phạm nghiêm trọng thủ tục tố tụng;
+
++ Có sai lầm nghiêm trọng trong việc áp dụng pháp luật.
+
+Phiên tòa giám đốc thẩm không mở công khai.
+
+* Thủ tục tái thẩm
+
+Thủ tục tái thẩm là thủ tục đặc biệt của tố tụng dân sự, trong đó tòa án có thẩm quyền xét lại vụ án mà bản án hoặc quyết định đã có hiệu lực pháp luật bị kháng nghị vì mới phát hiện được những tình tiết quan trọng làm thay đổi nội dung vụ án.
+
+Các bản án, quyết định của tòa án đã có hiệu lực pháp luật bị kháng nghị khi có một trong những căn cứ sau:
+
++ Mới phát hiện được tình tiết quan trọng của vụ án mà đương sự đã không thể biết
+
+được;
+
++ Đã xác định được lời khai của người làm chứng, kết luận giám định hoặc lời dịch
+
+của người phiên dịch rõ ràng không đúng sự thật hoặc đã có sự giả mạo bằng chứng;
+
++ Thẩm phán, hội thẩm phán nhân dân, kiểm sát viên cố tình làm sai lệch hồ sơ vụ án
+
+hoặc cố tình kết luận trái pháp
+
++ Bản án hình sự, dân sự hoặc quyết định của cơ quan, tổ chức mà tòa án đã dựa vào
+
+để giải quyết vụ án đã bị hủy.
+
+###### 6.2.3.6. Thi hành án dân sự
+
+Thi hành án dân sự là giai đoạn kết thúc của quá trình tố tụng, trong đó các bản án, quyết định dân sự của tòa án được thi hành.
+
+Thi hành án bảo đảm hiệu lực của các bản án, quyết định dân sự của tòa án, bảo vệ lợi ích của nhà nước, bảo hộ các quyền, lợi ích hợp pháp của các tổ chức và công dân.
+
+Khi bản án, quyết định của tòa án được thi hành thì tòa án đã tuyên bản án hoặc quyết định phải cấp cho người được thi hành án và người phải thi hành án bản sao bản án hoặc
+
+<!-- page: 80 -->
+
+quyết định có ghi "để thi hành". Căn cứ vào bản sao bản án, quyết định, người được thi hành án có quyền yêu cầu người phải thi hành án thi hành bản án, quyết định dân sự đó.
+
+Nếu người phải thi hành án không tự nguyện thi hành thì trong thời hạn ba năm kể từ ngày bản án, quyết đình có hiệu lực pháp luật, người được thi hành án là cá nhân, trong thời hạn một năm kể từ ngày bản án, quyết đình có hiệu lực pháp luật người được thi hành án là tổ chức có quyền gửi đơn đến cơ quan thi hành án, nơi tòa án đã xét xử sơ thẩm vụ án yêu cầu thi hành án.
+
+Nhận được đơn yêu cầu thi hành án, trong thời hạn mười ngày thủ trưởng cơ quan thi hành án ra quyết định thi hành án và giao cho chấp hành viên thi hành. Đối với các quyết định về trả lại tài sản hoặc bồi thường tài sản xã hội chủ nghĩa, phạt tiền, tịch thu tài sản và án phí, các quyết định khẩn cấp tạm thời thủ trưởng cơ quan thi hành án chủ động ra quyết định thi hành trong thời hạn bảy ngày, kể từ ngày nhận được bản sao bản án, quyết định.
+
+TÓM TẮT CHƯƠNG 6
+
+##### 1. Luật dân sự là ngành luật độc lập trong hệ thống pháp luật Việt Nam, bao gồm tổng
+
+thể các qui phạm pháp luật do nhà nước ban hành điều chỉnh các quan hệ về tài sản và quan hệ nhân thân phát sinh trong quá trình sản xuất, phân phối, lưu thông, tiêu dùng nhằm thoả mãn nhu cầu của cá nhân dựa trên nguyên tắc bình đẳng về mặt lợi ích, quyền tự định đoạt của các bên, tự chịu trách nhiệm về tài sản.
+
+##### 2. Đối tượng điều chỉnh:
+
+- Nhóm quan hệ tài sản:
+
+- Nhóm quan hệ nhân thân:
+
++ Quan hệ nhân thân không liên quan đến tài sản
+
++ Quan hệ nhân thân có liên quan đến tài sản
+
+##### 3. Phương pháp điều chỉnh:
+
+Luật dân sự sử dụng song song 3 phương pháp điều chỉnh sau: Bình đẳng, thoả thuận và tự chịu trách nhiệm bằng tài sản.
+
+##### 4. Quyền sở hữu là phạm trù pháp lý gồm tổng hợp các quy phạm pháp luật điều
+
+chỉnh những quan hệ về sở hữu đối với các quan hệ vật chất trong xã hội.
+
+Quyền sở hữu bao gồm quyền chiếm hữu, quyền sử dụng, quyền định đoạt tài sản của chủ sỏ hữu theo quy định của pháp luật.
+
+##### 5. Thừa kế là việc chuyển dịch tài sản của người chết cho những người còn sống. Có
+
+2 loại thừa kế: Thừa kế theo di chúc là việc chuyển di sản thừa kế của người đã chết cho những người còn sống theo sự định đoạt của người đó khi còn sống; Thừa kế theo pháp luật là việc chuyển dịch di sản của người chết cho người còn sống theo các qui định của pháp
+
+<!-- page: 81 -->
+
+##### 6. Hợp đồng dân sự là sự thoả thuận giữa các bên về việc xác lập, thay đổi hoặc chấm
+
+dứt quyền và nghĩa vụ dân sự. Hợp đồng dân sự có thể được giao kết bằng: Lời nói (miệng), bằng văn bản, hoặc bằng hành vi cụ thể.
+
+##### 7. Nghĩa vụ dân sự là việc mà theo đó, một hoặc nhiều chủ thể (gọi chung là bên có
+
+nghĩa vụ) phải chuyển giao vật, chuyển giao quyền, trả tiền hoặc giấy tờ có giá, thực hiện công việc khác hoặc không được thực hiện công việc nhất định vì lợi ích của một hoặc nhiều chủ thể khác (bên có quyền).
+
+* Căn cứ phát sinh nghĩa vụ dân sự:
+
+- Hợp đồng dân sự;
+
+- Hành vi pháp lý đơn phương;
+
+- Thực hiện công việc không có uỷ quyền;
+
+- Chiếm hữu, sử dụng tài sản hoặc được lợi về tài sản không có căn cứ pháp luật;
+
+- Gây thiệt hại do hành vi trái pháp luật;
+
+- Những căn cứ khác do pháp luật quy định.
+
+* Các biện pháp đảm bảo thực hiện nghĩa vụ dân sự bao gồm: Cầm cố tài sản, Thế
+
+chấp tài sản, Đặt cọc, Ký cược, Ký quỹ,Bảo lãnh, Tín chấp.
+
+##### 8. Luật tố tụng dân sự là tổng hợp tất cả các quy phạm pháp luật điều chỉnh các quan
+
+hệ xã hội phát sinh giữa toà án, viện kiểm sát với những người tham gia tố tụng trong quá trình toà án giải quyết án dân sự và thi hành án dân sự.
+
+##### 9. Chủ thể của luật tố tụng dân sự
+
+Tòa án nhân dân.
+
+Người tham gia tố tụng.
+
++ Đương sự: là cá nhân, pháp nhân hoặc chủ thể khác có quyền, nghĩa vụ liên quan
+
+đến vụ án tham gia tố tụng để bảo vệ quyền lợi của mình. Đương sự bao gồm: nguyên đơn, bị đơn người có quyền lợi, nghĩa vụ liên quan.
+
++ Người bảo vệ quyền lợi của đương sự là người tham gia tố tụng để giúp đỡ đương
+
+sự về mặt pháp lý nhằm bảo vệ quyền lợi của họ.
+
++ Viện kiểm sát: tham gia tố tụng thực hiện chức năng kiểm sát việc tuân theo pháp
+
+luật trong quá trình tòa án giải quyết vụ án. Viện kiểm sát chỉ tham gia vào vụ án nếu xét thấy cần thiết.
+
++ Tổ chức xã hội khởi kiện vì lợi ích chung: bao gồm ủy ban, Mặt trận tổ quốc, các tổ
+
+chức thành viên của Mặt trận tổ quốc. Tổ chức xã hội khởi kiện vì lợi ích chung có quyền và nghĩa vụ như nguyên đơn, trừ quyền hòa giải.
+
++ Người làm chứng là người biết được bất cứ tình tiết nào liên quan đến vụ án được
+
+tòa án, viện kiểm sát triệu tập đến làm chứng. Người làm chứng có nghĩa vụ khai trung thực tất cả những gì mà mình biết về vụ án.
+
++ Người giám định: là người có kiến thức cần thiết về lĩnh vực cần giám định mà tòa
+
+án hay viện kiểm sát trưng cầu.
+
+<!-- page: 82 -->
+
++ Người phiên dịch: do tòa án, viện kiểm sát yêu cầu trong trường hợp có người tham
+
+gia tố tụng không sử dụng được tiếng
+
+##### 10. Trình tự Thủ tục giải quyết vụ án dân sự
+
+- Khởi kiện và khởi tố vụ án dân sự
+
+- Thụ lý vụ án;
+
+- Lập hồ sơ vụ án;
+
+- Hòa giải vụ án;
+
+- Thủ tục xét xử:
+
++ Phiên toà sơ thẩm;
+
++ Thủ tục phúc thẩm;
+
++ Thủ tục giám đốc thẩm;
+
++ Thủ tục tái thẩm.
+
+- Thi hành án dân sự.
+
+Thi hành án dân sự là giai đoạn kết thúc của quá trình tố tụng, trong đó các bản án, quyết định dân sự của tòa án được thi hành. Thi hành án bảo đảm hiệu lực của các bản án, quyết định dân sự của tòa án, bảo vệ lợi ích của nhà nước, bảo hộ các quyền, lợi ích hợp pháp của các tổ chức và công dân.
+
+CÂU HỎI ÔN TẬP CHƯƠNG 6
+
+1. Khái niệm chung về luật dân sự?
+
+2. Nội dung chế định quyền sở hữu trong luật dân sự Việt Nam?
+
+3. Nội dung chế định hợp đồng dân sự trong luật dân sự Việt Nam?
+
+##### 4. Các căn cứ làm phát sinh nghĩa vụ dân sự? Phân tích các biện pháp bảo đảm thực hiện nghĩa vụ dân sự?
+
+5. Nêu khái quát về chế định thừa kế?
+
+7. Phân biệt hai hình thức thừa kế theo di chúc và thừa kế theo phap luật?
+
+##### 8. Khái niệm luật tố tụng dân sự? Chủ thể của luật tố tụng dân sự
+
+8. Trình bày tóm tắt thủ tục giải quyết các vụ án dân sự?
+
+<!-- page: 83 -->
+
+### Chương 7: Luật Hình Sự Và Tố Tụng Hình Sự
+
+Tội phạm là hành vi vi phạm pháp luật có tính chất nghiêm trọng nhất do nó xâm phạm đến an ninh và chủ quyền quốc gia, trật tự an toàn xã hội,sức khoẻ, tính mạng, danh dự nhân phẩm của công dân. Điều này đã được quy định trong khái niệm về tội phạm tại Khoản 1 Điều 8 Bộ luật hình sự Việt Nam. Trong nội dung chương này chúng tôi đưa ra những khái niệm cơ bản được quy định trong Bộ luật hình sự như khái niệm về tội phạm, phân loại tội phạm, các yếu tố cấu thành tội phạm, trách nhiệm hình sự và hệ thống hình phạt. Chương này cũng giúp người học nắm được quá trình giải quyết một vụ án hình sự như khởi tố vụ án hình sự, điều tra vụ án hình sự, xét xử sơ thẩm, phúc thẩm, tái thẩm và giám đốc thẩm (nếu có) và thi hành án. Tội phạm hình sự hiện nay đang ngày một gia tăng với rất nhiều tội danh khác nhau vì vậy việc nghiên cứu luật hình sự và tố tụng hình sự là vô cùng cần thiết, tuy nhiên do thời lượng có hạn nên chúng tôi không thể đề cập đến từng loại tội phạm được quy định trong phần các tội phạm của Bộ luật hình sự mà chủ yếu chỉ dùng lại ở những khái niệm cơ bản nhất giúp người học dễ dàng tiếp cận với Bộ luật hình sự hơn.
+
+#### 7.1. Luật Hình Sự
+
+##### 7.1.1. Khái niệm luật hình sự
+
+###### 7.1.1.1. Khái niệm
+
+Luật hình sự là một ngành luật trong hệ thống pháp luật của Nước cộng hoà xã hội chủ nghĩa Việt Nam, bao gồm hệ thống các quy phạm pháp luật do nhà nước ban hành, xác định những hành vi nào nguy hiểm cho xã hội là tội phạm, đồng thời quy định hình phạt đối với các tội phạm.
+
+Các quy phạm pháp luật hình sự được chia thành 2 loại:
+
+- Loại quy phạm quy định những nguyên tắc, nhiệm vụ của luật hình sự, những vấn
+
+đề chung về tội phạm và hình phạt... Những quy phạm này tạo thành phần chung của luật hình sự.
+
+- Loại quy phạm quy định các tội phạm cụ thể, loại và mức hình phạt với các loại tội
+
+phạm. Những quy phạm này tạo thành phần các tội phạm của luật hình sự.
+
+###### 7.1.1.2. Đối tượng điều chỉnh
+
+Đối tượng điều chỉnh của luật hình sự là những quan hệ xã hội phát sinh giữa nhà nước với người phạm tộikhi người này thực hiện một hành vi mà nhà nước quy định là tội phạm.
+
+###### 7.1.1.3. Phương pháp điều chỉnh của luật hình sự
+
+Phương pháp điều chỉnh của luật hình sự là phương pháp quyền uy. Đó là phương pháp sử dụng quyền lực nhà nước trong việc điều chỉnh các quan hệ pháp luật hình sự giữa
+
+<!-- page: 84 -->
+
+nhà nước và người phạm tội. Nhà nước có quyền tối cao trong việc định đoạt số phận của người phạm tội, buộc họ phải chịu trách nhiệm hình sự về tội phạm mà họ gây ra.
+
+##### 7.1.2. Tội phạm
+
+###### 7.1.2.1. Khái niệm tội phạm trong luật hình sự
+
+###### a. Định nghĩa:
+
+Điều 8 BLHS Nước CHXHCNVN đã định nghĩa tội phạm như sau: Tội phạm là hành vi nguy hiểm cho xã hội được quy định trong trong bộ luật hình sự, do người có năng lực trách nhiệm hình sự thực hiện một cách cố ý hoặc vô ý, xâm phạm độc lập, chủ quyền thống nhất và toàn vẹn lãnh thổ của Tổ quốc, xâm phạm chế độ chính trị, chế dộ kinh tế, nền văn hoá, quốc phòng an ninh, trật tự an toàn xã hội; quyền, lợi ích hợp pháp của tổ chức, xâm phạm tính mạng, sức khoẻ, danh dự, nhân phẩm, tự do, tài sản, các quyền, lợi ích hợp pháp khác của công dân, xâm phạm những lĩnh vực khác của trật tự pháp luật xã hội chủ nghĩa.
+
+###### b. Những dấu hiệu cơ bản của tội phạm:
+
+Theo luật hình sự Việt Nam, hành vi được coi là tội phạm được phân biệt với những hành vi khác không phải là tội phạm qua bốn dấu hiệu sau:
+
++ Tính nguy hiểm cho xã hội.
+
+Đây là dấu hiệu cơ bản, quan trọng nhất quyết định những dấu hiệu khác của tôi phạm. một hành vi được quy định trong luật hình sự, và phải chịu hình phạt bởi vì nó có tính nguy hiểm cho xã hội. Tính nguy hiểm cho xã hội là thuộc tính khách quan, là dấu hiệu vật chất của tội phạm. Hành vi nguy hiểm cho xã hội được coi là tội phạm phải là hành vi gây thiệt hại hoặc đe doạ gây thiệt hại đáng kể cho các quan hệ xã hội được luật hình sự bảo vệ.
+
++ Tính có lỗi của tội phạm.
+
+Lỗi là thái độ tâm lý của một người đối với hành vi nguy hiểm cho xã hội của mình và đối với hậu quả do hành vi đó gây ra.
+
+Trong Bộ luật hình sự nước ta, tính có lỗi được nêu trong định nghĩa về tội phạm là một dấu hiệu độc lập với tính nguy hiểm cho xã hội, để nhấn mạnh tầm quan trọng của nguyên tắc lỗi. Luật hình sự Việt Nam không chấp nhận sự buộc tội khách quan, tức là buộc tội một người không căn cứ vào lỗi của họ mà chỉ căn cứ vào hành vi khách quan họ đã thực hiện.
+
++ Tính trái pháp luật hình sự
+
+Hành vi nguy hiểm cho xã hội chỉ được coi là tội phạm nếu nó được quy định trong luật hình sự. Quy định của luật hình sự là cơ sở và đảm bảo quyền tự do dân chủ của công dân, thúc đẩy cơ quan lập pháp kịp thời sửa đổi, bổ sung luật phù hợp với sự thay đổi tình hình kinh tế, chính trị, văn hoá - xã hội.
+
++ Tính phải chịu hình phạt
+
+Tính phải chịu hình phạt có nghĩa là bất cứ một hành vi phạm tội nào cũng đều bị đe doạ phải chịu một hình phạt. Chỉ có hành vi phạm tội mới phải chịu hình phạt, tội càng nghiêm trọng thì hình phạt áp dụng càng nghiêm khắc.
+
+<!-- page: 85 -->
+
+Bốn dấu hiệu của tội phạm nêu trên quan hệ chặt chẽ với nhau. Tính nguy hiểm cho xã hội, tính có lỗi là những dấu hiệu biểu hiện mặt nội dung, còn tính trái pháp luật hình sự, tính phải chịu hình phạt là những dấu hiệu biểu hiện mặt hình thức của tội phạm.
+
+###### c. Phân loại tội phạm:
+
+Tội phạm tuy có chung các dấu hiệu nhưng những hành vi phạm tội cụ thể có tính chất và mức độ nguy hiểm cho xã hội rất khác nhau.
+
+Luật hình sự đã phân tội phạm thành:
+
+- Tội phạm ít nghiệm trọng: Tội phạm ít nghiêm trọng là tội phạm gây nguy hại
+
+không lớn cho xã hội mức phạt cao nhất của khung hình phạt là đến 3 năm tù.
+
+- Tội phạm nghiêm trọng: Tội phạm nghiêm trọng là tội phạm gây nguy hại lớn cho
+
+xã hội mức phạt cao nhất của khung hình phạt là đến 7 năm tù.
+
+- Tội phạm rất nghiêm trọng: Tội phạm rất nghiêm trọng là tội phạm gây nguy hại rất
+
+lớn cho xã hội mức phạt cao nhất của khung hình phạt là đến 15 năm tù.
+
+- Tội phạm đặc biệt nghiêm trọng: Tội phạm đặc biệt nghiêm trọng là tội phạm gây
+
+nguy hại đặc biệt lớn cho xã hội mức phạt cao nhất của khung hình phạt là từ 15 năm tù trở lên, tù chung thân hoặc tử hình.
+
+###### 7.1.2.2. Cấu thành tội phạm
+
+###### a. Khái niệm:
+
+Cấu thành tội phạm là tổng thể những dấu hiệu chung có tính đặc trưng cho một loại tội phạm cụ thể được quy định trong luật hình sự. Cấu thành tội phạm là khái niệm pháp lý của một loại tội, là sự mô tả khái quát một loại tội phạm trong luật hình sự.
+
+Cấu thành tội phạm là cơ sở pháp lý của trách nhiệm hình sự và là căn cứ pháp lý để định tội danh.
+
+###### b. Các yếu tố cấu thành tội phạm:
+
+Mỗi một trường hợp phạm tội cụ thể của một loại tội đều có những nội dung biểu hiện riêng biệt ở bốn yếu tố là: khách thể, mặt khách quan, chủ thể và mặt chủ quan.
+
+- Khách thể của tội phạm là quan hệ xã hội được luật hình sự bảo vệ và bị tội phạm
+
+gây thiệt hại hoặc đe doạ gây thiệt hại ở mức độ đáng kể. Không có sự xâm hại đến quan hệ xã hội được luật hình sự bảo vệ thì không có tội phạm
+
+- Mặt khách quan của tội phạm là những biểu hiện của tội phạm diễn ta hoặc tồn tại
+
+bên ngoài thế giới khách quan.
+
+Những biểu hiện (dấu hiệu) thuộc về khách quan của tội phạm gồm có: hành vi nguy hiểm cho xã hội, hậu quả nguy hiểm cho xã hội. Thuộc về mặt khách quan của tội phạm còn có các dấu hiệu như: phương tiện, công cụ phạm tội, phương pháp, thủ đoạn, thời gian, địa điểm thực hiện tội phạm Trong các dấu hiệu nêu trên thì hành vi (khách quan) của tội phạm là dấu hiệu bắt buộc, không thể thiếu được của mọi loại tội phạm. Còn các dấu hiệu khác là những dấu hiệu bắt buộc nếu điều luật về tội phạm cụ thể có quy định.
+
+<!-- page: 86 -->
+
+- Chủ thể của tội phạm là con người cụ thể đã thực hiệ hành vi nguy hiểm cho xã hội
+
+được luật hình sự quy định là tội phạm, có năng lực trách nhiệm hình sự và đạt độ tuổi theo quy định của luật hình sự. Người từ đủ 14 tuổi đến chưa đủ 16 tuổi chỉ phải chịu trách nhiệm hình sự với những tội phạm nghiêm trọng do cố ý, người từ đủ 16 tuổi trở lên chịu TNHS với mọi loại tội phạm.
+
+Ngoài các dấu hiệu trên, chủ thể của một số tội phạm đòi hỏi phải có thêm một số dấu hiệu đặc biệt khác, vì chỉ khi có những dấu hiệu đó chủ thể mới có thể thực hiện hành vi phạm tội của những tội đó. Khoa học luật hình sự gọi chủ thể của những loại tội phạm này là chủ thể đặc biệt, ví dụ: Quân nhân, người có chức vụ...
+
+- Mặt chủ quan của tội phạm là những diễn biến tâm lý bên trong của tội phạm, bao
+
+gồm: lỗi, mục đích và động cơ phạm tội. Bất cứ tội phạm cụ thể nào cũng phải là hành vi được thực hiện một cách có lỗi (lỗi cố ý hoặc vô ý).
+
+Một người sẽ bị coi là có lỗi khi thực hiện một hành vi gây thiệt hại cho xã hội nếu hành vi đó là kết quả của sự tự lựa chọn và quyết định trong khi người ấy hoàn toàn có đủ điều kiện khách quan và chủ quan để lựa chọn 1 cách xử sự khác phù hợp với xã hội.
+
+Động cơ và mục đích phạm tội là nội dung thuộc mặt chủ quan của một số loại tội nhất định.
+
+Tóm lại, theo luật hình sự Việt Nam bất cứ một hành vi phạm tội nào cũng đều là thể thống nhất giữa mặt khách quan và mặt chủ quan, đều là hoạt động của con người cụ thể xâm hại hoặc đe doạ xâm hại những quan hệ xã hội được luật hình sự bảo vệ. Sự thống nhất của bốn yếu tố này là hình thức cấu trúc, thể hiện đầy đủ nội dung chính trị - xã hội của tội phạm.
+
+###### c. Phân loại cấu thành tội phạm:
+
+Theo mức độ nguy hiểm của hành vi phạm tội được cấu thành tội phạm phản ánh, cấu thành tội phạm được phân thành:
+
++ Cấu thành tội phạm cơ bản là cấu thành tội phạm bao gồm các dấu hiệu bị tội.
+
++ Cấu thành tội phạm tăng nặng bao gồm những dấu hiệu định tội và thêm dấu hiệu
+
+thể hiện mức độ nguy hiểm cho xã hội của tội phạm tăng đáng kể so với cấu thành cơ bản.
+
++ Cấu thành tội phạm giảm nhẹ bao gồm những dấu hiệu định tội và thêm dấu hiêụ
+
+thể hiện mức độ nguy hiểm cho xã hội của tội phạm giảm đáng kể so với cấu thành cơ bản.
+
+Dựa vào đặc điểm cấu trúc của các dấu hiệu thuộc mặt khách quan có thể phân cấu thành tội phạm thành hai loại:
+
++ Cấu thành tội phạm vật chất là cấu thành tội phạm có các dấu hiệu của mặt khách
+
+quan là hành vi nguy hiểm cho xã hội, hậu quả nguy hiểm cho xã hội và mối quan hệ nhân quả giữa hành vi và hậu quả.
+
++ Cấu thành tội phạm hình thức là cấu thành tội phạm mà mặt khách quan chỉ có dấu
+
+hiệu hành vi nguy hiểm cho xã hội.

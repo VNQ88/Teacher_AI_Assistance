@@ -1,10 +1,12 @@
 package com.example.teacherassistantai.entity;
 
 import com.example.teacherassistantai.common.enumerate.DocumentStatus;
+import com.example.teacherassistantai.common.enumerate.DocumentEnrichmentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,6 +78,21 @@ public class Document extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     DocumentStatus status = DocumentStatus.UPLOADED;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "enrichment_status", nullable = false, length = 30,
+            columnDefinition = "VARCHAR(30) DEFAULT 'NOT_STARTED'")
+    @Builder.Default
+    DocumentEnrichmentStatus enrichmentStatus = DocumentEnrichmentStatus.NOT_STARTED;
+
+    @Column(name = "enrichment_started_at")
+    LocalDateTime enrichmentStartedAt;
+
+    @Column(name = "enrichment_completed_at")
+    LocalDateTime enrichmentCompletedAt;
+
+    @Column(name = "enrichment_error", columnDefinition = "TEXT")
+    String enrichmentError;
 
     @Column(columnDefinition = "TEXT")
     String processingError; // Lưu lỗi nếu status = FAILED

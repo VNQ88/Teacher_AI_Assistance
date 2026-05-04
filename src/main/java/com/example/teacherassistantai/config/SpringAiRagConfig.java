@@ -7,8 +7,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SpringAiRagConfig {
 
-    @Bean(name = "geminiChatClient")
-    public ChatClient geminiChatClient(ChatClient.Builder chatClientBuilder) {
+    @Bean(name = "ragChatClient")
+    public ChatClient ragChatClient(ChatClient.Builder chatClientBuilder) {
         // Model and default temperature come from spring.ai.openai.* properties.
         return chatClientBuilder.build();
     }
