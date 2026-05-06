@@ -39,6 +39,8 @@ public class RagChatService {
     private final AiChatGateway aiChatGateway;
     private final AgentLogRepository agentLogRepository;
     private final RagProperties ragProperties;
+    private final RagIntentRouterService intentRouterService;
+    private final RagArtifactChatHandlerService artifactChatHandlerService;
 
     @Transactional
     public ChatMessageResponse sendMessage(Long sessionId, SendChatMessageRequest request) {
@@ -52,6 +54,22 @@ public class RagChatService {
                 .build();
         chatMessageRepository.save(userMessage);
 
+        RagChatIntent intent = intentRouterService.route(request.getQuestion());
+        if (intent == RagChatIntent.SECTION_SUMMARY || intent == RagChatIntent.REVIEW_QUESTION_GENERATION) {
+            RagArtifactChatHandlerService.ArtifactChatResult artifactResult =
+                    artifactChatHandlerService.handle(session, request.getQuestion(), intent);
+            ChatMessage savedAssistant = saveAssistantMessage(
+                    session,
+                    artifactResult.answer(),
+                    artifactResult.sources(),
+                    startedAt,
+                    estimateTokens(request.getQuestion(), artifactResult.answer()),
+                    intent == RagChatIntent.REVIEW_QUESTION_GENERATION ? AgentType.QUIZ_GENERATOR : AgentType.KNOWLEDGE_CHATBOT
+            );
+            saveAgentLog(session, request.getQuestion(), savedAssistant, artifactResult.answer());
+            return toResponse(savedAssistant, artifactResult.confidenceScore(), artifactResult.confidenceLevel());
+        }
+
         int topK = request.getTopK() != null ? request.getTopK() : ragProperties.getTopK();
         List<DocumentChunk> sources = retrievalService.retrieve(session, request.getQuestion(), topK);
 
@@ -62,29 +80,15 @@ public class RagChatService {
         double confidenceScore = confidenceService.score(request.getQuestion(), sources, answer);
         String confidenceLevel = confidenceService.level(confidenceScore);
 
-        ChatMessage assistantMessage = ChatMessage.builder()
-                .session(session)
-                .role(MessageRole.ASSISTANT)
-                .content(answer)
-                .agentType(AgentType.KNOWLEDGE_CHATBOT)
-                .sourceChunks(sources)
-                .responseTimeMs(System.currentTimeMillis() - startedAt)
-                .tokensUsed(estimateTokens(prompt, answer))
-                .build();
-        ChatMessage savedAssistant = chatMessageRepository.save(assistantMessage);
-
-        agentLogRepository.save(AgentLog.builder()
-                .agentType(AgentType.KNOWLEDGE_CHATBOT)
-                .triggeredBy(session.getUser())
-                .subject(session.getSubject())
-                .success(true)
-                .inputSummary(request.getQuestion())
-                .outputSummary(answer)
-                .processingTimeMs(savedAssistant.getResponseTimeMs())
-                .tokensUsed(savedAssistant.getTokensUsed())
-                .relatedEntityType("ChatSession")
-                .relatedEntityId(session.getId())
-                .build());
+        ChatMessage savedAssistant = saveAssistantMessage(
+                session,
+                answer,
+                sources,
+                startedAt,
+                estimateTokens(prompt, answer),
+                AgentType.KNOWLEDGE_CHATBOT
+        );
+        saveAgentLog(session, request.getQuestion(), savedAssistant, answer);
 
         return toResponse(savedAssistant, confidenceScore, confidenceLevel);
     }
@@ -150,6 +154,39 @@ public class RagChatService {
         int promptTokens = prompt == null ? 0 : Math.max(1, prompt.length() / 4);
         int answerTokens = answer == null ? 0 : Math.max(1, answer.length() / 4);
         return promptTokens + answerTokens;
+    }
+
+    private ChatMessage saveAssistantMessage(ChatSession session,
+                                             String answer,
+                                             List<DocumentChunk> sources,
+                                             long startedAt,
+                                             int tokensUsed,
+                                             AgentType agentType) {
+        ChatMessage assistantMessage = ChatMessage.builder()
+                .session(session)
+                .role(MessageRole.ASSISTANT)
+                .content(answer)
+                .agentType(agentType)
+                .sourceChunks(sources)
+                .responseTimeMs(System.currentTimeMillis() - startedAt)
+                .tokensUsed(tokensUsed)
+                .build();
+        return chatMessageRepository.save(assistantMessage);
+    }
+
+    private void saveAgentLog(ChatSession session, String question, ChatMessage savedAssistant, String answer) {
+        agentLogRepository.save(AgentLog.builder()
+                .agentType(savedAssistant.getAgentType())
+                .triggeredBy(session.getUser())
+                .subject(session.getSubject())
+                .success(true)
+                .inputSummary(question)
+                .outputSummary(answer)
+                .processingTimeMs(savedAssistant.getResponseTimeMs())
+                .tokensUsed(savedAssistant.getTokensUsed())
+                .relatedEntityType("ChatSession")
+                .relatedEntityId(session.getId())
+                .build());
     }
 
     private ChatMessageResponse toResponse(ChatMessage message) {

@@ -31,7 +31,6 @@ public class MarkdownChunkingService {
     private static final Pattern ROMAN_SECTION_PATTERN = Pattern.compile("(?iu)^[ivxlcdm]+[.-]\\s+.+$");
     private static final Pattern DECIMAL_SECTION_PATTERN = Pattern.compile("^\\d+(?:\\.\\d+)+\\.?\\s+.+$");
     private static final Pattern SINGLE_NUMBERED_PATTERN = Pattern.compile("^\\d{1,2}\\.\\s+.+$");
-    private static final Pattern ALPHA_SECTION_PATTERN = Pattern.compile("(?iu)^[a-z][).]\\s+.+$");
 
     public List<String> chunk(String markdown) {
         if (markdown == null || markdown.isBlank()) {
@@ -239,7 +238,6 @@ public class MarkdownChunkingService {
         return CHAPTER_TITLE_PATTERN.matcher(lower).matches()
                 || DECIMAL_SECTION_PATTERN.matcher(title).matches()
                 || SINGLE_NUMBERED_PATTERN.matcher(title).matches()
-                || ALPHA_SECTION_PATTERN.matcher(title).matches()
                 || ROMAN_SECTION_PATTERN.matcher(lower).matches();
     }
 
@@ -329,9 +327,6 @@ public class MarkdownChunkingService {
         }
         if (SINGLE_NUMBERED_PATTERN.matcher(title).matches()) {
             return new HeadingInfo(4, "subsection", title);
-        }
-        if (ALPHA_SECTION_PATTERN.matcher(title).matches()) {
-            return new HeadingInfo(5, "subsection", title);
         }
         return null;
     }

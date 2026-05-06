@@ -1,0 +1,11 @@
+package com.example.teacherassistantai.service;
+
+public enum SummaryMode {
+    SUBSECTION_FROM_CHUNKS,
+    SECTION_FROM_SUBSECTIONS_AND_DIRECT_CHUNKS,
+    SECTION_FROM_CHUNKS_FALLBACK,
+    CHAPTER_FROM_SECTIONS,
+    CHAPTER_FALLBACK,
+    PART_FROM_CHAPTERS,
+    PART_FALLBACK
+}

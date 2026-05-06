@@ -53,7 +53,9 @@ class RagChatServiceSourceTrackingTest {
                 confidenceService,
                 aiChatGateway,
                 agentLogRepository,
-                ragProperties
+                ragProperties,
+                mock(RagIntentRouterService.class),
+                mock(RagArtifactChatHandlerService.class)
         );
 
         ChatSession session = session();
@@ -109,7 +111,9 @@ class RagChatServiceSourceTrackingTest {
                 mock(RagConfidenceService.class),
                 mock(AiChatGateway.class),
                 mock(AgentLogRepository.class),
-                new RagProperties()
+                new RagProperties(),
+                mock(RagIntentRouterService.class),
+                mock(RagArtifactChatHandlerService.class)
         );
 
         ChatSession session = session();

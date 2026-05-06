@@ -25,4 +25,12 @@ public interface DocumentNodeRepository extends JpaRepository<DocumentNode, Long
     List<DocumentNode> findByIdIn(Collection<Long> ids);
 
     List<DocumentNode> findByDocumentIdAndParentIdInOrderByOrderIndexAsc(Long documentId, Collection<Long> parentIds);
+
+    List<DocumentNode> findByDocumentIdAndNodeTypeInOrderByOrderIndexAsc(Long documentId, Collection<String> nodeTypes);
+
+    List<DocumentNode> findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(Long documentId, String nodeType);
+
+    List<DocumentNode> findByParentIdOrderByOrderIndexAsc(Long parentId);
+
+    List<DocumentNode> findBySubjectIdAndNodeTypeInOrderByOrderIndexAsc(Long subjectId, Collection<String> nodeTypes);
 }

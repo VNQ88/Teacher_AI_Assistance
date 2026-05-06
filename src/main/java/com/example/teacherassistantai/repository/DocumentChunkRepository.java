@@ -26,6 +26,10 @@ public interface DocumentChunkRepository extends JpaRepository<DocumentChunk, Lo
 
     List<DocumentChunk> findByDocumentIdAndParentNodeIdInOrderBySourceOrderAsc(Long documentId, List<Long> parentNodeIds);
 
+    List<DocumentChunk> findByNodeIdOrderBySourceOrderAsc(Long nodeId);
+
+    List<DocumentChunk> findByDocumentIdAndNodeIdOrderBySourceOrderAsc(Long documentId, Long nodeId);
+
     @Query(value = """
             WITH RECURSIVE node_tree AS (
                 SELECT id

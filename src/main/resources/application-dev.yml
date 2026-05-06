@@ -107,6 +107,22 @@ application:
     min-chunk-chars: 40
     embedding-dimensions: 1024
     max-history-messages: 5
+    enrichment:
+      enabled: true
+      auto-run-after-ready: true
+      prompt-version: enrichment-v2-bottom-up
+      summary-enabled: true
+      review-questions-enabled: true
+      default-review-question-min-count: 15
+      default-review-question-max-count: 20
+      max-node-chunks: 120
+      max-node-context-chars: 60000
+      max-concurrency: 1
+      representative-section-chunks: 3
+      parent-summary-max-child-chars: 3000
+      subsection-summary-max-chars: 1200
+      section-summary-max-key-points: 4
+      chapter-summary-max-key-points: 8
     ai:
       base-url: ${DIGITALOCEAN_BASE_URL}
       chat-model: ${DIGITALOCEAN_CHAT_MODEL}

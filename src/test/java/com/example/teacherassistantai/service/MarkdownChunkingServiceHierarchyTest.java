@@ -87,4 +87,39 @@ class MarkdownChunkingServiceHierarchyTest {
                     assertThat(chunk.sectionHeader()).contains("Quan điểm của triết học");
                 });
     }
+
+    @Test
+    void chunkHierarchical_keeps_alpha_markersInsideParentSection() {
+        MarkdownChunkingService.HierarchicalMarkdownDocument document =
+                chunkingService.parseHierarchicalDocument("""
+                        # Tài liệu
+
+                        ### Chương 1: Tổng quan
+
+                        #### I. Khái niệm
+
+                        Nội dung mở đầu.
+
+                        ##### a) Định nghĩa
+
+                        Nội dung định nghĩa.
+
+                        ##### b) Đặc điểm
+
+                        Nội dung đặc điểm.
+                        """);
+
+        assertThat(document.root().children()).hasSize(1);
+        MarkdownChunkingService.PublicHierarchyNode chapter = document.root().children().getFirst();
+        assertThat(chapter.children()).hasSize(1);
+        assertThat(chapter.children().getFirst().nodeType()).isEqualTo("section");
+        assertThat(chapter.children().getFirst().children()).isEmpty();
+
+        assertThat(document.chunks()).hasSize(1);
+        assertThat(document.chunks().getFirst().nodeType()).isEqualTo("section");
+        assertThat(document.chunks().getFirst().sectionHeader()).isEqualTo("I. Khái niệm");
+        assertThat(document.chunks().getFirst().content())
+                .contains("##### a) Định nghĩa")
+                .contains("##### b) Đặc điểm");
+    }
 }

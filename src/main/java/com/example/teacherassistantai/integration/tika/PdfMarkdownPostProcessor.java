@@ -23,8 +23,6 @@ public class PdfMarkdownPostProcessor {
     private static final Pattern NUMBERED_SECTION_PATTERN = Pattern.compile("^\\d+(?:\\.\\d+){1,4}\\.?\\s+.+$");
     private static final Pattern DECIMAL_PREFIX_PATTERN = Pattern.compile("^(\\d+(?:\\.\\d+){1,4})\\.?");
     private static final Pattern SINGLE_NUMBERED_SECTION_PATTERN = Pattern.compile("^\\d{1,2}\\.\\s+.+$");
-    private static final Pattern ALPHA_SECTION_PATTERN = Pattern.compile("(?iu)^[a-z]\\)\\s+.+$");
-    private static final Pattern ALPHA_DOT_SECTION_PATTERN = Pattern.compile("(?iu)^[a-z]\\.\\s+.+$");
     private static final Pattern BULLET_PATTERN = Pattern.compile("^[-+*]\\s+.+$");
     private static final Pattern FOOTNOTE_PATTERN = Pattern.compile("^\\d{1,3}\\s+\\S.+$");
     private static final Pattern TOC_LINE_PATTERN = Pattern.compile("(?iu).+\\s+\\d{1,3}$");
@@ -246,10 +244,6 @@ public class PdfMarkdownPostProcessor {
             return new Heading("##### " + normalizeHeadingText(line), false);
         }
 
-        if (isValidAlphaHeading(line)) {
-            return new Heading("###### " + normalizeHeadingText(line), false);
-        }
-
         return null;
     }
 
@@ -295,8 +289,7 @@ public class PdfMarkdownPostProcessor {
                 || CHAPTER_PATTERN.matcher(stripped).matches()
                 || (ROMAN_SECTION_PATTERN.matcher(stripped).matches() && isValidRomanHeading(line))
                 || (NUMBERED_SECTION_PATTERN.matcher(line).matches() && isValidNumberedHeading(line))
-                || (SINGLE_NUMBERED_SECTION_PATTERN.matcher(line).matches() && isValidSingleNumberedHeading(line))
-                || isValidAlphaHeading(line);
+                || (SINGLE_NUMBERED_SECTION_PATTERN.matcher(line).matches() && isValidSingleNumberedHeading(line));
     }
 
     private int consumeHeadingContinuation(List<String> lines, int start, List<String> markdownBlocks) {
@@ -504,20 +497,6 @@ public class PdfMarkdownPostProcessor {
                 || stripped.startsWith("vai tro ")
                 || stripped.startsWith("noi dung co ban va y nghia ")
                 || stripped.startsWith("khai quat qua trinh ");
-    }
-
-    private boolean isValidAlphaHeading(String line) {
-        String stripped = stripAccents(line);
-        boolean matches = ALPHA_SECTION_PATTERN.matcher(stripped).matches()
-                || ALPHA_DOT_SECTION_PATTERN.matcher(stripped).matches();
-        if (!matches || line.length() > 120) {
-            return false;
-        }
-        String rest = stripped.replaceFirst("(?iu)^[a-z][).]\\s+", "");
-        if (Pattern.compile("(?iu)\\b[a-z][).]\\s+").matcher(rest).find()) {
-            return false;
-        }
-        return !line.endsWith(",") && !line.contains("v.v");
     }
 
     private int romanToInt(String roman) {

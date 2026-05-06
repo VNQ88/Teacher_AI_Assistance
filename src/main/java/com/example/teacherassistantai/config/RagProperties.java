@@ -33,6 +33,8 @@ public class RagProperties {
 
     private Ai ai = new Ai();
 
+    private Enrichment enrichment = new Enrichment();
+
     @Data
     public static class Ai {
         @NotBlank
@@ -46,5 +48,49 @@ public class RagProperties {
 
         @Min(1)
         private int timeoutSeconds = 60;
+    }
+
+    @Data
+    public static class Enrichment {
+        private boolean enabled = true;
+
+        private boolean autoRunAfterReady = true;
+
+        @NotBlank
+        private String promptVersion = "enrichment-v1";
+
+        private boolean summaryEnabled = true;
+
+        private boolean reviewQuestionsEnabled = true;
+
+        @Min(1)
+        private int defaultReviewQuestionMinCount = 15;
+
+        @Min(1)
+        private int defaultReviewQuestionMaxCount = 20;
+
+        @Min(1)
+        private int maxNodeChunks = 120;
+
+        @Min(1)
+        private int maxNodeContextChars = 60_000;
+
+        @Min(1)
+        private int maxConcurrency = 1;
+
+        @Min(1)
+        private int representativeSectionChunks = 3;
+
+        @Min(1)
+        private int parentSummaryMaxChildChars = 3_000;
+
+        @Min(1)
+        private int subsectionSummaryMaxChars = 1_200;
+
+        @Min(1)
+        private int sectionSummaryMaxKeyPoints = 4;
+
+        @Min(1)
+        private int chapterSummaryMaxKeyPoints = 8;
     }
 }

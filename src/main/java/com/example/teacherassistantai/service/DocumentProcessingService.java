@@ -1,6 +1,8 @@
 package com.example.teacherassistantai.service;
 
 import com.example.teacherassistantai.common.enumerate.DocumentStatus;
+import com.example.teacherassistantai.common.enumerate.DocumentEnrichmentStatus;
+import com.example.teacherassistantai.common.enumerate.DocumentNodeArtifactType;
 import com.example.teacherassistantai.common.file.InMemoryMultipartFile;
 import com.example.teacherassistantai.entity.Document;
 import com.example.teacherassistantai.integration.minio.MinioChannel;
@@ -14,6 +16,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -33,6 +36,7 @@ public class DocumentProcessingService {
     private final DocumentHierarchyArtifactService documentHierarchyArtifactService;
     private final DocumentHierarchyArtifactValidationService documentHierarchyArtifactValidationService;
     private final DocumentHierarchyPersistenceService documentHierarchyPersistenceService;
+    private final DocumentEnrichmentService documentEnrichmentService;
 
     @Async("documentProcessingExecutor")
     public void processDocumentAsync(Long documentId) {
@@ -93,7 +97,14 @@ public class DocumentProcessingService {
                 documentId, chunks.size());
 
         document.setStatus(DocumentStatus.READY);
+        document.setEnrichmentStatus(DocumentEnrichmentStatus.QUEUED);
+        document.setEnrichmentError(null);
         documentRepository.save(document);
+        documentEnrichmentService.enqueueDocumentEnrichment(
+                documentId,
+                false,
+                List.of(DocumentNodeArtifactType.SUMMARY)
+        );
     }
 
     private byte[] downloadOriginal(String objectKey) throws Exception {

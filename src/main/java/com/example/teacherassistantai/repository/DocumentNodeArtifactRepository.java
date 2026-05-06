@@ -58,4 +58,49 @@ public interface DocumentNodeArtifactRepository extends JpaRepository<DocumentNo
     List<DocumentNodeArtifact> findLatestByNodeTypeAndStatus(@Param("documentNodeId") Long documentNodeId,
                                                              @Param("artifactType") DocumentNodeArtifactType artifactType,
                                                              @Param("status") DocumentNodeArtifactStatus status);
+
+    Optional<DocumentNodeArtifact> findFirstByDocumentNodeIdAndArtifactTypeAndStatusOrderByUpdatedAtDesc(
+            Long documentNodeId,
+            DocumentNodeArtifactType artifactType,
+            DocumentNodeArtifactStatus status
+    );
+
+    Optional<DocumentNodeArtifact> findFirstByDocumentNodeIdAndArtifactTypeAndStatusAndPromptVersionAndModelOrderByUpdatedAtDesc(
+            Long documentNodeId,
+            DocumentNodeArtifactType artifactType,
+            DocumentNodeArtifactStatus status,
+            String promptVersion,
+            String model
+    );
+
+    default Optional<DocumentNodeArtifact> findLatestCompletedSummaryByNodeId(Long nodeId) {
+        return findFirstByDocumentNodeIdAndArtifactTypeAndStatusOrderByUpdatedAtDesc(
+                nodeId,
+                DocumentNodeArtifactType.SUMMARY,
+                DocumentNodeArtifactStatus.COMPLETED
+        );
+    }
+
+    default Optional<DocumentNodeArtifact> findLatestCompletedSummaryByNodeId(Long nodeId,
+                                                                              String promptVersion,
+                                                                              String model) {
+        return findFirstByDocumentNodeIdAndArtifactTypeAndStatusAndPromptVersionAndModelOrderByUpdatedAtDesc(
+                nodeId,
+                DocumentNodeArtifactType.SUMMARY,
+                DocumentNodeArtifactStatus.COMPLETED,
+                promptVersion,
+                model
+        );
+    }
+
+    @Query("""
+            SELECT a
+            FROM DocumentNodeArtifact a
+            JOIN FETCH a.documentNode n
+            WHERE n.id IN :nodeIds
+              AND a.artifactType = com.example.teacherassistantai.common.enumerate.DocumentNodeArtifactType.SUMMARY
+              AND a.status = com.example.teacherassistantai.common.enumerate.DocumentNodeArtifactStatus.COMPLETED
+            ORDER BY n.orderIndex ASC, a.updatedAt DESC
+            """)
+    List<DocumentNodeArtifact> findCompletedSummariesByNodeIds(@Param("nodeIds") Collection<Long> nodeIds);
 }

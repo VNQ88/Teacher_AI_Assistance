@@ -12,6 +12,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class DocumentAsyncConfig {
 
     private final DocumentIngestionProps ingestionProps;
+    private final RagProperties ragProperties;
 
     @Bean(name = "documentProcessingExecutor")
     public ThreadPoolTaskExecutor documentProcessingExecutor() {
@@ -21,6 +22,21 @@ public class DocumentAsyncConfig {
         executor.setCorePoolSize(1);
         executor.setMaxPoolSize(maxPool);
         executor.setQueueCapacity(20);
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(30);
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.initialize();
+        return executor;
+    }
+
+    @Bean(name = "documentEnrichmentExecutor")
+    public ThreadPoolTaskExecutor documentEnrichmentExecutor() {
+        int maxPool = Math.max(1, ragProperties.getEnrichment().getMaxConcurrency());
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setThreadNamePrefix("doc-enrich-");
+        executor.setCorePoolSize(1);
+        executor.setMaxPoolSize(maxPool);
+        executor.setQueueCapacity(50);
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(30);
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
