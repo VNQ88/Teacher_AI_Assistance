@@ -56,6 +56,27 @@ class LocalRerankingServiceTest {
         assertThat(intent.sectionNumber()).isEqualTo(2);
     }
 
+    @Test
+    void rerank_shouldExcludeCitationChunksWhenContentCandidatesExist() {
+        LocalRerankingService.RetrievalIntent intent =
+                service.detectIntent("Hồ Chí Minh nói gì về lý luận cách mạng?");
+
+        DocumentChunk citationChunk = chunk(21L, "CITATION",
+                "3 Hồ Chí Minh Toàn tập, Nxb Chính trị quốc gia, Hà Nội, 2011, tập 5, trang 273.",
+                null, 1, null);
+        DocumentChunk textChunk = chunk(22L, "TEXT",
+                "Hồ Chí Minh nhấn mạnh lý luận cách mạng phải gắn với thực tiễn.",
+                null, 2, null);
+
+        LocalRerankingService.RerankResult result =
+                service.rerank("Hồ Chí Minh nói gì về lý luận cách mạng?",
+                        List.of(citationChunk, textChunk), intent, 1);
+
+        assertThat(result.policyCandidates()).extracting(scored -> scored.chunk().getId())
+                .containsExactly(22L);
+        assertThat(result.selected()).extracting(DocumentChunk::getId).containsExactly(22L);
+    }
+
     private DocumentChunk chunk(Long id,
                                 String chunkType,
                                 String content,

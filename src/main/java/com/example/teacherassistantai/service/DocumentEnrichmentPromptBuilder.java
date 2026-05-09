@@ -51,11 +51,11 @@ public class DocumentEnrichmentPromptBuilder {
 
     public String buildSectionSummaryPrompt(SummaryGenerationContext context) {
         StringBuilder prompt = basePrompt(context.document(), context.node());
-        prompt.append("Nhiem vu: Tao summary section theo huong bottom-up.\n");
+        prompt.append("Nhiem vu: Tao summary node theo huong bottom-up.\n");
         prompt.append("Yeu cau rieng:\n");
         prompt.append("- Viet bang tieng Viet.\n");
-        prompt.append("- Tong hop tu child summaries cua subsection va direct chunks cua section.\n");
-        prompt.append("- Direct chunks chi la noi dung truc tiep nam duoi section, khong thay the child summaries.\n");
+        prompt.append("- Tong hop tu child summaries va direct chunks cua node hien tai.\n");
+        prompt.append("- Direct chunks chi la noi dung truc tiep nam duoi node, khong thay the child summaries.\n");
         prompt.append("- Khong bo sot child summary nao.\n");
         prompt.append("- Output gom 2 den ").append(ragProperties.getEnrichment().getSectionSummaryMaxKeyPoints())
                 .append(" keyPoints.\n");
@@ -304,6 +304,7 @@ public class DocumentEnrichmentPromptBuilder {
     private SummaryMode chunksFallbackMode(DocumentNode node) {
         String nodeType = node == null ? "" : valueOrFallback(node.getNodeType(), "");
         return switch (nodeType) {
+            case "subsection_level2" -> SummaryMode.SUBSECTION_LEVEL2_FROM_CHUNKS;
             case "subsection" -> SummaryMode.SUBSECTION_FROM_CHUNKS;
             case "section" -> SummaryMode.SECTION_FROM_CHUNKS_FALLBACK;
             case "part" -> SummaryMode.PART_FALLBACK;
@@ -312,7 +313,7 @@ public class DocumentEnrichmentPromptBuilder {
     }
 
     private String summaryStyle(DocumentNode node, SummaryMode summaryMode) {
-        if (summaryMode == SummaryMode.SUBSECTION_FROM_CHUNKS) {
+        if (summaryMode == SummaryMode.SUBSECTION_FROM_CHUNKS || summaryMode == SummaryMode.SUBSECTION_LEVEL2_FROM_CHUNKS) {
             return "mot doan ngan, toi da " + ragProperties.getEnrichment().getSubsectionSummaryMaxChars() + " ky tu";
         }
         String nodeType = node == null ? "" : valueOrFallback(node.getNodeType(), "");

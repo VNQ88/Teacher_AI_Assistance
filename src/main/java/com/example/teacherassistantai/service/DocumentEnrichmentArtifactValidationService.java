@@ -412,6 +412,7 @@ public class DocumentEnrichmentArtifactValidationService {
     private SummaryMode chunksFallbackMode(DocumentNode node) {
         String nodeType = node == null ? "" : node.getNodeType();
         return switch (nodeType) {
+            case "subsection_level2" -> SummaryMode.SUBSECTION_LEVEL2_FROM_CHUNKS;
             case "subsection" -> SummaryMode.SUBSECTION_FROM_CHUNKS;
             case "section" -> SummaryMode.SECTION_FROM_CHUNKS_FALLBACK;
             case "part" -> SummaryMode.PART_FALLBACK;

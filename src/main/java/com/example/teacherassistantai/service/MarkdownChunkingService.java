@@ -26,11 +26,21 @@ public class MarkdownChunkingService {
     private static final Pattern TABLE_LINE_PATTERN = Pattern.compile("^\\s*\\|.*\\|\\s*$");
     private static final Pattern MARKDOWN_HEADER_PATTERN = Pattern.compile("^(#{1,6})\\s+(.+)$");
     private static final Pattern PAGE_MARKER_PATTERN = Pattern.compile("^<!--\\s*page:\\s*(\\d+)\\s*-->$");
-    private static final Pattern PART_TITLE_PATTERN = Pattern.compile("(?iu)^phần\\s+[ivxlcdm]+\\b.*$");
+    private static final Pattern PART_TITLE_PATTERN = Pattern.compile("(?iu)^phần\\s+([ivxlcdm]+)\\b.*$");
     private static final Pattern CHAPTER_TITLE_PATTERN = Pattern.compile("(?iu)^chương\\s+([0-9ivxlcdm]+|nhập\\s+môn)\\b.*$");
     private static final Pattern ROMAN_SECTION_PATTERN = Pattern.compile("(?iu)^[ivxlcdm]+[.-]\\s+.+$");
     private static final Pattern DECIMAL_SECTION_PATTERN = Pattern.compile("^\\d+(?:\\.\\d+)+\\.?\\s+.+$");
     private static final Pattern SINGLE_NUMBERED_PATTERN = Pattern.compile("^\\d{1,2}\\.\\s+.+$");
+    private static final Pattern REVIEW_HEADING_PATTERN = Pattern.compile("(?iu)^(câu\\s+hỏi\\s+ôn\\s+tập|nội\\s+dung\\s+ôn\\s+tập.*).*$");
+    private static final Pattern SUMMARY_HEADING_PATTERN = Pattern.compile("(?iu)^tóm\\s+tắt\\s+chương.*$");
+    private static final Pattern CONCLUSION_HEADING_PATTERN = Pattern.compile("(?iu)^kết\\s+luận$");
+    private static final Pattern LIST_LEAD_IN_PATTERN = Pattern.compile("(?iu).*(bao\\s+g[oồ]m|như\\s+sau|g[oồ]m|sau\\s+đây)\\s*:\\s*$");
+    private static final Pattern CITATION_NUMBERED_LINE_PATTERN = Pattern.compile("^\\d{1,3}\\.?\\s+\\S.+$");
+    private static final Pattern CITATION_STRONG_SIGNAL_PATTERN = Pattern.compile("(?iu).*(nxb\\.?|toàn\\s+tập|văn\\s+kiện|\\btrang\\s+\\d|\\btr\\.?\\s*\\d|\\bt\\.?\\s*\\d|sđd|dẫn\\s+theo|xem\\s+sđd).*");
+    private static final Pattern CITATION_CONTINUATION_PATTERN = Pattern.compile("(?iu)^(trang\\s+\\d|tr\\.?\\s*\\d|t\\.?\\s*\\d|nxb\\.?\\s+.+|hà\\s+nội[,\\s].+|mátxcơva[,\\s].+|số\\s+\\d.+|ngày\\s+\\d.+|\\(tiếng\\s+nga\\).*)$");
+    private static final String CITATION_CHUNK_TYPE = "CITATION";
+    private static final String TEXT_CHUNK_TYPE = "TEXT";
+    private static final String DEFAULT_ROOT_TITLE = "Document";
 
     public List<String> chunk(String markdown) {
         if (markdown == null || markdown.isBlank()) {
@@ -61,12 +71,16 @@ public class MarkdownChunkingService {
     }
 
     public HierarchicalMarkdownDocument parseHierarchicalDocument(String markdown) {
+        return parseHierarchicalDocument(markdown, null);
+    }
+
+    public HierarchicalMarkdownDocument parseHierarchicalDocument(String markdown, String documentTitle) {
         if (markdown == null || markdown.isBlank()) {
             throw new InvalidDataException("Markdown content is empty");
         }
 
         String normalized = normalizeForHierarchy(markdown);
-        HierarchyNode root = parseHierarchy(normalized);
+        HierarchyNode root = parseHierarchy(normalized, rootTitle(markdown, documentTitle));
         List<HierarchicalMarkdownChunk> chunks = new ArrayList<>();
         emitHierarchicalChunks(root, chunks);
         if (chunks.isEmpty()) {
@@ -116,7 +130,8 @@ public class MarkdownChunkingService {
                 output.add(line);
             }
         }
-        return repairBrokenHeadings(String.join("\n", output).replaceAll("\\n{4,}", "\n\n\n")).trim();
+        String repaired = repairBrokenHeadings(String.join("\n", output).replaceAll("\\n{4,}", "\n\n\n"));
+        return demoteInvalidMarkdownHeadings(repaired).trim();
     }
 
     private String normalizeForHierarchy(String markdown) {
@@ -138,6 +153,83 @@ public class MarkdownChunkingService {
             output.add(line);
         }
         return String.join("\n", output);
+    }
+
+    private String demoteInvalidMarkdownHeadings(String markdown) {
+        String[] lines = markdown.split("\\n", -1);
+        List<String> output = new ArrayList<>();
+        boolean inSingleNumberListContext = false;
+        boolean inSpecialNodeContext = false;
+
+        for (String line : lines) {
+            String trimmed = line.trim();
+            java.util.regex.Matcher headingMatcher = MARKDOWN_HEADER_PATTERN.matcher(trimmed);
+            if (!headingMatcher.matches()) {
+                output.add(line);
+                if (isSpecialNodeTitle(trimmed)) {
+                    inSpecialNodeContext = true;
+                    inSingleNumberListContext = false;
+                } else if (isStructuredHeadingTitle(trimmed) && !isSingleNumberedTitle(trimmed)) {
+                    inSpecialNodeContext = false;
+                    inSingleNumberListContext = false;
+                }
+                continue;
+            }
+
+            String hashes = headingMatcher.group(1);
+            String title = headingMatcher.group(2).trim();
+            String previous = previousNonBlank(output);
+
+            if (isSpecialNodeTitle(title)) {
+                output.add(hashes + " " + title);
+                inSpecialNodeContext = true;
+                inSingleNumberListContext = false;
+                continue;
+            }
+
+            if (isSingleNumberedTitle(title)) {
+                if (inSpecialNodeContext || inSingleNumberListContext || isListLeadIn(previous)) {
+                    output.add(title);
+                    inSingleNumberListContext = true;
+                    continue;
+                }
+                if (isReviewQuestionHeading(title)) {
+                    output.add(hashes + " " + title);
+                    continue;
+                }
+                output.add(hashes + " " + title);
+                continue;
+            }
+
+            if (isStructuredHeadingTitle(title)) {
+                output.add(hashes + " " + title);
+                inSpecialNodeContext = false;
+                inSingleNumberListContext = false;
+                continue;
+            }
+
+            output.add(title);
+        }
+
+        return String.join("\n", output);
+    }
+
+    private String previousNonBlank(List<String> lines) {
+        for (int i = lines.size() - 1; i >= 0; i--) {
+            String value = lines.get(i).trim();
+            if (!value.isBlank() && !PAGE_MARKER_PATTERN.matcher(value).matches()) {
+                return stripMarkdownHeading(value);
+            }
+        }
+        return null;
+    }
+
+    private String stripMarkdownHeading(String value) {
+        if (value == null) {
+            return null;
+        }
+        java.util.regex.Matcher matcher = MARKDOWN_HEADER_PATTERN.matcher(value.trim());
+        return matcher.matches() ? matcher.group(2).trim() : value.trim();
     }
 
     private boolean isIncompleteMarkdownHeading(String line) {
@@ -174,10 +266,14 @@ public class MarkdownChunkingService {
         if (line == null || line.isBlank() || line.length() > 120) {
             return false;
         }
-        if (MARKDOWN_HEADER_PATTERN.matcher(line.trim()).matches() || PAGE_MARKER_PATTERN.matcher(line.trim()).matches()) {
+        String trimmed = line.trim();
+        if (MARKDOWN_HEADER_PATTERN.matcher(trimmed).matches() || PAGE_MARKER_PATTERN.matcher(trimmed).matches()) {
             return false;
         }
-        return !line.trim().matches("^[-+*]\\s+.+$");
+        if (isStructuredHeadingTitle(trimmed) || isSpecialNodeTitle(trimmed)) {
+            return false;
+        }
+        return !trimmed.matches("^[-+*]\\s+.+$");
     }
 
     private String nextNonBlank(String[] lines, int start) {
@@ -234,15 +330,97 @@ public class MarkdownChunkingService {
     }
 
     private boolean isSplittableLongHeading(String title) {
-        String lower = title.toLowerCase(Locale.ROOT);
-        return CHAPTER_TITLE_PATTERN.matcher(lower).matches()
-                || DECIMAL_SECTION_PATTERN.matcher(title).matches()
+        return isChapterTitle(title)
+                || isSupportedDecimalHeading(title)
                 || SINGLE_NUMBERED_PATTERN.matcher(title).matches()
-                || ROMAN_SECTION_PATTERN.matcher(lower).matches();
+                || isRomanSectionTitle(title);
     }
 
-    private HierarchyNode parseHierarchy(String markdown) {
-        HierarchyNode root = new HierarchyNode("n0", null, 0, "document", "Document", 0);
+    private String rootTitle(String markdown, String documentTitle) {
+        if (documentTitle != null && !documentTitle.isBlank()) {
+            return documentTitle.trim();
+        }
+        String inferred = firstH1Title(markdown);
+        return inferred == null || inferred.isBlank() ? DEFAULT_ROOT_TITLE : inferred;
+    }
+
+    private String firstH1Title(String markdown) {
+        if (markdown == null || markdown.isBlank()) {
+            return null;
+        }
+        for (String line : markdown.lines().toList()) {
+            java.util.regex.Matcher matcher = Pattern.compile("^#\\s+(.+)$").matcher(line.trim());
+            if (matcher.matches()) {
+                return matcher.group(1).trim();
+            }
+        }
+        return null;
+    }
+
+    private boolean isStructuredHeadingTitle(String title) {
+        return isPartTitle(title)
+                || isChapterTitle(title)
+                || isRomanSectionTitle(title)
+                || isSupportedDecimalHeading(title)
+                || CONCLUSION_HEADING_PATTERN.matcher(normalizeTitle(title)).matches();
+    }
+
+    private boolean isSpecialNodeTitle(String title) {
+        String normalized = normalizeTitle(title);
+        return SUMMARY_HEADING_PATTERN.matcher(normalized).matches()
+                || REVIEW_HEADING_PATTERN.matcher(normalized).matches();
+    }
+
+    private boolean isPartTitle(String title) {
+        java.util.regex.Matcher matcher = PART_TITLE_PATTERN.matcher(normalizeTitle(title));
+        return matcher.matches() && isRomanNumeral(matcher.group(1));
+    }
+
+    private boolean isChapterTitle(String title) {
+        return CHAPTER_TITLE_PATTERN.matcher(normalizeTitle(title)).matches();
+    }
+
+    private boolean isRomanSectionTitle(String title) {
+        return ROMAN_SECTION_PATTERN.matcher(normalizeTitle(title)).matches();
+    }
+
+    private boolean isSupportedDecimalHeading(String title) {
+        int depth = decimalDepth(title);
+        return depth >= 2 && depth <= 4;
+    }
+
+    private int decimalDepth(String title) {
+        if (title == null) {
+            return 0;
+        }
+        java.util.regex.Matcher matcher = Pattern.compile("^(\\d+(?:\\.\\d+)+)\\.?\\s+.+$").matcher(title.trim());
+        if (!matcher.matches()) {
+            return 0;
+        }
+        return matcher.group(1).split("\\.").length;
+    }
+
+    private boolean isSingleNumberedTitle(String title) {
+        return SINGLE_NUMBERED_PATTERN.matcher(title == null ? "" : title.trim()).matches();
+    }
+
+    private boolean isListLeadIn(String value) {
+        return value != null && LIST_LEAD_IN_PATTERN.matcher(value.trim()).matches();
+    }
+
+    private boolean isRomanNumeral(String token) {
+        if (token == null || token.isBlank()) {
+            return false;
+        }
+        return token.trim().matches("(?iu)^(i|ii|iii|iv|v|vi|vii|viii|ix|x)$");
+    }
+
+    private String normalizeTitle(String title) {
+        return title == null ? "" : title.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private HierarchyNode parseHierarchy(String markdown, String rootTitle) {
+        HierarchyNode root = new HierarchyNode("n0", null, 0, "document", rootTitle, 0);
         Deque<HierarchyNode> stack = new ArrayDeque<>();
         stack.push(root);
 
@@ -274,7 +452,7 @@ public class MarkdownChunkingService {
                 node.observePage(currentPage);
                 parent.children.add(node);
                 stack.push(node);
-                inSpecialNode = true;
+                inSpecialNode = node.type.equals("summary") || node.type.equals("review_questions");
                 offset += line.length() + 1;
                 continue;
             }
@@ -308,22 +486,30 @@ public class MarkdownChunkingService {
         }
 
         String title = matcher.group(2).trim();
-        String lower = title.toLowerCase(Locale.ROOT);
         if (isReviewQuestionHeading(title)) {
             return null;
         }
-        if (PART_TITLE_PATTERN.matcher(lower).matches()) {
+        if (isPartTitle(title)) {
             return new HeadingInfo(1, "part", title);
         }
-        if (CHAPTER_TITLE_PATTERN.matcher(lower).matches()) {
+        if (isChapterTitle(title)) {
             return new HeadingInfo(2, "chapter", title);
         }
-        if (ROMAN_SECTION_PATTERN.matcher(lower).matches()) {
+        if (isRomanSectionTitle(title)) {
             return new HeadingInfo(3, "section", title);
         }
         if (DECIMAL_SECTION_PATTERN.matcher(title).matches()) {
-            int depth = title.replaceFirst("^([0-9.]+).*", "$1").split("\\.").length;
-            return new HeadingInfo(Math.min(6, 2 + depth), depth >= 3 ? "subsection" : "section", title);
+            int depth = decimalDepth(title);
+            if (depth == 2) {
+                return new HeadingInfo(3, "section", title);
+            }
+            if (depth == 3) {
+                return new HeadingInfo(4, "subsection", title);
+            }
+            if (depth == 4) {
+                return new HeadingInfo(5, "subsection_level2", title);
+            }
+            return null;
         }
         if (SINGLE_NUMBERED_PATTERN.matcher(title).matches()) {
             return new HeadingInfo(4, "subsection", title);
@@ -350,13 +536,13 @@ public class MarkdownChunkingService {
         if (MARKDOWN_HEADER_PATTERN.matcher(line).matches() && isReviewQuestionHeading(withoutHeading)) {
             return new SpecialMarker("review_questions", withoutHeading);
         }
-        if (lower.matches("(?iu)^tóm\\s+tắt\\s+chương.*$")) {
+        if (SUMMARY_HEADING_PATTERN.matcher(lower).matches()) {
             return new SpecialMarker("summary", withoutHeading);
         }
-        if (lower.matches("(?iu)^(câu\\s+hỏi\\s+ôn\\s+tập|nội\\s+dung\\s+ôn\\s+tập.*).*$")) {
+        if (REVIEW_HEADING_PATTERN.matcher(lower).matches()) {
             return new SpecialMarker("review_questions", withoutHeading);
         }
-        if (lower.matches("(?iu)^kết\\s+luận$")) {
+        if (CONCLUSION_HEADING_PATTERN.matcher(lower).matches()) {
             return new SpecialMarker("section", withoutHeading);
         }
         return null;
@@ -371,28 +557,181 @@ public class MarkdownChunkingService {
         if (node.type.equals("review_questions") && !node.title.isBlank() && isReviewQuestionHeading(node.title)) {
             body = body.isBlank() ? node.title : node.title + "\n\n" + body;
         }
+        if (node.type.equals("summary") || node.type.equals("review_questions")) {
+            body = stripMarkdownHeadingMarkers(body);
+        }
         if (node.parent == null || body.isBlank()) {
             return;
         }
 
         List<String> breadcrumb = breadcrumb(node);
         String breadcrumbText = String.join(" > ", breadcrumb);
-        List<String> bodyChunks = chunkTextBlock(body);
-        for (String bodyChunk : bodyChunks) {
-            String content = breadcrumbText.isBlank() ? bodyChunk : breadcrumbText + "\n\n" + bodyChunk;
-            output.add(new HierarchicalMarkdownChunk(
-                    content,
-                    chunkType(node.type),
-                    node.type,
-                    node.id,
-                    parentNodeId(node),
-                    node.title,
-                    breadcrumb,
-                    node.pageFrom,
-                    node.pageTo,
-                    node.charStart,
-                    node.charEnd
-            ));
+        for (BodySegment segment : splitCitationSegments(body)) {
+            String segmentChunkType = CITATION_CHUNK_TYPE.equals(segment.chunkType())
+                    ? CITATION_CHUNK_TYPE
+                    : chunkType(node.type);
+            List<String> bodyChunks = chunkTextBlock(segment.content());
+            for (String bodyChunk : bodyChunks) {
+                String content = breadcrumbText.isBlank() ? bodyChunk : breadcrumbText + "\n\n" + bodyChunk;
+                output.add(new HierarchicalMarkdownChunk(
+                        content,
+                        segmentChunkType,
+                        node.type,
+                        node.id,
+                        parentNodeId(node),
+                        node.title,
+                        breadcrumb,
+                        node.pageFrom,
+                        node.pageTo,
+                        node.charStart,
+                        node.charEnd
+                ));
+            }
+        }
+    }
+
+    private String stripMarkdownHeadingMarkers(String content) {
+        if (content == null || content.isBlank()) {
+            return "";
+        }
+        List<String> output = new ArrayList<>();
+        for (String line : content.split("\\n", -1)) {
+            java.util.regex.Matcher matcher = MARKDOWN_HEADER_PATTERN.matcher(line.trim());
+            output.add(matcher.matches() ? matcher.group(2).trim() : line);
+        }
+        return String.join("\n", output).trim();
+    }
+
+    private List<BodySegment> splitCitationSegments(String body) {
+        if (body == null || body.isBlank()) {
+            return List.of();
+        }
+        List<String> lines = java.util.Arrays.asList(body.split("\\n", -1));
+        boolean[] citationLines = classifyCitationLines(lines);
+
+        List<BodySegment> segments = new ArrayList<>();
+        String currentType = null;
+        StringBuilder current = new StringBuilder();
+        for (int i = 0; i < lines.size(); i++) {
+            String type = citationLines[i] ? CITATION_CHUNK_TYPE : TEXT_CHUNK_TYPE;
+            if (currentType == null) {
+                currentType = type;
+            } else if (!currentType.equals(type)) {
+                addBodySegment(segments, currentType, current);
+                current.setLength(0);
+                currentType = type;
+            }
+            current.append(lines.get(i)).append('\n');
+        }
+        addBodySegment(segments, currentType == null ? TEXT_CHUNK_TYPE : currentType, current);
+        return segments;
+    }
+
+    private boolean[] classifyCitationLines(List<String> lines) {
+        boolean[] citationLines = new boolean[lines.size()];
+        for (int i = 0; i < lines.size(); i++) {
+            if (isStrongCitationLine(lines.get(i).trim())) {
+                citationLines[i] = true;
+            }
+        }
+
+        boolean changed;
+        do {
+            changed = false;
+            for (int i = 0; i < lines.size(); i++) {
+                if (citationLines[i]) {
+                    continue;
+                }
+                String line = lines.get(i).trim();
+                if (line.isBlank()) {
+                    int previous = previousNonBlankIndex(lines, i - 1);
+                    int next = nextNonBlankIndex(lines, i + 1);
+                    if (isCitationIndex(citationLines, previous) && isCitationIndex(citationLines, next)) {
+                        citationLines[i] = true;
+                        changed = true;
+                    }
+                    continue;
+                }
+
+                int previous = previousNonBlankIndex(lines, i - 1);
+                int next = nextNonBlankIndex(lines, i + 1);
+                if (isCitationContinuationLine(line) && isCitationIndex(citationLines, previous)) {
+                    citationLines[i] = true;
+                    changed = true;
+                    continue;
+                }
+                if (isWeakFootnoteLine(line)
+                        && (isHighNumberFootnoteLine(line)
+                        || isCitationIndex(citationLines, previous)
+                        || isCitationIndex(citationLines, next))) {
+                    citationLines[i] = true;
+                    changed = true;
+                }
+            }
+        } while (changed);
+        return citationLines;
+    }
+
+    private boolean isStrongCitationLine(String line) {
+        return isWeakFootnoteLine(line) && CITATION_STRONG_SIGNAL_PATTERN.matcher(line).matches();
+    }
+
+    private boolean isWeakFootnoteLine(String line) {
+        return line != null
+                && CITATION_NUMBERED_LINE_PATTERN.matcher(line.trim()).matches()
+                && !isReviewQuestionHeading(line.trim());
+    }
+
+    private boolean isHighNumberFootnoteLine(String line) {
+        Integer number = leadingNumber(line);
+        return number != null && number >= 20;
+    }
+
+    private Integer leadingNumber(String line) {
+        if (line == null) {
+            return null;
+        }
+        java.util.regex.Matcher matcher = Pattern.compile("^(\\d{1,3})\\.?\\s+\\S.+$").matcher(line.trim());
+        if (!matcher.matches()) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(matcher.group(1));
+        } catch (NumberFormatException ex) {
+            return null;
+        }
+    }
+
+    private boolean isCitationContinuationLine(String line) {
+        return line != null && CITATION_CONTINUATION_PATTERN.matcher(line.trim()).matches();
+    }
+
+    private int previousNonBlankIndex(List<String> lines, int startIndex) {
+        for (int i = startIndex; i >= 0; i--) {
+            if (!lines.get(i).trim().isBlank()) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private int nextNonBlankIndex(List<String> lines, int startIndex) {
+        for (int i = startIndex; i < lines.size(); i++) {
+            if (!lines.get(i).trim().isBlank()) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private boolean isCitationIndex(boolean[] citationLines, int index) {
+        return index >= 0 && index < citationLines.length && citationLines[index];
+    }
+
+    private void addBodySegment(List<BodySegment> segments, String chunkType, StringBuilder content) {
+        String value = content.toString().trim();
+        if (!value.isBlank()) {
+            segments.add(new BodySegment(chunkType, value));
         }
     }
 
@@ -650,7 +989,7 @@ public class MarkdownChunkingService {
             int split = findBestSplit(value, start, hardEnd);
             chunks.add(value.substring(start, split).trim());
             if (split >= value.length()) break;
-            start = Math.max(start + 1, split - OVERLAP_SIZE);
+            start = Math.max(start + 1, overlapStart(value, split, OVERLAP_SIZE));
         }
         return chunks;
     }
@@ -704,7 +1043,22 @@ public class MarkdownChunkingService {
     private String tail(String input, int size) {
         if (input == null || input.isBlank()) return "";
         if (input.length() <= size) return input;
-        return input.substring(input.length() - size);
+        return input.substring(overlapStart(input, input.length(), size));
+    }
+
+    private int overlapStart(String input, int endExclusive, int size) {
+        int start = Math.max(0, endExclusive - size);
+        if (start == 0) {
+            return start;
+        }
+        int cursor = start;
+        while (cursor < endExclusive && !Character.isWhitespace(input.charAt(cursor))) {
+            cursor++;
+        }
+        while (cursor < endExclusive && Character.isWhitespace(input.charAt(cursor))) {
+            cursor++;
+        }
+        return cursor >= endExclusive ? start : cursor;
     }
 
     private record Section(String header, String content) {
@@ -716,6 +1070,9 @@ public class MarkdownChunkingService {
     }
 
     private record Block(BlockType type, String content) {
+    }
+
+    private record BodySegment(String chunkType, String content) {
     }
 
     private record HeadingInfo(int level, String type, String title) {

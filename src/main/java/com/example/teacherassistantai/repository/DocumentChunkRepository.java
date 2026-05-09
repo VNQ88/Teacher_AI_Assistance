@@ -52,6 +52,7 @@ public interface DocumentChunkRepository extends JpaRepository<DocumentChunk, Lo
             FROM document_chunks dc
             WHERE dc.subject_id = :subjectId
               AND dc.embedding IS NOT NULL
+              AND upper(COALESCE(dc.chunk_type, 'TEXT')) <> 'CITATION'
               AND (
                     :sectionNumber IS NULL
                     OR lower(dc.content) LIKE ('%phan ' || :sectionNumber || '%')

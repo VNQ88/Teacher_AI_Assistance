@@ -58,7 +58,7 @@ class DocumentEnrichmentPromptBuilderTest {
 
         String prompt = promptBuilder.buildSectionSummaryPrompt(context);
 
-        assertThat(prompt).contains("Tao summary section");
+        assertThat(prompt).contains("Tao summary node");
         assertThat(prompt).contains("summaryMode bat buoc: SECTION_FROM_SUBSECTIONS_AND_DIRECT_CHUNKS");
         assertThat(prompt).contains("expectedChildCount: 1");
         assertThat(prompt).contains("nodeId: 101");

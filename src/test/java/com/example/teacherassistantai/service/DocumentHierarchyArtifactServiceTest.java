@@ -44,11 +44,13 @@ class DocumentHierarchyArtifactServiceTest {
         assertThat(hierarchy.get("documentId").asLong()).isEqualTo(99L);
         assertThat(hierarchy.get("chunkCount").asInt()).isGreaterThanOrEqualTo(3);
         assertThat(hierarchy.get("root").get("nodeType").asText()).isEqualTo("document");
+        assertThat(hierarchy.get("root").get("title").asText()).isEqualTo("Test document");
         assertThat(hierarchy.get("nodes").findValuesAsText("nodeType")).doesNotContain("parent");
 
         String[] jsonLines = artifacts.chunksJsonl().strip().split("\\R");
         assertThat(jsonLines).isNotEmpty();
         assertThat(artifacts.chunksJsonl()).contains("\"chunkType\":\"SUMMARY\"");
         assertThat(artifacts.chunksJsonl()).contains("\"chunkType\":\"REVIEW_QUESTIONS\"");
+        assertThat(artifacts.normalizedMarkdown()).doesNotContain("##### 1. Đây là heading giả trong tóm tắt");
     }
 }

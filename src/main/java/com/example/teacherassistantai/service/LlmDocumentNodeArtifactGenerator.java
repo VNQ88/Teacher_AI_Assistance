@@ -50,8 +50,9 @@ public class LlmDocumentNodeArtifactGenerator implements DocumentNodeArtifactGen
     @Override
     public DocumentNodeArtifactGenerationResult generateSummary(SummaryGenerationContext context) {
         String prompt = switch (context.summaryMode()) {
-            case SUBSECTION_FROM_CHUNKS, SECTION_FROM_CHUNKS_FALLBACK ->
+            case SUBSECTION_LEVEL2_FROM_CHUNKS, SUBSECTION_FROM_CHUNKS, SECTION_FROM_CHUNKS_FALLBACK ->
                     promptBuilder.buildLeafSummaryPrompt(context.document(), context.node(), context.directChunks());
+            case SUBSECTION_FROM_LEVEL2_AND_DIRECT_CHUNKS -> promptBuilder.buildSectionSummaryPrompt(context);
             case CHAPTER_FALLBACK -> context.childSummaries().isEmpty()
                     ? promptBuilder.buildLeafSummaryPrompt(context.document(), context.node(), context.directChunks())
                     : promptBuilder.buildParentSummaryPrompt(context);
@@ -133,7 +134,7 @@ public class LlmDocumentNodeArtifactGenerator implements DocumentNodeArtifactGen
                       "nodeTitle": "string",
                       "sectionPath": "string",
                       "nodeType": "string",
-                      "summaryMode": "SUBSECTION_FROM_CHUNKS|SECTION_FROM_CHUNKS_FALLBACK|CHAPTER_FALLBACK|PART_FALLBACK",
+                      "summaryMode": "SUBSECTION_LEVEL2_FROM_CHUNKS|SUBSECTION_FROM_CHUNKS|SECTION_FROM_CHUNKS_FALLBACK|CHAPTER_FALLBACK|PART_FALLBACK",
                       "summary": "string",
                       "keyPoints": ["string"],
                       "childSummaries": [],

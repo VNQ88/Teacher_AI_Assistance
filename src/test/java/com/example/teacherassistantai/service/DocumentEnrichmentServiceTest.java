@@ -190,6 +190,8 @@ class DocumentEnrichmentServiceTest {
                 .thenReturn(List.of(section, subsection));
         when(documentNodeRepository.findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(fixture.document().getId(), "subsection"))
                 .thenReturn(List.of(subsection));
+        when(documentNodeRepository.findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(fixture.document().getId(), "subsection_level2"))
+                .thenReturn(List.of());
         when(documentNodeRepository.findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(fixture.document().getId(), "section"))
                 .thenReturn(List.of(section));
         when(documentNodeRepository.findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(fixture.document().getId(), "chapter"))
@@ -224,7 +226,67 @@ class DocumentEnrichmentServiceTest {
     }
 
     @Test
-    void enrichNode_summary_doesNotGenerateParentWhenChildSummaryMissing() {
+    void enrichDocument_summaryOnly_generatesSubsectionLevel2BeforeSubsectionAndSection() {
+        Fixture fixture = fixture();
+        DocumentNode section = node(fixture.document(), 110L, "section", "Mục 1", null);
+        DocumentNode subsection = node(fixture.document(), 111L, "subsection", "Tiểu mục 1", section);
+        DocumentNode subsectionLevel2 = node(fixture.document(), 112L, "subsection_level2", "Tiểu mục 1.1", subsection);
+        DocumentChunk sectionChunk = chunk(fixture.document(), section, 210L, "Nội dung trực tiếp của mục");
+        DocumentChunk subsectionChunk = chunk(fixture.document(), subsection, 211L, "Nội dung trực tiếp của tiểu mục");
+        DocumentChunk subsectionLevel2Chunk = chunk(fixture.document(), subsectionLevel2, 212L, "Nội dung tiểu mục cấp hai");
+
+        List<SummaryMode> modes = new ArrayList<>();
+        DocumentNodeArtifactGenerator generator = summaryGenerator(modes);
+        DocumentEnrichmentService service = service(List.of(generator));
+        mockDocument(fixture.document());
+        when(documentNodeRepository.findByDocumentIdAndNodeTypeInOrderByOrderIndexAsc(anyLong(), any()))
+                .thenReturn(List.of(section, subsection, subsectionLevel2));
+        when(documentNodeRepository.findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(fixture.document().getId(), "subsection_level2"))
+                .thenReturn(List.of(subsectionLevel2));
+        when(documentNodeRepository.findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(fixture.document().getId(), "subsection"))
+                .thenReturn(List.of(subsection));
+        when(documentNodeRepository.findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(fixture.document().getId(), "section"))
+                .thenReturn(List.of(section));
+        when(documentNodeRepository.findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(fixture.document().getId(), "chapter"))
+                .thenReturn(List.of());
+        when(documentNodeRepository.findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(fixture.document().getId(), "part"))
+                .thenReturn(List.of());
+        when(documentNodeRepository.findByParentIdOrderByOrderIndexAsc(subsection.getId())).thenReturn(List.of(subsectionLevel2));
+        when(documentNodeRepository.findByParentIdOrderByOrderIndexAsc(section.getId())).thenReturn(List.of(subsection));
+        when(documentChunkRepository.findByDocumentIdAndNodeIdOrderBySourceOrderAsc(fixture.document().getId(), subsectionLevel2.getId()))
+                .thenReturn(List.of(subsectionLevel2Chunk));
+        when(documentChunkRepository.findByDocumentIdAndNodeIdOrderBySourceOrderAsc(fixture.document().getId(), subsection.getId()))
+                .thenReturn(List.of(subsectionChunk));
+        when(documentChunkRepository.findByDocumentIdAndNodeIdOrderBySourceOrderAsc(fixture.document().getId(), section.getId()))
+                .thenReturn(List.of(sectionChunk));
+        when(artifactRepository.findLatestCompletedSummaryByNodeId(
+                subsectionLevel2.getId(),
+                ragProperties.getEnrichment().getPromptVersion(),
+                ragProperties.getAi().getChatModel()
+        )).thenReturn(Optional.of(completedSummaryArtifact(fixture.document(), subsectionLevel2, "Tóm tắt cấp hai")));
+        when(artifactRepository.findLatestCompletedSummaryByNodeId(
+                subsection.getId(),
+                ragProperties.getEnrichment().getPromptVersion(),
+                ragProperties.getAi().getChatModel()
+        )).thenReturn(Optional.of(completedSummaryArtifact(fixture.document(), subsection, "Tóm tắt tiểu mục")));
+        when(artifactRepository.findByDocumentNodeIdAndArtifactTypeAndPromptVersionAndModelAndSourceHash(
+                anyLong(), any(), any(), any(), any()))
+                .thenReturn(Optional.empty());
+        when(artifactRepository.save(any(DocumentNodeArtifact.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        service.enrichDocument(fixture.document().getId(), false, List.of(DocumentNodeArtifactType.SUMMARY));
+
+        assertThat(modes).containsExactly(
+                SummaryMode.SUBSECTION_LEVEL2_FROM_CHUNKS,
+                SummaryMode.SUBSECTION_FROM_LEVEL2_AND_DIRECT_CHUNKS,
+                SummaryMode.SECTION_FROM_SUBSECTIONS_AND_DIRECT_CHUNKS
+        );
+        assertThat(fixture.document().getStatus()).isEqualTo(DocumentStatus.FULL_USE);
+    }
+
+    @Test
+    void enrichNode_summary_skipsParentWhenChildSummaryMissing() {
         Fixture fixture = fixture();
         DocumentNode section = DocumentNode.builder()
                 .document(fixture.document())
@@ -269,7 +331,8 @@ class DocumentEnrichmentServiceTest {
 
         ArgumentCaptor<DocumentNodeArtifact> artifactCaptor = ArgumentCaptor.forClass(DocumentNodeArtifact.class);
         verify(artifactRepository).save(artifactCaptor.capture());
-        assertThat(artifactCaptor.getValue().getStatus()).isEqualTo(DocumentNodeArtifactStatus.FAILED);
+        assertThat(artifactCaptor.getValue().getStatus()).isEqualTo(DocumentNodeArtifactStatus.SKIPPED);
+        assertThat(artifactCaptor.getValue().getErrorMessage()).contains("Missing completed child summaries");
         assertThat(modes).isEmpty();
     }
 
@@ -296,6 +359,95 @@ class DocumentEnrichmentServiceTest {
         assertThat(contexts.getFirst().summaryMode()).isEqualTo(SummaryMode.SUBSECTION_FROM_CHUNKS);
         assertThat(contexts.getFirst().directChunks()).containsExactly(chunk);
         assertThat(contexts.getFirst().childSummaries()).isEmpty();
+    }
+
+    @Test
+    void enrichNode_subsectionLevel2Summary_usesDirectChunks() {
+        Fixture fixture = fixture();
+        DocumentNode subsectionLevel2 = node(fixture.document(), 205L, "subsection_level2", "Tiểu mục cấp hai", null);
+        DocumentChunk chunk = chunk(fixture.document(), subsectionLevel2, 305L, "Nội dung tiểu mục cấp hai");
+        List<SummaryGenerationContext> contexts = new ArrayList<>();
+        DocumentEnrichmentService service = service(List.of(summaryContextGenerator(contexts)));
+        mockDocument(fixture.document());
+        when(documentNodeRepository.findById(subsectionLevel2.getId())).thenReturn(Optional.of(subsectionLevel2));
+        when(documentChunkRepository.findByDocumentIdAndNodeIdOrderBySourceOrderAsc(fixture.document().getId(), subsectionLevel2.getId()))
+                .thenReturn(List.of(chunk));
+        when(artifactRepository.findByDocumentNodeIdAndArtifactTypeAndPromptVersionAndModelAndSourceHash(
+                anyLong(), any(), any(), any(), any()))
+                .thenReturn(Optional.empty());
+        when(artifactRepository.save(any(DocumentNodeArtifact.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        service.enrichNode(subsectionLevel2.getId(), false, List.of(DocumentNodeArtifactType.SUMMARY));
+
+        assertThat(contexts).hasSize(1);
+        assertThat(contexts.getFirst().summaryMode()).isEqualTo(SummaryMode.SUBSECTION_LEVEL2_FROM_CHUNKS);
+        assertThat(contexts.getFirst().directChunks()).containsExactly(chunk);
+    }
+
+    @Test
+    void enrichNode_subsectionSummary_usesLevel2SummariesAndDirectChunks() {
+        Fixture fixture = fixture();
+        DocumentNode subsection = node(fixture.document(), 206L, "subsection", "Tiểu mục 1", null);
+        DocumentNode subsectionLevel2 = node(fixture.document(), 207L, "subsection_level2", "Tiểu mục 1.1", subsection);
+        DocumentChunk directChunk = chunk(fixture.document(), subsection, 306L, "Nội dung trực tiếp của tiểu mục");
+        List<SummaryGenerationContext> contexts = new ArrayList<>();
+        DocumentEnrichmentService service = service(List.of(summaryContextGenerator(contexts)));
+        mockDocument(fixture.document());
+        when(documentNodeRepository.findById(subsection.getId())).thenReturn(Optional.of(subsection));
+        when(documentNodeRepository.findByParentIdOrderByOrderIndexAsc(subsection.getId())).thenReturn(List.of(subsectionLevel2));
+        when(documentChunkRepository.findByDocumentIdAndNodeIdOrderBySourceOrderAsc(fixture.document().getId(), subsection.getId()))
+                .thenReturn(List.of(directChunk));
+        when(artifactRepository.findLatestCompletedSummaryByNodeId(
+                subsectionLevel2.getId(),
+                ragProperties.getEnrichment().getPromptVersion(),
+                ragProperties.getAi().getChatModel()
+        )).thenReturn(Optional.of(completedSummaryArtifact(fixture.document(), subsectionLevel2, "Tóm tắt cấp hai")));
+        when(artifactRepository.findByDocumentNodeIdAndArtifactTypeAndPromptVersionAndModelAndSourceHash(
+                anyLong(), any(), any(), any(), any()))
+                .thenReturn(Optional.empty());
+        when(artifactRepository.save(any(DocumentNodeArtifact.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        service.enrichNode(subsection.getId(), false, List.of(DocumentNodeArtifactType.SUMMARY));
+
+        assertThat(contexts).hasSize(1);
+        SummaryGenerationContext context = contexts.getFirst();
+        assertThat(context.summaryMode()).isEqualTo(SummaryMode.SUBSECTION_FROM_LEVEL2_AND_DIRECT_CHUNKS);
+        assertThat(context.childSummaries()).hasSize(1);
+        assertThat(context.childSummaries().getFirst().nodeId()).isEqualTo(subsectionLevel2.getId());
+        assertThat(context.directChunks()).containsExactly(directChunk);
+    }
+
+    @Test
+    void enrichNode_emptySummaryInput_persistsSkippedArtifact() {
+        Fixture fixture = fixture();
+        DocumentNode subsection = node(fixture.document(), 208L, "subsection", "Tiểu mục rỗng", null);
+        List<SummaryGenerationContext> contexts = new ArrayList<>();
+        DocumentEnrichmentService service = service(List.of(summaryContextGenerator(contexts)));
+        mockDocument(fixture.document());
+        when(documentNodeRepository.findById(subsection.getId())).thenReturn(Optional.of(subsection));
+        when(documentNodeRepository.findByParentIdOrderByOrderIndexAsc(subsection.getId())).thenReturn(List.of());
+        when(documentChunkRepository.findByDocumentIdAndNodeIdOrderBySourceOrderAsc(fixture.document().getId(), subsection.getId()))
+                .thenReturn(List.of());
+        when(nodeScopeService.getScope(subsection.getId()))
+                .thenReturn(new DocumentNodeScopeService.NodeScope(subsection, List.of(), "empty-source"));
+        when(artifactRepository.findByDocumentNodeIdAndArtifactTypeAndPromptVersionAndModelAndSourceHash(
+                anyLong(), any(), any(), any(), any()))
+                .thenReturn(Optional.empty());
+        when(artifactRepository.save(any(DocumentNodeArtifact.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        service.enrichNode(subsection.getId(), false, List.of(DocumentNodeArtifactType.SUMMARY));
+
+        ArgumentCaptor<DocumentNodeArtifact> artifactCaptor = ArgumentCaptor.forClass(DocumentNodeArtifact.class);
+        verify(artifactRepository).save(artifactCaptor.capture());
+        DocumentNodeArtifact artifact = artifactCaptor.getValue();
+        assertThat(artifact.getStatus()).isEqualTo(DocumentNodeArtifactStatus.SKIPPED);
+        assertThat(artifact.getErrorMessage()).contains("No chunks available");
+        assertThat(artifact.getContentJsonb())
+                .containsEntry("summaryMode", SummaryMode.SUBSECTION_FROM_CHUNKS.name());
+        assertThat(contexts).isEmpty();
     }
 
     @Test
@@ -395,6 +547,8 @@ class DocumentEnrichmentServiceTest {
                 .thenReturn(List.of(fixture.node()));
         when(documentNodeRepository.findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(fixture.document().getId(), "chapter"))
                 .thenReturn(List.of(fixture.node()));
+        when(documentNodeRepository.findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(fixture.document().getId(), "subsection_level2"))
+                .thenReturn(List.of());
         when(documentNodeRepository.findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(fixture.document().getId(), "subsection"))
                 .thenReturn(List.of());
         when(documentNodeRepository.findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(fixture.document().getId(), "section"))

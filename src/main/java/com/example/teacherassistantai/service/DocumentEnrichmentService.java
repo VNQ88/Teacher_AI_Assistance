@@ -40,8 +40,8 @@ import java.util.Set;
 @Slf4j
 public class DocumentEnrichmentService {
 
-    private static final Set<String> ENRICHABLE_NODE_TYPES = Set.of("part", "chapter", "section", "subsection");
-    private static final List<String> SUMMARY_NODE_ORDER = List.of("subsection", "section", "chapter", "part");
+    private static final Set<String> ENRICHABLE_NODE_TYPES = Set.of("part", "chapter", "section", "subsection", "subsection_level2");
+    private static final List<String> SUMMARY_NODE_ORDER = List.of("subsection_level2", "subsection", "section", "chapter", "part");
     private static final String PHASE_4_GENERATOR_MISSING =
             "Artifact generation is not available until Phase 4 prompt/LLM generator is implemented";
 
@@ -241,8 +241,8 @@ public class DocumentEnrichmentService {
 
         if (input.dependencyError() != null) {
             upsertArtifact(existing, document, node, DocumentNodeArtifactType.SUMMARY, promptVersion, model, sourceHash,
-                    DocumentNodeArtifactStatus.FAILED, dependencyFailureContent(node, sourceHash, input), input.dependencyError(), null);
-            return ArtifactOutcome.generatedFailed();
+                    DocumentNodeArtifactStatus.SKIPPED, skippedSummaryContent(node, sourceHash, input), input.dependencyError(), null);
+            return ArtifactOutcome.generatedSkipped(input.dependencyError());
         }
 
         DocumentNodeArtifactGenerator generator = findSummaryGenerator(input.summaryMode());
@@ -250,7 +250,7 @@ public class DocumentEnrichmentService {
             upsertArtifact(existing, document, node, DocumentNodeArtifactType.SUMMARY, promptVersion, model, sourceHash,
                     DocumentNodeArtifactStatus.SKIPPED, skippedContent(node, DocumentNodeArtifactType.SUMMARY, sourceHash),
                     PHASE_4_GENERATOR_MISSING, null);
-            return ArtifactOutcome.generatedSkipped();
+            return ArtifactOutcome.generatedSkipped(PHASE_4_GENERATOR_MISSING);
         }
 
         try {
@@ -279,7 +279,8 @@ public class DocumentEnrichmentService {
 
     private SummaryInput resolveSummaryInput(Document document, DocumentNode node) {
         return switch (node.getNodeType()) {
-            case "subsection" -> chunksSummaryInput(document, node, SummaryMode.SUBSECTION_FROM_CHUNKS);
+            case "subsection_level2" -> chunksSummaryInput(document, node, SummaryMode.SUBSECTION_LEVEL2_FROM_CHUNKS);
+            case "subsection" -> subsectionSummaryInput(document, node);
             case "section" -> sectionSummaryInput(document, node);
             case "chapter" -> parentSummaryInput(document, node, "section", SummaryMode.CHAPTER_FROM_SECTIONS, SummaryMode.CHAPTER_FALLBACK);
             case "part" -> parentSummaryInput(document, node, "chapter", SummaryMode.PART_FROM_CHAPTERS, SummaryMode.PART_FALLBACK);
@@ -287,30 +288,34 @@ public class DocumentEnrichmentService {
         };
     }
 
+    private SummaryInput subsectionSummaryInput(Document document, DocumentNode node) {
+        List<DocumentNode> children = directChildrenOfType(node, "subsection_level2");
+        if (children.isEmpty()) {
+            return chunksSummaryInput(document, node, SummaryMode.SUBSECTION_FROM_CHUNKS);
+        }
+        return childBackedSummaryInput(
+                document,
+                node,
+                children,
+                SummaryMode.SUBSECTION_FROM_LEVEL2_AND_DIRECT_CHUNKS,
+                true
+        );
+    }
+
     private SummaryInput sectionSummaryInput(Document document, DocumentNode node) {
         List<DocumentNode> subsections = directChildrenOfType(node, "subsection");
         if (subsections.isEmpty()) {
+            subsections = directChildrenOfType(node, "subsection_level2");
+        }
+        if (subsections.isEmpty()) {
             return chunksSummaryInput(document, node, SummaryMode.SECTION_FROM_CHUNKS_FALLBACK);
         }
-        ChildSummaryResolution childResolution = childSummaries(subsections);
-        List<DocumentChunk> directChunks = representativeDirectChunks(document, node);
-        SummaryCoverage coverage = new SummaryCoverage(
-                subsections.size(),
-                childResolution.childSummaries().size(),
-                childResolution.missingNodeIds(),
-                directChunks.size(),
-                directChunks.size(),
-                childResolution.missingNodeIds().isEmpty()
-        );
-        String dependencyError = childResolution.missingNodeIds().isEmpty()
-                ? null
-                : "Missing completed child summaries for node ids: " + childResolution.missingNodeIds();
-        return new SummaryInput(
+        return childBackedSummaryInput(
+                document,
+                node,
+                subsections,
                 SummaryMode.SECTION_FROM_SUBSECTIONS_AND_DIRECT_CHUNKS,
-                directChunks,
-                childResolution.childSummaries(),
-                coverage,
-                dependencyError
+                true
         );
     }
 
@@ -345,6 +350,35 @@ public class DocumentEnrichmentService {
         return new SummaryInput(mode, List.of(), childResolution.childSummaries(), coverage, dependencyError);
     }
 
+    private SummaryInput childBackedSummaryInput(Document document,
+                                                 DocumentNode node,
+                                                 List<DocumentNode> children,
+                                                 SummaryMode summaryMode,
+                                                 boolean includeDirectChunks) {
+        ChildSummaryResolution childResolution = childSummaries(children);
+        List<DocumentChunk> directChunks = includeDirectChunks
+                ? representativeDirectChunks(document, node)
+                : List.of();
+        SummaryCoverage coverage = new SummaryCoverage(
+                children.size(),
+                childResolution.childSummaries().size(),
+                childResolution.missingNodeIds(),
+                directChunks.size(),
+                directChunks.size(),
+                childResolution.missingNodeIds().isEmpty()
+        );
+        String dependencyError = childResolution.missingNodeIds().isEmpty()
+                ? null
+                : "Missing completed child summaries for node ids: " + childResolution.missingNodeIds();
+        return new SummaryInput(
+                summaryMode,
+                directChunks,
+                childResolution.childSummaries(),
+                coverage,
+                dependencyError
+        );
+    }
+
     private SummaryInput chunksSummaryInput(Document document, DocumentNode node, SummaryMode summaryMode) {
         List<DocumentChunk> chunks = directChunks(document, node);
         if (chunks.isEmpty()) {
@@ -374,8 +408,8 @@ public class DocumentEnrichmentService {
             return List.of();
         }
         List<String> candidateTypes = "chapter".equals(preferredChildType)
-                ? List.of("section", "subsection")
-                : List.of("subsection");
+                ? List.of("section", "subsection", "subsection_level2")
+                : List.of("subsection", "subsection_level2");
         List<DocumentNode> directChildren = documentNodeRepository.findByParentIdOrderByOrderIndexAsc(node.getId());
         for (String candidateType : candidateTypes) {
             List<DocumentNode> matches = directChildren.stream()
@@ -474,7 +508,7 @@ public class DocumentEnrichmentService {
         if (generator == null) {
             upsertArtifact(existing, document, node, artifactType, promptVersion, model, sourceHash,
                     DocumentNodeArtifactStatus.SKIPPED, skippedContent(node, artifactType, sourceHash), PHASE_4_GENERATOR_MISSING, null);
-            return ArtifactOutcome.generatedSkipped();
+            return ArtifactOutcome.generatedSkipped(PHASE_4_GENERATOR_MISSING);
         }
 
         try {
@@ -630,8 +664,36 @@ public class DocumentEnrichmentService {
     private Map<String, Object> skippedContent(DocumentNode node,
                                                DocumentNodeArtifactType artifactType,
                                                String sourceHash) {
+        return skippedContent(node, artifactType, sourceHash, PHASE_4_GENERATOR_MISSING);
+    }
+
+    private Map<String, Object> skippedContent(DocumentNode node,
+                                               DocumentNodeArtifactType artifactType,
+                                               String sourceHash,
+                                               String reason) {
         Map<String, Object> content = baseContent(node, artifactType, sourceHash);
-        content.put("reason", PHASE_4_GENERATOR_MISSING);
+        content.put("reason", reason);
+        return content;
+    }
+
+    private Map<String, Object> skippedSummaryContent(DocumentNode node,
+                                                      String sourceHash,
+                                                      SummaryInput input) {
+        Map<String, Object> content = skippedContent(
+                node,
+                DocumentNodeArtifactType.SUMMARY,
+                sourceHash,
+                input.dependencyError()
+        );
+        content.put("summaryMode", input.summaryMode().name());
+        content.put("coverage", Map.of(
+                "expectedChildCount", input.coverage().expectedChildCount(),
+                "usedChildCount", input.coverage().usedChildCount(),
+                "missingChildNodeIds", input.coverage().missingChildNodeIds(),
+                "directChunkCount", input.coverage().directChunkCount(),
+                "usedDirectChunkCount", input.coverage().usedDirectChunkCount(),
+                "complete", input.coverage().complete()
+        ));
         return content;
     }
 
@@ -649,23 +711,6 @@ public class DocumentEnrichmentService {
                                                Exception ex) {
         Map<String, Object> content = baseContent(node, artifactType, sourceHash);
         content.put("error", ex.getMessage());
-        return content;
-    }
-
-    private Map<String, Object> dependencyFailureContent(DocumentNode node,
-                                                         String sourceHash,
-                                                         SummaryInput input) {
-        Map<String, Object> content = baseContent(node, DocumentNodeArtifactType.SUMMARY, sourceHash);
-        content.put("summaryMode", input.summaryMode().name());
-        content.put("coverage", Map.of(
-                "expectedChildCount", input.coverage().expectedChildCount(),
-                "usedChildCount", input.coverage().usedChildCount(),
-                "missingChildNodeIds", input.coverage().missingChildNodeIds(),
-                "directChunkCount", input.coverage().directChunkCount(),
-                "usedDirectChunkCount", input.coverage().usedDirectChunkCount(),
-                "complete", input.coverage().complete()
-        ));
-        content.put("error", input.dependencyError());
         return content;
     }
 
@@ -719,8 +764,8 @@ public class DocumentEnrichmentService {
             document.setEnrichmentCompletedAt(LocalDateTime.now());
             if (summary.total() == 0 || summary.skipped() == summary.total()) {
                 document.setEnrichmentStatus(DocumentEnrichmentStatus.SKIPPED);
-                document.setEnrichmentError(PHASE_4_GENERATOR_MISSING);
-            } else if (summary.completed() == summary.total()) {
+                document.setEnrichmentError(summary.primarySkippedReason());
+            } else if (summary.failed() == 0 && summary.completed() > 0) {
                 document.setStatus(DocumentStatus.FULL_USE);
                 document.setEnrichmentStatus(DocumentEnrichmentStatus.ENRICHED);
                 document.setEnrichmentError(null);
@@ -741,31 +786,47 @@ public class DocumentEnrichmentService {
         return status == DocumentStatus.READY || status == DocumentStatus.FULL_USE;
     }
 
-    private record ArtifactOutcome(boolean completed, boolean failed, boolean skipped) {
+    private record ArtifactOutcome(boolean completed, boolean failed, boolean skipped, String skippedReason) {
         static ArtifactOutcome generatedCompleted() {
-            return new ArtifactOutcome(true, false, false);
+            return new ArtifactOutcome(true, false, false, null);
         }
 
         static ArtifactOutcome existingCompleted() {
-            return new ArtifactOutcome(true, false, false);
+            return new ArtifactOutcome(true, false, false, null);
         }
 
         static ArtifactOutcome generatedFailed() {
-            return new ArtifactOutcome(false, true, false);
+            return new ArtifactOutcome(false, true, false, null);
         }
 
-        static ArtifactOutcome generatedSkipped() {
-            return new ArtifactOutcome(false, false, true);
+        static ArtifactOutcome generatedSkipped(String reason) {
+            return new ArtifactOutcome(false, false, true, reason);
         }
     }
 
-    private record ArtifactSummary(int total, int completed, int failed, int skipped) {
+    private record ArtifactSummary(int total, int completed, int failed, int skipped, List<String> skippedReasons) {
         static ArtifactSummary from(List<ArtifactOutcome> outcomes) {
             List<ArtifactOutcome> safeOutcomes = outcomes == null ? List.of() : outcomes;
             int completed = (int) safeOutcomes.stream().filter(ArtifactOutcome::completed).count();
             int failed = (int) safeOutcomes.stream().filter(ArtifactOutcome::failed).count();
             int skipped = (int) safeOutcomes.stream().filter(ArtifactOutcome::skipped).count();
-            return new ArtifactSummary(safeOutcomes.size(), completed, failed, skipped);
+            List<String> skippedReasons = safeOutcomes.stream()
+                    .filter(ArtifactOutcome::skipped)
+                    .map(ArtifactOutcome::skippedReason)
+                    .filter(reason -> reason != null && !reason.isBlank())
+                    .distinct()
+                    .toList();
+            return new ArtifactSummary(safeOutcomes.size(), completed, failed, skipped, skippedReasons);
+        }
+
+        String primarySkippedReason() {
+            if (skippedReasons.isEmpty()) {
+                return "All enrichment artifacts were skipped";
+            }
+            if (skippedReasons.size() == 1) {
+                return skippedReasons.getFirst();
+            }
+            return "All enrichment artifacts were skipped: " + skippedReasons;
         }
     }
 

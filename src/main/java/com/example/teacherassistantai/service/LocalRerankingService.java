@@ -95,7 +95,13 @@ public class LocalRerankingService {
         List<ScoredChunk> allowed = scored.stream()
                 .filter(scoredChunk -> isAllowedChunkType(scoredChunk.chunk(), intent))
                 .toList();
-        return allowed.isEmpty() ? scored : allowed;
+        if (!allowed.isEmpty()) {
+            return allowed;
+        }
+        List<ScoredChunk> nonCitation = scored.stream()
+                .filter(scoredChunk -> !chunkType(scoredChunk.chunk()).equals("CITATION"))
+                .toList();
+        return nonCitation.isEmpty() ? scored : nonCitation;
     }
 
     private ParentSelection selectParentAware(List<ScoredChunk> scored, int safeTopK) {
@@ -218,8 +224,8 @@ public class LocalRerankingService {
     private boolean isAllowedChunkType(DocumentChunk chunk, RetrievalIntent intent) {
         String chunkType = chunkType(chunk);
         return switch (intent.type()) {
-            case REVIEW_QUESTIONS -> chunkType.equals("REVIEW_QUESTIONS") || chunkType.equals("TEXT");
-            case SUMMARY -> chunkType.equals("SUMMARY") || chunkType.equals("TEXT");
+            case REVIEW_QUESTIONS -> chunkType.equals("REVIEW_QUESTIONS") || chunkType.equals("TEXT") || chunkType.equals("SUMMARY");
+            case SUMMARY -> chunkType.equals("SUMMARY") || chunkType.equals("TEXT") || chunkType.equals("REVIEW_QUESTIONS");
             case FACTUAL -> chunkType.equals("TEXT") || chunkType.equals("SUMMARY");
         };
     }
@@ -229,17 +235,22 @@ public class LocalRerankingService {
         return switch (intent.type()) {
             case REVIEW_QUESTIONS -> switch (chunkType) {
                 case "REVIEW_QUESTIONS" -> 0.35;
+                case "SUMMARY" -> 0.02;
                 case "TEXT" -> 0.05;
+                case "CITATION" -> -1.00;
                 default -> -0.20;
             };
             case SUMMARY -> switch (chunkType) {
                 case "SUMMARY" -> 0.30;
                 case "TEXT" -> 0.05;
+                case "REVIEW_QUESTIONS" -> -0.10;
+                case "CITATION" -> -1.00;
                 default -> -0.30;
             };
             case FACTUAL -> switch (chunkType) {
                 case "TEXT" -> 0.12;
                 case "SUMMARY" -> -0.05;
+                case "CITATION" -> -1.00;
                 default -> -0.50;
             };
         };

@@ -28,7 +28,7 @@ public class DocumentChunkIngestionService {
     @Transactional
     public List<DocumentChunk> ingest(Document document, String markdown) {
         MarkdownChunkingService.HierarchicalMarkdownDocument hierarchyDocument =
-                markdownChunkingService.parseHierarchicalDocument(markdown);
+                markdownChunkingService.parseHierarchicalDocument(markdown, document.getTitle());
         return ingest(document, hierarchyDocument, Map.of());
     }
 

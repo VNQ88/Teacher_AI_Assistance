@@ -21,7 +21,7 @@ public class DocumentHierarchyArtifactService {
 
     public Artifacts buildArtifacts(Document document, String markdown) {
         MarkdownChunkingService.HierarchicalMarkdownDocument hierarchyDocument =
-                markdownChunkingService.parseHierarchicalDocument(markdown);
+                markdownChunkingService.parseHierarchicalDocument(markdown, document.getTitle());
         List<HierarchicalMarkdownChunk> chunks = hierarchyDocument.chunks();
         return new Artifacts(
                 hierarchyDocument,
