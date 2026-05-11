@@ -12,9 +12,15 @@ import com.example.teacherassistantai.entity.Document;
 import com.example.teacherassistantai.entity.DocumentChunk;
 import com.example.teacherassistantai.entity.Subject;
 import com.example.teacherassistantai.entity.User;
-import com.example.teacherassistantai.integration.ai.AiChatGateway;
 import com.example.teacherassistantai.repository.AgentLogRepository;
 import com.example.teacherassistantai.repository.ChatMessageRepository;
+import com.example.teacherassistantai.repository.DocumentRepository;
+import com.example.teacherassistantai.service.agent.AgentResult;
+import com.example.teacherassistantai.service.agent.DocumentScopeAgent;
+import com.example.teacherassistantai.service.agent.FactualQaAgent;
+import com.example.teacherassistantai.service.agent.QuizAgent;
+import com.example.teacherassistantai.service.agent.RagChatOrchestrator;
+import com.example.teacherassistantai.service.agent.SummaryAgent;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageImpl;
 
@@ -23,9 +29,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -35,27 +38,24 @@ class RagChatServiceSourceTrackingTest {
     void sendMessage_shouldReturnDetailedSourceMetadataForCitations() {
         ChatSessionService chatSessionService = mock(ChatSessionService.class);
         ChatMessageRepository chatMessageRepository = mock(ChatMessageRepository.class);
-        VectorRetrievalService retrievalService = mock(VectorRetrievalService.class);
-        RagPromptBuilderService promptBuilderService = mock(RagPromptBuilderService.class);
-        RagConfidenceService confidenceService = mock(RagConfidenceService.class);
-        AiChatGateway aiChatGateway = mock(AiChatGateway.class);
         AgentLogRepository agentLogRepository = mock(AgentLogRepository.class);
+        FactualQaAgent factualQaAgent = mock(FactualQaAgent.class);
 
         RagProperties ragProperties = new RagProperties();
         ragProperties.setTopK(2);
         ragProperties.setMaxHistoryMessages(5);
 
-        RagChatService service = new RagChatService(
+        RagChatOrchestrator orchestrator = new RagChatOrchestrator(
                 chatSessionService,
                 chatMessageRepository,
-                retrievalService,
-                promptBuilderService,
-                confidenceService,
-                aiChatGateway,
                 agentLogRepository,
                 ragProperties,
                 mock(RagIntentRouterService.class),
-                mock(RagArtifactChatHandlerService.class)
+                mock(DocumentRepository.class),
+                factualQaAgent,
+                mock(DocumentScopeAgent.class),
+                mock(SummaryAgent.class),
+                mock(QuizAgent.class)
         );
 
         ChatSession session = session();
@@ -75,14 +75,11 @@ class RagChatServiceSourceTrackingTest {
         });
         when(chatMessageRepository.findBySessionIdOrderByCreatedAtDesc(any(), any()))
                 .thenReturn(new PageImpl<>(List.of()));
-        when(retrievalService.retrieve(session, request.getQuestion(), 1)).thenReturn(List.of(source));
-        when(promptBuilderService.buildPrompt(anyString(), anyList(), anyList())).thenReturn("prompt");
-        when(aiChatGateway.generateAnswer(anyString(), anyDouble()))
-                .thenReturn("Vật chất là ... [Source 1, pages 12-13]");
-        when(confidenceService.score(anyString(), anyList(), anyString())).thenReturn(0.82);
-        when(confidenceService.level(0.82)).thenReturn("HIGH");
+        when(factualQaAgent.execute(any()))
+                .thenReturn(new AgentResult("Vật chất là ... [Source 1, pages 12-13]",
+                        List.of(source), 0.82, "HIGH", false, false));
 
-        ChatMessageResponse response = service.sendMessage(5L, request);
+        ChatMessageResponse response = orchestrator.execute(5L, request);
 
         assertThat(response.getSources()).containsExactly("Giao trinh Triet hoc");
         assertThat(response.getSourceDetails()).hasSize(1);
@@ -103,17 +100,17 @@ class RagChatServiceSourceTrackingTest {
     void getHistory_shouldReturnSourceDetailsFromStoredMessageSourceChunks() {
         ChatSessionService chatSessionService = mock(ChatSessionService.class);
         ChatMessageRepository chatMessageRepository = mock(ChatMessageRepository.class);
-        RagChatService service = new RagChatService(
+        RagChatOrchestrator orchestrator = new RagChatOrchestrator(
                 chatSessionService,
                 chatMessageRepository,
-                mock(VectorRetrievalService.class),
-                mock(RagPromptBuilderService.class),
-                mock(RagConfidenceService.class),
-                mock(AiChatGateway.class),
                 mock(AgentLogRepository.class),
                 new RagProperties(),
                 mock(RagIntentRouterService.class),
-                mock(RagArtifactChatHandlerService.class)
+                mock(DocumentRepository.class),
+                mock(FactualQaAgent.class),
+                mock(DocumentScopeAgent.class),
+                mock(SummaryAgent.class),
+                mock(QuizAgent.class)
         );
 
         ChatSession session = session();
@@ -129,7 +126,7 @@ class RagChatServiceSourceTrackingTest {
         when(chatMessageRepository.findBySessionIdOrderByCreatedAtAsc(5L))
                 .thenReturn(List.of(assistantMessage));
 
-        List<ChatMessageResponse> history = service.getHistory(5L);
+        List<ChatMessageResponse> history = orchestrator.getHistory(5L);
 
         assertThat(history).hasSize(1);
         assertThat(history.getFirst().getSourceDetails()).hasSize(1);

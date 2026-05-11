@@ -33,18 +33,25 @@ class DocumentChunkIngestionServiceHierarchyTest {
         }).when(chunkRepository).save(any(DocumentChunk.class));
 
         AiEmbeddingGateway embeddingGateway = mock(AiEmbeddingGateway.class);
-        org.mockito.Mockito.when(embeddingGateway.embed(any()))
-                .thenReturn(IntStream.range(0, 4).mapToObj(i -> 0.1d).toList());
+        List<Double> fakeEmbedding = IntStream.range(0, 4).mapToObj(i -> 0.1d).toList();
+        org.mockito.Mockito.when(embeddingGateway.embedAll(any()))
+                .thenAnswer(inv -> {
+                    List<String> inputs = inv.getArgument(0);
+                    return inputs.stream().map(t -> fakeEmbedding).toList();
+                });
 
         RagProperties ragProperties = new RagProperties();
         ragProperties.setEmbeddingDimensions(4);
+        ragProperties.setEmbeddingBatchSize(64);
+        ragProperties.setEmbeddingConcurrency(1);
 
         DocumentChunkIngestionService service = new DocumentChunkIngestionService(
                 new MarkdownChunkingService(),
                 new ChunkMetadataBuilder(),
                 embeddingGateway,
                 chunkRepository,
-                ragProperties
+                ragProperties,
+                mock(org.springframework.transaction.PlatformTransactionManager.class)
         );
 
         Subject subject = Subject.builder().name("Subject").code("SUB").build();

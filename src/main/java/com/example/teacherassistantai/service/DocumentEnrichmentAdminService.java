@@ -85,9 +85,6 @@ public class DocumentEnrichmentAdminService {
         } else {
             artifactRepository.deleteByDocumentIdAndArtifactTypeIn(documentId, artifactTypes);
         }
-        if (document.getStatus() == DocumentStatus.FULL_USE) {
-            document.setStatus(DocumentStatus.READY);
-        }
         document.setEnrichmentStatus(DocumentEnrichmentStatus.NOT_STARTED);
         document.setEnrichmentStartedAt(null);
         document.setEnrichmentCompletedAt(null);
@@ -98,15 +95,13 @@ public class DocumentEnrichmentAdminService {
     private Document markQueued(Long documentId, boolean forceRegenerate) {
         Document document = documentRepository.findById(documentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + documentId));
-        if (document.getStatus() != DocumentStatus.READY && document.getStatus() != DocumentStatus.FULL_USE) {
-            throw new InvalidDataException("Document must be READY or FULL_USE before enrichment can run");
-        }
-        if (forceRegenerate && document.getStatus() == DocumentStatus.FULL_USE) {
-            document.setStatus(DocumentStatus.READY);
+        if (document.getStatus() != DocumentStatus.READY && document.getStatus() != DocumentStatus.FAILED) {
+            throw new InvalidDataException("Document must be in READY or FAILED status before enrichment can run");
         }
         document.setEnrichmentStatus(DocumentEnrichmentStatus.QUEUED);
         document.setEnrichmentCompletedAt(null);
         document.setEnrichmentError(null);
+        document.setEnrichmentRetryCount(0);
         return documentRepository.save(document);
     }
 

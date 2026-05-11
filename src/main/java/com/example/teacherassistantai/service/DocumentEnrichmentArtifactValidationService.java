@@ -296,12 +296,22 @@ public class DocumentEnrichmentArtifactValidationService {
         int usedChildCount = requireInt(coverage, "usedChildCount", "coverage.usedChildCount is required");
         int directChunkCount = requireInt(coverage, "directChunkCount", "coverage.directChunkCount is required");
         int usedDirectChunkCount = requireInt(coverage, "usedDirectChunkCount", "coverage.usedDirectChunkCount is required");
+        int fallbackChildCount = coverage.path("fallbackChildCount").asInt(0);
         List<Long> missingChildNodeIds = requireLongArray(coverage.path("missingChildNodeIds"), "coverage.missingChildNodeIds");
         if (!missingChildNodeIds.isEmpty()) {
             throw new InvalidDataException("coverage.missingChildNodeIds must be empty when coverage is complete");
         }
         if (usedChildCount > expectedChildCount) {
             throw new InvalidDataException("coverage.usedChildCount cannot exceed expectedChildCount");
+        }
+        if (fallbackChildCount < 0 || fallbackChildCount > expectedChildCount) {
+            throw new InvalidDataException("coverage.fallbackChildCount out of range");
+        }
+        if (expectedChildCount > 0 && usedChildCount + fallbackChildCount < expectedChildCount) {
+            throw new InvalidDataException(
+                    "coverage incomplete: expected=" + expectedChildCount
+                            + " used=" + usedChildCount
+                            + " fallback=" + fallbackChildCount);
         }
         if (usedDirectChunkCount > directChunkCount) {
             throw new InvalidDataException("coverage.usedDirectChunkCount cannot exceed directChunkCount");
@@ -313,6 +323,7 @@ public class DocumentEnrichmentArtifactValidationService {
                 || usedChildCount != expectedCoverage.usedChildCount()
                 || directChunkCount != expectedCoverage.directChunkCount()
                 || usedDirectChunkCount != expectedCoverage.usedDirectChunkCount()
+                || fallbackChildCount != expectedCoverage.fallbackChildCount()
                 || !Objects.equals(missingChildNodeIds, expectedCoverage.missingChildNodeIds())) {
             throw new InvalidDataException("coverage does not match expected summary input");
         }

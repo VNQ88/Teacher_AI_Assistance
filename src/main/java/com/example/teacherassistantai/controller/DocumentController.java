@@ -73,6 +73,15 @@ public class DocumentController {
                 documentService.getDocuments(subjectId, status, pageNo, pageSize));
     }
 
+    @PostMapping("/{documentId}/reprocess")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
+    @Operation(summary = "Reprocess document", description = "Reset a FAILED document to UPLOADED and re-trigger the full processing pipeline")
+    public ResponseData<DocumentResponse> reprocessDocument(@PathVariable @Min(1) Long documentId) {
+        log.info("Reprocess document request: id={}", documentId);
+        return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Document reprocessing started",
+                documentService.reprocessDocument(documentId));
+    }
+
     @DeleteMapping("/{documentId}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
     @Operation(summary = "Delete document", description = "Delete document, all related chunks, and storage objects")

@@ -53,7 +53,7 @@ class DocumentEnrichmentAdminServiceTest {
 
     @Test
     void getDocumentArtifacts_mapsArtifactAndNodeMetadata() {
-        Document document = document(DocumentStatus.FULL_USE);
+        Document document = document(DocumentStatus.READY);
         DocumentNode node = node(document);
         DocumentNodeArtifact artifact = DocumentNodeArtifact.builder()
                 .document(document)
@@ -83,7 +83,7 @@ class DocumentEnrichmentAdminServiceTest {
 
     @Test
     void enrichDocument_marksQueuedAndDispatchesAsyncService() {
-        Document document = document(DocumentStatus.FULL_USE);
+        Document document = document(DocumentStatus.READY);
         when(documentRepository.findById(10L)).thenReturn(Optional.of(document));
         when(documentRepository.save(any(Document.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -113,7 +113,7 @@ class DocumentEnrichmentAdminServiceTest {
 
     @Test
     void deleteArtifacts_deletesSelectedTypesAndResetsFullUseDocument() {
-        Document document = document(DocumentStatus.FULL_USE);
+        Document document = document(DocumentStatus.READY);
         when(documentRepository.findById(10L)).thenReturn(Optional.of(document));
         when(documentRepository.save(any(Document.class))).thenAnswer(invocation -> invocation.getArgument(0));
         DocumentEnrichmentRequest request = new DocumentEnrichmentRequest();

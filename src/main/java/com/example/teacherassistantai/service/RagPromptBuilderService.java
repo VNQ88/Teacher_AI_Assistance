@@ -25,8 +25,7 @@ public class RagPromptBuilderService {
         prompt.append("- If evidence is sufficient and consistent: provide a concise answer.\n");
         prompt.append("- If evidence is missing: state what is missing and ask exactly one concise clarification question; do not infer.\n");
         prompt.append("- If evidence conflicts: state the conflict clearly and ask exactly one concise clarification question; do not guess.\n");
-        prompt.append("- Cite supporting evidence using source index and page/path when available, e.g. [Source 1, pages 12-13].\n");
-        prompt.append("- Never cite raw chunk ids such as [Chunk <id>] in the final answer.\n");
+        prompt.append("- Do not include citations, source references, or chunk identifiers in the answer text.\n");
         prompt.append("- Always end the final answer with one suggested next question for the user.\n\n");
 
         prompt.append("Untrusted history (reference only):\n");
@@ -51,7 +50,7 @@ public class RagPromptBuilderService {
         prompt.append("<<<END_CONTEXT>>>\n");
 
         prompt.append("\nUser question: ").append(question).append("\n");
-        prompt.append("Return a concise Vietnamese answer in natural text, cite sources when using evidence, and include one suggested next question at the end.\n");
+        prompt.append("Return a concise Vietnamese answer in natural text without any citations or source references, and include one suggested next question at the end.\n");
         return prompt.toString();
     }
 

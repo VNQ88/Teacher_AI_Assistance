@@ -96,7 +96,7 @@ public class DocumentProcessingService {
         log.info("Persisted document hierarchical chunks and embeddings: documentId={}, chunkCount={}",
                 documentId, chunks.size());
 
-        document.setStatus(DocumentStatus.READY);
+        document.setStatus(DocumentStatus.SUMMARISING);
         document.setEnrichmentStatus(DocumentEnrichmentStatus.QUEUED);
         document.setEnrichmentError(null);
         documentRepository.save(document);

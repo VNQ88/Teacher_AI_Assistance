@@ -94,6 +94,10 @@ public class Document extends BaseEntity {
     @Column(name = "enrichment_error", columnDefinition = "TEXT")
     String enrichmentError;
 
+    @Column(name = "enrichment_retry_count", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
+    @Builder.Default
+    Integer enrichmentRetryCount = 0;
+
     @Column(columnDefinition = "TEXT")
     String processingError; // Lưu lỗi nếu status = FAILED
 

@@ -5,5 +5,6 @@ public enum DocumentNodeArtifactStatus {
     RUNNING,
     COMPLETED,
     FAILED,
-    SKIPPED
+    SKIPPED,
+    RATE_LIMITED
 }

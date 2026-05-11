@@ -20,7 +20,7 @@ class LlmDocumentNodeArtifactGeneratorTest {
 
     @Test
     void generate_returnsValidatedSummaryContent() {
-        LlmDocumentNodeArtifactGenerator generator = generator((prompt, temperature) -> """
+        LlmDocumentNodeArtifactGenerator generator = generator((prompt, temperature, workload) -> """
                 {
                   "summaryMode": "CHAPTER_FALLBACK",
                   "summary": "Tóm tắt hợp lệ.",
@@ -60,7 +60,7 @@ class LlmDocumentNodeArtifactGeneratorTest {
 
     @Test
     void generate_throwsWhenLlmJsonFailsValidation() {
-        LlmDocumentNodeArtifactGenerator generator = generator((prompt, temperature) -> """
+        LlmDocumentNodeArtifactGenerator generator = generator((prompt, temperature, workload) -> """
                 {
                   "summaryMode": "CHAPTER_FALLBACK",
                   "summary": "",
@@ -99,7 +99,7 @@ class LlmDocumentNodeArtifactGeneratorTest {
     @Test
     void generate_repairsInvalidJsonOnceBeforeFailingArtifact() {
         AtomicInteger callCount = new AtomicInteger();
-        LlmDocumentNodeArtifactGenerator generator = generator((prompt, temperature) -> {
+        LlmDocumentNodeArtifactGenerator generator = generator((prompt, temperature, workload) -> {
             if (callCount.incrementAndGet() == 1) {
                 return """
                         {

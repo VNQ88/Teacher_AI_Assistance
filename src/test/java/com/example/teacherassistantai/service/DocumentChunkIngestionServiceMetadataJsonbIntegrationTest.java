@@ -129,9 +129,13 @@ class DocumentChunkIngestionServiceMetadataJsonbIntegrationTest {
             return new AiEmbeddingGateway() {
                 @Override
                 public List<Double> embed(String input) {
-                    return IntStream.range(0, 1024)
-                            .mapToObj(i -> 0.01d)
-                            .toList();
+                    return IntStream.range(0, 1024).mapToObj(i -> 0.01d).toList();
+                }
+
+                @Override
+                public List<List<Double>> embedAll(List<String> inputs) {
+                    List<Double> vec = IntStream.range(0, 1024).mapToObj(i -> 0.01d).toList();
+                    return inputs.stream().map(t -> vec).toList();
                 }
 
                 @Override

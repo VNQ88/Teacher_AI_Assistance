@@ -3,14 +3,19 @@ package com.example.teacherassistantai.service;
 import com.example.teacherassistantai.common.enumerate.DocumentNodeArtifactType;
 import com.example.teacherassistantai.exception.InvalidDataException;
 import com.example.teacherassistantai.integration.ai.AiChatGateway;
+import com.example.teacherassistantai.integration.ai.AiWorkload;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class LlmDocumentNodeArtifactGenerator implements DocumentNodeArtifactGenerator {
+
+    private static final int PROMPT_WARN_CHARS = 200_000; // ~50K tokens
 
     private final AiChatGateway aiChatGateway;
     private final DocumentEnrichmentPromptBuilder promptBuilder;
@@ -34,7 +39,8 @@ public class LlmDocumentNodeArtifactGenerator implements DocumentNodeArtifactGen
                     context.maxQuestionCount()
             );
         };
-        String rawResponse = aiChatGateway.generateAnswer(prompt, 0.2);
+        warnIfLargePrompt(prompt, context.node().getId(), context.node().getNodeType(), context.artifactType().name());
+        String rawResponse = aiChatGateway.generateAnswer(prompt, 0.2, AiWorkload.BACKGROUND);
         Map<String, Object> content = parseOrRepair(context, prompt, rawResponse);
         return new DocumentNodeArtifactGenerationResult(
                 content,
@@ -63,7 +69,8 @@ public class LlmDocumentNodeArtifactGenerator implements DocumentNodeArtifactGen
             case CHAPTER_FROM_SECTIONS -> promptBuilder.buildParentSummaryPrompt(context);
             case PART_FROM_CHAPTERS -> promptBuilder.buildPartSummaryPrompt(context);
         };
-        String rawResponse = aiChatGateway.generateAnswer(prompt, 0.2);
+        warnIfLargePrompt(prompt, context.node().getId(), context.node().getNodeType(), context.summaryMode().name());
+        String rawResponse = aiChatGateway.generateAnswer(prompt, 0.2, AiWorkload.BACKGROUND);
         Map<String, Object> content = parseSummaryOrRepair(context, prompt, rawResponse);
         return new DocumentNodeArtifactGenerationResult(
                 content,
@@ -78,7 +85,7 @@ public class LlmDocumentNodeArtifactGenerator implements DocumentNodeArtifactGen
             return parse(context, rawResponse);
         } catch (InvalidDataException ex) {
             String repairPrompt = buildRepairPrompt(context, originalPrompt, rawResponse, ex.getMessage());
-            String repairedResponse = aiChatGateway.generateAnswer(repairPrompt, 0.0);
+            String repairedResponse = aiChatGateway.generateAnswer(repairPrompt, 0.0, AiWorkload.BACKGROUND);
             return parse(context, repairedResponse);
         }
     }
@@ -101,7 +108,7 @@ public class LlmDocumentNodeArtifactGenerator implements DocumentNodeArtifactGen
             return parseSummary(context, rawResponse);
         } catch (InvalidDataException ex) {
             String repairPrompt = buildSummaryRepairPrompt(context, originalPrompt, rawResponse, ex.getMessage());
-            String repairedResponse = aiChatGateway.generateAnswer(repairPrompt, 0.0);
+            String repairedResponse = aiChatGateway.generateAnswer(repairPrompt, 0.0, AiWorkload.BACKGROUND);
             return parseSummary(context, repairedResponse);
         }
     }
@@ -218,6 +225,13 @@ public class LlmDocumentNodeArtifactGenerator implements DocumentNodeArtifactGen
                 .append(rawResponse)
                 .append("\n<<<END_RESPONSE>>>\n");
         return prompt.toString();
+    }
+
+    private void warnIfLargePrompt(String prompt, Object nodeId, String nodeType, String mode) {
+        if (prompt != null && prompt.length() > PROMPT_WARN_CHARS) {
+            log.warn("Large prompt: nodeId={} nodeType={} mode={} chars={} (~{}K tokens)",
+                    nodeId, nodeType, mode, prompt.length(), prompt.length() / 4000);
+        }
     }
 
     private Integer estimateTokenCount(String prompt, String response) {

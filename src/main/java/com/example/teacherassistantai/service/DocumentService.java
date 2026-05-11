@@ -169,6 +169,25 @@ public class DocumentService {
         deleteDocument(documentId);
     }
 
+    @Transactional
+    public DocumentResponse reprocessDocument(Long documentId) {
+        Document document = documentRepository.findById(documentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + documentId));
+
+        User currentUser = getCurrentUser();
+        validateDeletePermission(document, currentUser);
+
+        document.setStatus(DocumentStatus.UPLOADED);
+        document.setProcessingError(null);
+        document.setEnrichmentStatus(DocumentEnrichmentStatus.NOT_STARTED);
+        document.setEnrichmentError(null);
+        Document saved = documentRepository.save(document);
+        log.info("Reprocessing document id={}", documentId);
+
+        triggerProcessingAfterCommit(documentId);
+        return toResponse(saved);
+    }
+
     private void validateUploadRequest(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new InvalidDataException("File is required");
@@ -272,7 +291,7 @@ public class DocumentService {
                 .enrichmentStatus(document.getEnrichmentStatus())
                 .enrichmentStatusLabel(enrichmentStatusLabel(document.getEnrichmentStatus()))
                 .ragReady(isRagReady(document.getStatus()))
-                .learningMaterialsReady(document.getStatus() == DocumentStatus.FULL_USE
+                .learningMaterialsReady(document.getStatus() == DocumentStatus.READY
                         && document.getEnrichmentStatus() == DocumentEnrichmentStatus.ENRICHED)
                 .processingError(document.getProcessingError())
                 .enrichmentError(document.getEnrichmentError())
@@ -284,7 +303,7 @@ public class DocumentService {
     }
 
     private boolean isRagReady(DocumentStatus status) {
-        return status == DocumentStatus.READY || status == DocumentStatus.FULL_USE;
+        return status == DocumentStatus.READY;
     }
 
     private String statusLabel(DocumentStatus status) {
@@ -296,8 +315,8 @@ public class DocumentService {
             case PARSING -> "Đang đọc";
             case CHUNKING -> "Đang chia đoạn";
             case EMBEDDING -> "Đang lập chỉ mục";
-            case READY -> "Sẵn sàng hỏi đáp";
-            case FULL_USE -> "Đủ học liệu";
+            case SUMMARISING -> "Đang tạo học liệu";
+            case READY -> "Sẵn sàng học tập";
             case FAILED -> "Lỗi xử lý";
         };
     }

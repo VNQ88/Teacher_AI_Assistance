@@ -1,5 +1,6 @@
 package com.example.teacherassistantai.exception;
 
+import com.example.teacherassistantai.exception.AiRateLimitedException;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -193,6 +194,18 @@ public class GlobalExceptionHandler {
         errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
         errorResponse.setStatus(BAD_GATEWAY.value());
         errorResponse.setError(BAD_GATEWAY.getReasonPhrase());
+        errorResponse.setMessage(e.getMessage());
+        return errorResponse;
+    }
+
+    @ExceptionHandler(AiRateLimitedException.class)
+    @ResponseStatus(TOO_MANY_REQUESTS)
+    public ErrorResponse handleAiRateLimitedException(AiRateLimitedException e, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(new Date());
+        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
+        errorResponse.setStatus(TOO_MANY_REQUESTS.value());
+        errorResponse.setError(TOO_MANY_REQUESTS.getReasonPhrase());
         errorResponse.setMessage(e.getMessage());
         return errorResponse;
     }

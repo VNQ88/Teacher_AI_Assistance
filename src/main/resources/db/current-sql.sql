@@ -176,11 +176,12 @@ create table documents
     status               varchar(255) default 'UPLOADED'::character varying not null
         constraint documents_status_check
             check ((status)::text = ANY
-                   ((ARRAY ['UPLOADED'::character varying, 'PARSING'::character varying, 'CHUNKING'::character varying, 'EMBEDDING'::character varying, 'READY'::character varying, 'FULL_USE'::character varying, 'FAILED'::character varying])::text[])),
+                   ((ARRAY ['UPLOADED'::character varying, 'PARSING'::character varying, 'CHUNKING'::character varying, 'EMBEDDING'::character varying, 'SUMMARISING'::character varying, 'READY'::character varying, 'FAILED'::character varying])::text[])),
     enrichment_status    varchar(30)  default 'NOT_STARTED'::character varying not null,
     enrichment_started_at timestamp(6),
     enrichment_completed_at timestamp(6),
     enrichment_error     text,
+    enrichment_retry_count INTEGER NOT NULL DEFAULT 0,
     title                varchar(255)                                       not null,
     classroom_id         bigint
         constraint fk7aiojwtxhjitwsuhj7exotvne
@@ -577,3 +578,8 @@ create index idx_document_nodes_doc_parent_order
 
 create index idx_document_node_metadata_jsonb_gin
     on document_nodes using gin (metadata_jsonb);
+
+-- Phase 2a migration: add SUMMARISING status, remove FULL_USE
+ALTER TABLE documents DROP CONSTRAINT IF EXISTS documents_status_check;
+ALTER TABLE documents ADD CONSTRAINT documents_status_check CHECK ((status)::text = ANY ((ARRAY ['UPLOADED'::character varying, 'PARSING'::character varying, 'CHUNKING'::character varying, 'EMBEDDING'::character varying, 'SUMMARISING'::character varying, 'READY'::character varying, 'FAILED'::character varying])::text[]));
+UPDATE documents SET status = 'READY' WHERE status = 'FULL_USE';

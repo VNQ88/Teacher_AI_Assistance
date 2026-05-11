@@ -6,5 +6,7 @@ public interface AiEmbeddingGateway {
 
     List<Double> embed(String input);
 
+    List<List<Double>> embedAll(List<String> inputs);
+
     String embeddingModel();
 }

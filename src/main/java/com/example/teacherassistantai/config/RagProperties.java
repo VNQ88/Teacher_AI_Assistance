@@ -29,6 +29,12 @@ public class RagProperties {
     private int embeddingDimensions = 1024;
 
     @Min(1)
+    private int embeddingBatchSize = 64;
+
+    @Min(1)
+    private int embeddingConcurrency = 3;
+
+    @Min(1)
     private int maxHistoryMessages = 5;
 
     private Ai ai = new Ai();
@@ -48,6 +54,37 @@ public class RagProperties {
 
         @Min(1)
         private int timeoutSeconds = 60;
+
+        private RateLimit rateLimit = new RateLimit();
+
+        @Data
+        public static class RateLimit {
+            private boolean enabled = true;
+
+            @Min(1)
+            private int totalRequestsPerMinute = 180;
+
+            @Min(1)
+            private int totalRequestsPerHour = 4500;
+
+            @Min(1)
+            private int backgroundRequestsPerMinute = 65;
+
+            @Min(1)
+            private int backgroundRequestsPerHour = 4000;
+
+            @Min(1)
+            private int backgroundPauseRemainingThreshold = 500;
+
+            @Min(1)
+            private int backgroundResumeRemainingThreshold = 1000;
+
+            @Min(1)
+            private int backgroundHourlyPauseMinutes = 10;
+
+            @Min(1)
+            private int backgroundResumeBatchSize = 30;
+        }
     }
 
     @Data
@@ -76,7 +113,18 @@ public class RagProperties {
         private int maxNodeContextChars = 60_000;
 
         @Min(1)
-        private int maxConcurrency = 1;
+        private int maxConcurrency = 3;
+
+        @Min(1)
+        private int intraDocumentConcurrency = 2;
+
+        private boolean autoRetryOnPartialFailed = true;
+
+        @Min(1)
+        private int autoRetryDelayMinutes = 35;
+
+        @Min(1)
+        private int autoRetryMaxAttempts = 3;
 
         @Min(1)
         private int representativeSectionChunks = 3;

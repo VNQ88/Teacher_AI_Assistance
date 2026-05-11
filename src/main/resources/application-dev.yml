@@ -48,6 +48,13 @@ spring:
       time-to-live: 300000 # 5 phút
       cache-null-values: false
   ai:
+    retry:
+      max-attempts: 3
+      backoff:
+        initial-interval: 3s
+        multiplier: 2
+        max-interval: 40s
+      on-http-codes: 424
     openai:
       api-key: ${DIGITALOCEAN_MODEL_ACCESS_KEY}
       chat:
@@ -106,6 +113,8 @@ application:
     candidate-top-k: 24
     min-chunk-chars: 40
     embedding-dimensions: 1024
+    embedding-batch-size: 64
+    embedding-concurrency: 3
     max-history-messages: 5
     enrichment:
       enabled: true
@@ -117,17 +126,31 @@ application:
       default-review-question-max-count: 20
       max-node-chunks: 120
       max-node-context-chars: 60000
-      max-concurrency: 1
+      max-concurrency: 3
+      intra-document-concurrency: 2
+      auto-retry-on-partial-failed: true
+      auto-retry-delay-minutes: 35
+      auto-retry-max-attempts: 3
       representative-section-chunks: 3
-      parent-summary-max-child-chars: 3000
-      subsection-summary-max-chars: 1200
-      section-summary-max-key-points: 4
-      chapter-summary-max-key-points: 8
+      parent-summary-max-child-chars: 8000
+      subsection-summary-max-chars: 2500
+      section-summary-max-key-points: 6
+      chapter-summary-max-key-points: 10
     ai:
       base-url: ${DIGITALOCEAN_BASE_URL}
       chat-model: ${DIGITALOCEAN_CHAT_MODEL}
       embedding-model: ${DIGITALOCEAN_EMBEDDING_MODEL}
-      timeout-seconds: 60
+      timeout-seconds: 80
+      rate-limit:
+        enabled: true
+        total-requests-per-minute: 180
+        total-requests-per-hour: 4500
+        background-requests-per-minute: 65
+        background-requests-per-hour: 4000
+        background-pause-remaining-threshold: 500
+        background-resume-remaining-threshold: 1000
+        background-hourly-pause-minutes: 10
+        background-resume-batch-size: 30
 
 logging:
   level:

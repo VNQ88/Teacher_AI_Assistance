@@ -23,6 +23,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.SimpleTransactionStatus;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.ArrayList;
@@ -134,7 +135,7 @@ class DocumentEnrichmentServiceTest {
                 DocumentNodeArtifactStatus.COMPLETED
         );
 
-        assertThat(fixture.document().getStatus()).isEqualTo(DocumentStatus.FULL_USE);
+        assertThat(fixture.document().getStatus()).isEqualTo(DocumentStatus.READY);
         assertThat(fixture.document().getEnrichmentStatus()).isEqualTo(DocumentEnrichmentStatus.ENRICHED);
         assertThat(fixture.document().getEnrichmentError()).isNull();
     }
@@ -222,7 +223,7 @@ class DocumentEnrichmentServiceTest {
                 SummaryMode.SUBSECTION_FROM_CHUNKS,
                 SummaryMode.SECTION_FROM_SUBSECTIONS_AND_DIRECT_CHUNKS
         );
-        assertThat(fixture.document().getStatus()).isEqualTo(DocumentStatus.FULL_USE);
+        assertThat(fixture.document().getStatus()).isEqualTo(DocumentStatus.READY);
     }
 
     @Test
@@ -282,7 +283,7 @@ class DocumentEnrichmentServiceTest {
                 SummaryMode.SUBSECTION_FROM_LEVEL2_AND_DIRECT_CHUNKS,
                 SummaryMode.SECTION_FROM_SUBSECTIONS_AND_DIRECT_CHUNKS
         );
-        assertThat(fixture.document().getStatus()).isEqualTo(DocumentStatus.FULL_USE);
+        assertThat(fixture.document().getStatus()).isEqualTo(DocumentStatus.READY);
     }
 
     @Test
@@ -667,7 +668,9 @@ class DocumentEnrichmentServiceTest {
                 nodeScopeService,
                 ragProperties,
                 objectProvider(generators),
-                new TransactionTemplate(new NoOpTransactionManager())
+                new TransactionTemplate(new NoOpTransactionManager()),
+                mock(RedisTemplate.class),
+                mock(com.example.teacherassistantai.service.quiz.HierarchicalQuizEnrichmentService.class)
         );
     }
 

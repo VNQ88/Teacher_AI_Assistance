@@ -8,13 +8,23 @@ import com.example.teacherassistantai.exception.InvalidDataException;
 import com.example.teacherassistantai.integration.ai.AiEmbeddingGateway;
 import com.example.teacherassistantai.repository.DocumentChunkRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DocumentChunkIngestionService {
@@ -24,62 +34,29 @@ public class DocumentChunkIngestionService {
     private final AiEmbeddingGateway embeddingGateway;
     private final DocumentChunkRepository documentChunkRepository;
     private final RagProperties ragProperties;
+    private final PlatformTransactionManager transactionManager;
 
-    @Transactional
     public List<DocumentChunk> ingest(Document document, String markdown) {
         MarkdownChunkingService.HierarchicalMarkdownDocument hierarchyDocument =
                 markdownChunkingService.parseHierarchicalDocument(markdown, document.getTitle());
         return ingest(document, hierarchyDocument, Map.of());
     }
 
-    @Transactional
+    // No @Transactional — transactions managed per-step to avoid holding a connection during HTTP calls
     public List<DocumentChunk> ingest(Document document,
                                       MarkdownChunkingService.HierarchicalMarkdownDocument hierarchyDocument,
                                       Map<String, DocumentNode> nodeByKey) {
-        List<HierarchicalMarkdownChunk> chunks = hierarchyDocument.chunks();
-        List<DocumentChunk> persisted = new ArrayList<>();
+        List<HierarchicalMarkdownChunk> rawChunks = hierarchyDocument.chunks();
+        List<DocumentChunk> shells = buildChunkShells(rawChunks, document, nodeByKey);
 
-        for (int i = 0; i < chunks.size(); i++) {
-            HierarchicalMarkdownChunk hierarchicalChunk = chunks.get(i);
-            String content = hierarchicalChunk.content();
-            DocumentNode node = resolveNode(nodeByKey, hierarchicalChunk.nodeId(), "nodeId");
-            DocumentNode parentNode = resolveNode(nodeByKey, hierarchicalChunk.parentNodeId(), "parentNodeId");
-            DocumentChunk chunk = DocumentChunk.builder()
-                    .document(document)
-                    .subjectId(document.getSubject().getId())
-                    .node(node)
-                    .parentNode(parentNode)
-                    .chunkIndex(i + 1)
-                    .sourceOrder(i + 1)
-                    .chunkType(hierarchicalChunk.chunkType())
-                    .sectionPath(String.join(" > ", hierarchicalChunk.breadcrumb()))
-                    .pageFrom(hierarchicalChunk.pageFrom())
-                    .pageTo(hierarchicalChunk.pageTo())
-                    .content(content)
-                    .tokenCount(Math.max(1, content.length() / 4))
-                    .metadataJsonb(chunkMetadataBuilder.buildHierarchicalJsonb(
-                            hierarchicalChunk.pageFrom(),
-                            hierarchicalChunk.pageTo(),
-                            hierarchicalChunk.sectionHeader(),
-                            hierarchicalChunk.chunkType(),
-                            content.length(),
-                            hierarchicalChunk.nodeType(),
-                            hierarchicalChunk.nodeId(),
-                            hierarchicalChunk.parentNodeId(),
-                            hierarchicalChunk.breadcrumb(),
-                            hierarchicalChunk.charStart(),
-                            hierarchicalChunk.charEnd()))
-                    .build();
+        // Step 1: bulk save all chunk shells (no embeddings yet) — one short transaction
+        List<DocumentChunk> saved = saveAllChunkShells(shells);
+        log.info("Saved {} chunk shells for documentId={}", saved.size(), document.getId());
 
-            DocumentChunk saved = documentChunkRepository.save(chunk);
-            List<Double> embedding = embeddingGateway.embed(content);
-            validateEmbeddingDimensions(embedding, saved.getId());
-            String embeddingLiteral = toVectorLiteral(embedding);
-            documentChunkRepository.updateEmbeddingLiteral(saved.getId(), embeddingLiteral);
-            persisted.add(saved);
-        }
+        // Step 2: embed in parallel batches — DB connection NOT held during HTTP calls
+        embedInParallelBatches(saved, document.getId());
 
-        return persisted;
+        return saved;
     }
 
     @Transactional
@@ -88,13 +65,117 @@ public class DocumentChunkIngestionService {
         documentChunkRepository.deleteByDocumentId(documentId);
     }
 
+    @Transactional
+    protected List<DocumentChunk> saveAllChunkShells(List<DocumentChunk> shells) {
+        List<DocumentChunk> saved = new ArrayList<>(shells.size());
+        for (DocumentChunk shell : shells) {
+            saved.add(documentChunkRepository.save(shell));
+        }
+        return saved;
+    }
+
+    private void embedInParallelBatches(List<DocumentChunk> chunks, Long documentId) {
+        int batchSize = ragProperties.getEmbeddingBatchSize();
+        int concurrency = ragProperties.getEmbeddingConcurrency();
+        List<List<DocumentChunk>> batches = partition(chunks, batchSize);
+        int totalBatches = batches.size();
+        AtomicInteger batchesDone = new AtomicInteger(0);
+        AtomicInteger chunksDone = new AtomicInteger(0);
+        int total = chunks.size();
+
+        log.info("Starting parallel batch embedding: documentId={}, chunks={}, batchSize={}, concurrency={}, batches={}",
+                documentId, total, batchSize, concurrency, totalBatches);
+
+        // TransactionTemplate with REQUIRES_NEW — each batch commits independently
+        TransactionTemplate txTemplate = new TransactionTemplate(transactionManager);
+        txTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+
+        Semaphore semaphore = new Semaphore(concurrency);
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            List<Future<Void>> futures = batches.stream()
+                    .<Future<Void>>map(batch -> executor.submit(() -> {
+                        semaphore.acquireUninterruptibly();
+                        try {
+                            // HTTP call outside transaction — no connection held during network wait
+                            List<String> texts = batch.stream().map(DocumentChunk::getContent).toList();
+                            List<List<Double>> embeddings = embeddingGateway.embedAll(texts);
+
+                            if (embeddings.size() != batch.size()) {
+                                throw new InvalidDataException(
+                                        "Embedding count mismatch: expected %d, got %d"
+                                                .formatted(batch.size(), embeddings.size()));
+                            }
+
+                            // DB update in its own short transaction
+                            txTemplate.executeWithoutResult(status -> {
+                                for (int i = 0; i < batch.size(); i++) {
+                                    List<Double> embedding = embeddings.get(i);
+                                    validateEmbeddingDimensions(embedding, batch.get(i).getId());
+                                    documentChunkRepository.updateEmbeddingLiteral(
+                                            batch.get(i).getId(), toVectorLiteral(embedding));
+                                }
+                            });
+
+                            int batchNo = batchesDone.incrementAndGet();
+                            int chunksNow = chunksDone.addAndGet(batch.size());
+                            log.info("Embedding progress: {}/{} batches, {}/{} chunks (documentId={})",
+                                    batchNo, totalBatches, chunksNow, total, documentId);
+                        } finally {
+                            semaphore.release();
+                        }
+                        return null;
+                    }))
+                    .toList();
+
+            for (Future<Void> future : futures) {
+                try {
+                    future.get();
+                } catch (ExecutionException ex) {
+                    throw new RuntimeException("Batch embedding failed for documentId=" + documentId, ex.getCause());
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Batch embedding interrupted for documentId=" + documentId, ex);
+                }
+            }
+        }
+
+        log.info("Completed embedding: documentId={}, total={} chunks", documentId, total);
+    }
+
+    private List<DocumentChunk> buildChunkShells(List<HierarchicalMarkdownChunk> rawChunks,
+                                                  Document document,
+                                                  Map<String, DocumentNode> nodeByKey) {
+        List<DocumentChunk> shells = new ArrayList<>(rawChunks.size());
+        for (int i = 0; i < rawChunks.size(); i++) {
+            HierarchicalMarkdownChunk hc = rawChunks.get(i);
+            String content = hc.content();
+            DocumentNode node = resolveNode(nodeByKey, hc.nodeId(), "nodeId");
+            DocumentNode parentNode = resolveNode(nodeByKey, hc.parentNodeId(), "parentNodeId");
+            shells.add(DocumentChunk.builder()
+                    .document(document)
+                    .subjectId(document.getSubject().getId())
+                    .node(node)
+                    .parentNode(parentNode)
+                    .chunkIndex(i + 1)
+                    .sourceOrder(i + 1)
+                    .chunkType(hc.chunkType())
+                    .sectionPath(String.join(" > ", hc.breadcrumb()))
+                    .pageFrom(hc.pageFrom())
+                    .pageTo(hc.pageTo())
+                    .content(content)
+                    .tokenCount(Math.max(1, content.length() / 4))
+                    .metadataJsonb(chunkMetadataBuilder.buildHierarchicalJsonb(
+                            hc.pageFrom(), hc.pageTo(), hc.sectionHeader(), hc.chunkType(),
+                            content.length(), hc.nodeType(), hc.nodeId(), hc.parentNodeId(),
+                            hc.breadcrumb(), hc.charStart(), hc.charEnd()))
+                    .build());
+        }
+        return shells;
+    }
+
     private DocumentNode resolveNode(Map<String, DocumentNode> nodeByKey, String nodeKey, String fieldName) {
-        if (nodeKey == null || nodeKey.isBlank()) {
-            return null;
-        }
-        if (nodeByKey == null || nodeByKey.isEmpty()) {
-            return null;
-        }
+        if (nodeKey == null || nodeKey.isBlank()) return null;
+        if (nodeByKey == null || nodeByKey.isEmpty()) return null;
         DocumentNode node = nodeByKey.get(nodeKey);
         if (node == null) {
             throw new InvalidDataException("Cannot resolve %s '%s' to persisted document_nodes row"
@@ -120,5 +201,13 @@ public class DocumentChunkIngestionService {
         }
         builder.append(']');
         return builder.toString();
+    }
+
+    private static <T> List<List<T>> partition(List<T> list, int size) {
+        List<List<T>> partitions = new ArrayList<>();
+        for (int i = 0; i < list.size(); i += size) {
+            partitions.add(list.subList(i, Math.min(i + size, list.size())));
+        }
+        return partitions;
     }
 }

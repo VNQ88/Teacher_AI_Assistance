@@ -36,8 +36,7 @@ class RagPromptBuilderServiceTest {
         assertTrue(prompt.contains("If evidence is sufficient and consistent"));
         assertTrue(prompt.contains("If evidence is missing"));
         assertTrue(prompt.contains("If evidence conflicts"));
-        assertTrue(prompt.contains("Cite supporting evidence using source index and page/path when available"));
-        assertTrue(prompt.contains("Never cite raw chunk ids such as [Chunk <id>]"));
+        assertTrue(prompt.contains("Do not include citations, source references, or chunk identifiers in the answer text."));
         assertTrue(prompt.contains("Always end the final answer with one suggested next question for the user"));
         assertTrue(prompt.contains("<<<HISTORY>>>"));
         assertTrue(prompt.contains("<<<CONTEXT>>>"));
@@ -49,7 +48,7 @@ class RagPromptBuilderServiceTest {
         assertTrue(prompt.contains("Content:\nPhan 2 la noi dung ve dong tu bat quy tac"));
         assertFalse(prompt.contains("[Chunk 12]"));
         assertTrue(prompt.contains("User question: Phan 2 noi gi?"));
-        assertTrue(prompt.contains("Return a concise Vietnamese answer in natural text, cite sources when using evidence, and include one suggested next question at the end"));
+        assertTrue(prompt.contains("Return a concise Vietnamese answer in natural text without any citations or source references, and include one suggested next question at the end"));
         assertFalse(prompt.contains("Output schema (exactly 3 sections, no extra sections)"));
     }
 

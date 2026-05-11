@@ -91,14 +91,13 @@ public class RagArtifactChatHandlerService {
         return ArtifactChatResult.fallback(answer);
     }
 
-    private String renderSummary(Map<String, Object> content, DocumentNode node) {
+    public String renderSummary(Map<String, Object> content, DocumentNode node) {
         String summary = asString(content.get("summary"));
         StringBuilder answer = new StringBuilder();
         answer.append("Tóm tắt ").append(displayPath(node)).append(":\n\n");
         answer.append(summary == null || summary.isBlank() ? "Chưa có nội dung tóm tắt hợp lệ." : summary);
         appendKeyPoints(answer, content);
         appendChildSummaryParagraphs(answer, content);
-        appendCitationLine(answer, content);
         return answer.toString();
     }
 
@@ -147,35 +146,42 @@ public class RagArtifactChatHandlerService {
     }
 
     @SuppressWarnings("unchecked")
-    private String renderQuestions(Map<String, Object> content, DocumentNode node) {
+    public String renderQuestions(Map<String, Object> content, DocumentNode node) {
         Object rawQuestions = content.get("questions");
         if (!(rawQuestions instanceof List<?> questions) || questions.isEmpty()) {
             return "Bộ câu hỏi cho %s chưa có dữ liệu hợp lệ.".formatted(displayPath(node));
         }
 
-        StringBuilder answer = new StringBuilder();
-        answer.append("Bộ câu hỏi ôn tập ").append(displayPath(node)).append(":\n");
+        StringBuilder questionSection = new StringBuilder();
+        StringBuilder answerSection = new StringBuilder();
+        questionSection.append("Bộ câu hỏi ôn tập ").append(displayPath(node)).append(":\n");
+        answerSection.append("\n\n---\n**Đáp án:**\n");
+
         int index = 1;
         for (Object item : questions) {
             if (!(item instanceof Map<?, ?> rawQuestion)) {
                 continue;
             }
             Map<String, Object> question = (Map<String, Object>) rawQuestion;
-            answer.append("\n").append(index++).append(". ");
-            answer.append("[")
+            int questionIndex = index++;
+
+            questionSection.append("\n").append(questionIndex).append(". ");
+            questionSection.append("[")
                     .append(asString(question.get("type")))
                     .append(difficultySuffix(question))
                     .append("] ");
-            answer.append(asString(question.get("question"))).append('\n');
-            appendOptions(answer, question.get("options"));
-            answer.append("Đáp án: ").append(formatAnswer(question.get("correctAnswer"))).append('\n');
+            questionSection.append(asString(question.get("question"))).append('\n');
+            appendOptions(questionSection, question.get("options"));
+
+            answerSection.append("\n").append(questionIndex).append(". ");
+            answerSection.append("Đáp án: ").append(formatAnswer(question.get("correctAnswer"))).append('\n');
             String explanation = asString(question.get("answerExplanation"));
             if (explanation != null && !explanation.isBlank()) {
-                answer.append("Giải thích: ").append(explanation).append('\n');
+                answerSection.append("   Giải thích: ").append(explanation).append('\n');
             }
-            appendCitationLine(answer, question);
         }
-        return answer.toString().trim();
+
+        return (questionSection.toString() + answerSection.toString()).trim();
     }
 
     @SuppressWarnings("unchecked")
@@ -208,7 +214,7 @@ public class RagArtifactChatHandlerService {
     }
 
     @SuppressWarnings("unchecked")
-    private List<DocumentChunk> sourceChunksFromCitations(Map<String, Object> content) {
+    public List<DocumentChunk> sourceChunksFromCitations(Map<String, Object> content) {
         Set<Long> chunkIds = new LinkedHashSet<>();
         collectCitationChunkIds(content.get("citations"), chunkIds);
         collectChildSummaryCitationChunkIds(content.get("childSummaries"), chunkIds);
@@ -262,35 +268,6 @@ public class RagArtifactChatHandlerService {
                 }
             }
         }
-    }
-
-    private void appendCitationLine(StringBuilder answer, Map<String, Object> content) {
-        String citations = citationText(content.get("citations"));
-        if (!citations.isBlank()) {
-            answer.append("\nCitation: ").append(citations);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private String citationText(Object rawCitations) {
-        if (!(rawCitations instanceof List<?> citations) || citations.isEmpty()) {
-            return "";
-        }
-        List<String> values = new ArrayList<>();
-        for (Object citation : citations) {
-            if (citation instanceof Map<?, ?> rawCitation) {
-                Map<String, Object> citationMap = (Map<String, Object>) rawCitation;
-                Object chunkId = citationMap.get("chunkId");
-                Object pageFrom = citationMap.get("pageFrom");
-                Object pageTo = citationMap.get("pageTo");
-                String pageText = pageFrom == null && pageTo == null
-                        ? ""
-                        : ", trang " + (pageFrom != null ? pageFrom : pageTo)
-                        + (pageFrom != null && pageTo != null && !pageFrom.equals(pageTo) ? "-" + pageTo : "");
-                values.add("chunk " + chunkId + pageText);
-            }
-        }
-        return String.join("; ", values);
     }
 
     private String displayPath(DocumentNode node) {

@@ -97,6 +97,15 @@ public interface DocumentNodeArtifactRepository extends JpaRepository<DocumentNo
             SELECT a
             FROM DocumentNodeArtifact a
             JOIN FETCH a.documentNode n
+            WHERE a.status = com.example.teacherassistantai.common.enumerate.DocumentNodeArtifactStatus.RATE_LIMITED
+            ORDER BY a.updatedAt ASC
+            """)
+    List<DocumentNodeArtifact> findRateLimitedOrderByUpdatedAtAsc();
+
+    @Query("""
+            SELECT a
+            FROM DocumentNodeArtifact a
+            JOIN FETCH a.documentNode n
             WHERE n.id IN :nodeIds
               AND a.artifactType = com.example.teacherassistantai.common.enumerate.DocumentNodeArtifactType.SUMMARY
               AND a.status = com.example.teacherassistantai.common.enumerate.DocumentNodeArtifactStatus.COMPLETED

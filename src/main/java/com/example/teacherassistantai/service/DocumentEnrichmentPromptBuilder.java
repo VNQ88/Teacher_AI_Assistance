@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -57,10 +58,12 @@ public class DocumentEnrichmentPromptBuilder {
         prompt.append("- Tong hop tu child summaries va direct chunks cua node hien tai.\n");
         prompt.append("- Direct chunks chi la noi dung truc tiep nam duoi node, khong thay the child summaries.\n");
         prompt.append("- Khong bo sot child summary nao.\n");
-        prompt.append("- Output gom 2 den ").append(ragProperties.getEnrichment().getSectionSummaryMaxKeyPoints())
-                .append(" keyPoints.\n");
+        prompt.append("- Truong 'summary' phai gom 3-5 cau, bao quat toan bo noi dung section, khong chi liet ke.\n");
+        prompt.append("- Output gom 4 den ").append(ragProperties.getEnrichment().getSectionSummaryMaxKeyPoints())
+                .append(" keyPoints, moi keyPoint mo ta mot y/giai doan chinh.\n");
         prompt.append("- Chi tra ve mot JSON object hop le, khong boc trong markdown/code fence.\n\n");
-        appendSummarySchema(prompt, context, "2-4 y chinh");
+        int maxKp = ragProperties.getEnrichment().getSectionSummaryMaxKeyPoints();
+        appendSummarySchema(prompt, context, "3-5 cau tom tat + 4-" + maxKp + " y chinh");
         appendCoverageContract(prompt, context);
         appendChildSummaries(prompt, context.childSummaries());
         appendContext(prompt, context.directChunks());
@@ -75,15 +78,18 @@ public class DocumentEnrichmentPromptBuilder {
         prompt.append("Nhiem vu: Tao summary cap cha theo huong bottom-up.\n");
         prompt.append("Yeu cau rieng:\n");
         prompt.append("- Viet bang tieng Viet.\n");
-        prompt.append("- Chi tong hop tu child summaries duoc cung cap.\n");
-        prompt.append("- Khong bo sot child summary nao.\n");
-        prompt.append("- Neu la chapter, output gom 5 den ").append(ragProperties.getEnrichment().getChapterSummaryMaxKeyPoints())
-                .append(" keyPoints.\n");
+        prompt.append("- Tong hop tu child summaries duoc cung cap; voi muc thieu summary, tu rut y chinh tu raw chunks fallback.\n");
+        prompt.append("- Khong bo sot child summary nao va khong bo sot muc fallback nao.\n");
+        prompt.append("- Truong 'summary' phai gom 4-6 cau bao quat toan bo chapter, khong chi liet ke.\n");
+        prompt.append("- Neu la chapter, output gom 6 den ").append(ragProperties.getEnrichment().getChapterSummaryMaxKeyPoints())
+                .append(" keyPoints, moi keyPoint mo ta mot y quan trong hoac giai doan.\n");
         prompt.append("- Khong them kien thuc ngoai input.\n");
         prompt.append("- Chi tra ve mot JSON object hop le, khong boc trong markdown/code fence.\n\n");
-        appendSummarySchema(prompt, context, "5-8 y chinh");
+        int maxKp = ragProperties.getEnrichment().getChapterSummaryMaxKeyPoints();
+        appendSummarySchema(prompt, context, "4-6 cau tom tat + 6-" + maxKp + " y chinh");
         appendCoverageContract(prompt, context);
         appendChildSummaries(prompt, context.childSummaries());
+        appendFallbackRawChunks(prompt, context.fallbackRawChunks());
         appendContext(prompt, context.directChunks());
         return prompt.toString();
     }
@@ -95,13 +101,14 @@ public class DocumentEnrichmentPromptBuilder {
         prompt.append("- Viet bang tieng Viet.\n");
         prompt.append("- Tao overview ngan cho part.\n");
         prompt.append("- Moi chapter/childSummary chinh phai co mot doan noi dung ngan.\n");
-        prompt.append("- Chi tong hop tu child summaries duoc cung cap.\n");
-        prompt.append("- Khong bo sot child summary nao.\n");
+        prompt.append("- Tong hop tu child summaries duoc cung cap; voi chapter thieu summary, tu rut y chinh tu raw chunks fallback.\n");
+        prompt.append("- Khong bo sot child summary nao va khong bo sot muc fallback nao.\n");
         prompt.append("- Khong them kien thuc ngoai input.\n");
         prompt.append("- Chi tra ve mot JSON object hop le, khong boc trong markdown/code fence.\n\n");
         appendSummarySchema(prompt, context, "overview ngan + moi chapter mot doan ngan");
         appendCoverageContract(prompt, context);
         appendChildSummaries(prompt, context.childSummaries());
+        appendFallbackRawChunks(prompt, context.fallbackRawChunks());
         appendContext(prompt, context.directChunks());
         return prompt.toString();
     }
@@ -222,7 +229,8 @@ public class DocumentEnrichmentPromptBuilder {
                     "missingChildNodeIds": [],
                     "directChunkCount": 1,
                     "usedDirectChunkCount": 1,
-                    "complete": true
+                    "complete": true,
+                    "fallbackChildCount": 0
                   }
                 }
                 """);
@@ -238,7 +246,32 @@ public class DocumentEnrichmentPromptBuilder {
         prompt.append("- missingChildNodeIds: ").append(coverage == null ? List.of() : coverage.missingChildNodeIds()).append('\n');
         prompt.append("- directChunkCount: ").append(coverage == null ? 0 : coverage.directChunkCount()).append('\n');
         prompt.append("- usedDirectChunkCount: ").append(coverage == null ? 0 : coverage.usedDirectChunkCount()).append('\n');
-        prompt.append("- complete: ").append(coverage == null || coverage.complete()).append("\n\n");
+        prompt.append("- complete: ").append(coverage == null || coverage.complete()).append('\n');
+        prompt.append("- fallbackChildCount: ").append(coverage == null ? 0 : coverage.fallbackChildCount()).append("\n\n");
+    }
+
+    private void appendFallbackRawChunks(StringBuilder prompt, Map<Long, List<DocumentChunk>> fallbackRawChunks) {
+        if (fallbackRawChunks == null || fallbackRawChunks.isEmpty()) {
+            return;
+        }
+        prompt.append("Fallback raw chunks (cho cac muc khong co child summary):\n");
+        prompt.append("<<<FALLBACK_CHUNKS>>>\n");
+        for (Map.Entry<Long, List<DocumentChunk>> entry : fallbackRawChunks.entrySet()) {
+            prompt.append("[fallback]\n");
+            prompt.append("childNodeId: ").append(entry.getKey()).append('\n');
+            for (DocumentChunk chunk : entry.getValue()) {
+                if (chunk == null) {
+                    continue;
+                }
+                prompt.append("[chunk]\n");
+                prompt.append("chunkId: ").append(chunk.getId()).append('\n');
+                prompt.append("path: ").append(valueOrFallback(chunk.getSectionPath(), "N/A")).append('\n');
+                prompt.append("pages: ").append(pageRange(chunk)).append('\n');
+                prompt.append("content:\n").append(valueOrFallback(chunk.getContent(), "")).append("\n[/chunk]\n");
+            }
+            prompt.append("[/fallback]\n\n");
+        }
+        prompt.append("<<<END_FALLBACK_CHUNKS>>>\n\n");
     }
 
     private void appendChildSummaries(StringBuilder prompt, List<ChildSummary> childSummaries) {
@@ -317,10 +350,12 @@ public class DocumentEnrichmentPromptBuilder {
             return "mot doan ngan, toi da " + ragProperties.getEnrichment().getSubsectionSummaryMaxChars() + " ky tu";
         }
         String nodeType = node == null ? "" : valueOrFallback(node.getNodeType(), "");
+        int maxSectionKp = ragProperties.getEnrichment().getSectionSummaryMaxKeyPoints();
+        int maxChapterKp = ragProperties.getEnrichment().getChapterSummaryMaxKeyPoints();
         return switch (nodeType) {
-            case "section" -> "2-4 y chinh";
+            case "section" -> "3-5 cau + 4-" + maxSectionKp + " y chinh";
             case "part" -> "overview ngan + moi chapter mot doan ngan";
-            default -> "5-8 y chinh";
+            default -> "4-6 cau + 6-" + maxChapterKp + " y chinh";
         };
     }
 
