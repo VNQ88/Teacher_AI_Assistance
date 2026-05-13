@@ -3,8 +3,8 @@ package com.example.teacherassistantai.integration.ai;
 import com.example.teacherassistantai.config.RagProperties;
 import com.example.teacherassistantai.exception.AiRateLimitedException;
 import com.example.teacherassistantai.exception.BackgroundRateLimitedException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +13,6 @@ import java.time.Instant;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class DigitalOceanAiRateLimiter {
 
     private static final String KEY_BG_PAUSED = "ai:bg:pausedUntil";
@@ -25,6 +24,14 @@ public class DigitalOceanAiRateLimiter {
     private final RedisTemplate<String, String> redisTemplate;
     private final RateLimitTracker rateLimitTracker;
     private final RagProperties ragProperties;
+
+    public DigitalOceanAiRateLimiter(@Qualifier("aiRateLimitRedisTemplate") RedisTemplate<String, String> redisTemplate,
+                                     RateLimitTracker rateLimitTracker,
+                                     RagProperties ragProperties) {
+        this.redisTemplate = redisTemplate;
+        this.rateLimitTracker = rateLimitTracker;
+        this.ragProperties = ragProperties;
+    }
 
     public void acquire(AiWorkload workload) {
         RagProperties.Ai.RateLimit cfg = ragProperties.getAi().getRateLimit();
