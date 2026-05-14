@@ -10,6 +10,7 @@ import com.example.teacherassistantai.entity.DocumentChunk;
 import com.example.teacherassistantai.entity.DocumentNode;
 import com.example.teacherassistantai.entity.DocumentNodeArtifact;
 import com.example.teacherassistantai.entity.Subject;
+import com.example.teacherassistantai.integration.ai.AiModelRoutingService;
 import com.example.teacherassistantai.repository.DocumentChunkRepository;
 import com.example.teacherassistantai.repository.DocumentNodeArtifactRepository;
 import com.example.teacherassistantai.repository.DocumentNodeRepository;
@@ -49,6 +50,9 @@ class DocumentEnrichmentServiceTest {
     private DocumentChunkRepository documentChunkRepository;
     private DocumentNodeArtifactRepository artifactRepository;
     private DocumentNodeScopeService nodeScopeService;
+    private DocumentEnrichmentBacklogService backlogService;
+    private ReviewQuestionCountResolver reviewQuestionCountResolver;
+    private AiModelRoutingService aiModelRoutingService;
     private RagProperties ragProperties;
 
     @BeforeEach
@@ -58,7 +62,12 @@ class DocumentEnrichmentServiceTest {
         documentChunkRepository = mock(DocumentChunkRepository.class);
         artifactRepository = mock(DocumentNodeArtifactRepository.class);
         nodeScopeService = mock(DocumentNodeScopeService.class);
+        backlogService = mock(DocumentEnrichmentBacklogService.class);
+        reviewQuestionCountResolver = mock(ReviewQuestionCountResolver.class);
+        when(reviewQuestionCountResolver.resolve(any())).thenReturn(new ReviewQuestionCountResolver.CountRange(15, 20));
+        aiModelRoutingService = mock(AiModelRoutingService.class);
         ragProperties = new RagProperties();
+        when(aiModelRoutingService.enrichmentModelFor(any())).thenReturn(ragProperties.getAi().getChatModel());
     }
 
     @Test
@@ -670,7 +679,10 @@ class DocumentEnrichmentServiceTest {
                 objectProvider(generators),
                 new TransactionTemplate(new NoOpTransactionManager()),
                 mock(RedisTemplate.class),
-                mock(com.example.teacherassistantai.service.quiz.HierarchicalQuizEnrichmentService.class)
+                mock(com.example.teacherassistantai.service.quiz.HierarchicalQuizEnrichmentService.class),
+                backlogService,
+                reviewQuestionCountResolver,
+                aiModelRoutingService
         );
     }
 

@@ -242,6 +242,56 @@ class DocumentEnrichmentArtifactValidationServiceTest {
     }
 
     @Test
+    void parseAndValidate_acceptsSubsectionLevel2QuestionCountRangeAndAddsMetadata() {
+        Fixture fixture = fixture("Nội dung đủ dài. ".repeat(100));
+
+        Map<String, Object> content = validationService.parseAndValidate(
+                DocumentNodeArtifactType.REVIEW_QUESTION_SET,
+                reviewQuestionJson(7),
+                fixture.node(),
+                List.of(fixture.chunk()),
+                5,
+                10
+        );
+
+        assertThat(content).containsEntry("questionCount", 7);
+        assertThat(content).containsEntry("requestedQuestionMinCount", 5);
+        assertThat(content).containsEntry("requestedQuestionMaxCount", 10);
+    }
+
+    @Test
+    void parseAndValidate_rejectsSubsectionLevel2QuestionCountAboveMax() {
+        Fixture fixture = fixture("Nội dung đủ dài. ".repeat(100));
+
+        assertThatThrownBy(() -> validationService.parseAndValidate(
+                DocumentNodeArtifactType.REVIEW_QUESTION_SET,
+                reviewQuestionJson(12),
+                fixture.node(),
+                List.of(fixture.chunk()),
+                5,
+                10
+        ))
+                .isInstanceOf(InvalidDataException.class)
+                .hasMessageContaining("between 5 and 10");
+    }
+
+    @Test
+    void parseAndValidate_acceptsSectionQuestionCountRange() {
+        Fixture fixture = fixture("Nội dung đủ dài. ".repeat(100));
+
+        Map<String, Object> content = validationService.parseAndValidate(
+                DocumentNodeArtifactType.REVIEW_QUESTION_SET,
+                reviewQuestionJson(18),
+                fixture.node(),
+                List.of(fixture.chunk()),
+                15,
+                20
+        );
+
+        assertThat(content).containsEntry("questionCount", 18);
+    }
+
+    @Test
     void parseAndValidate_acceptsMismatchedDeclaredQuestionCountAndNormalizesIt() {
         Fixture fixture = fixture("Ngắn.");
 
@@ -358,6 +408,30 @@ class DocumentEnrichmentArtifactValidationServiceTest {
                 .build();
         chunk.setId(200L);
         return new Fixture(document, node, chunk);
+    }
+
+    private String reviewQuestionJson(int count) {
+        StringBuilder questions = new StringBuilder();
+        for (int i = 1; i <= count; i++) {
+            if (i > 1) {
+                questions.append(",");
+            }
+            questions.append("""
+                    {
+                      "type": "TRUE_FALSE",
+                      "difficulty": "EASY",
+                      "question": "Nhận định %d đúng hay sai?",
+                      "correctAnswer": true,
+                      "answerExplanation": "Dựa trên tài liệu.",
+                      "citations": [{"chunkId": 200}]
+                    }
+                    """.formatted(i));
+        }
+        return """
+                {
+                  "questions": [%s]
+                }
+                """.formatted(questions);
     }
 
     private record Fixture(Document document, DocumentNode node, DocumentChunk chunk) {

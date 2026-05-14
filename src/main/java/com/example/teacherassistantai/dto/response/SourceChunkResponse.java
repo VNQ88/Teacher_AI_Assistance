@@ -30,6 +30,12 @@ public class SourceChunkResponse {
     @Schema(description = "Source end page when available", example = "13")
     private Integer pageTo;
 
+    @Schema(description = "Friendly source label for UI display", example = "Giao trinh Triet hoc, Chuong 1 > I. Khai niem (trang 12-13)")
+    private String sourceLabel;
+
+    @Schema(description = "Friendly page range for UI display", example = "trang 12-13")
+    private String pageRange;
+
     @Schema(description = "Chunk type", example = "TEXT")
     private String chunkType;
 

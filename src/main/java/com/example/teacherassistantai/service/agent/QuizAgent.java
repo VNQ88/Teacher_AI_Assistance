@@ -2,13 +2,16 @@ package com.example.teacherassistantai.service.agent;
 
 import com.example.teacherassistantai.common.enumerate.DocumentNodeArtifactStatus;
 import com.example.teacherassistantai.common.enumerate.DocumentNodeArtifactType;
+import com.example.teacherassistantai.entity.DocumentChunk;
 import com.example.teacherassistantai.entity.DocumentNode;
 import com.example.teacherassistantai.entity.DocumentNodeArtifact;
 import com.example.teacherassistantai.repository.DocumentNodeArtifactRepository;
 import com.example.teacherassistantai.service.DocumentNodeScopeService;
 import com.example.teacherassistantai.service.RagArtifactChatHandlerService;
 import com.example.teacherassistantai.service.quiz.HierarchicalQuizEnrichmentService;
+import com.example.teacherassistantai.service.quiz.HierarchicalQuizEnrichmentService.QuizArtifactOutcome;
 import com.example.teacherassistantai.service.quiz.QuizGenerationStrategy;
+import com.example.teacherassistantai.service.quiz.ReviewQuestionCompositionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Slf4j
@@ -29,14 +33,25 @@ public class QuizAgent {
     private final QuizGenerationStrategy strategy;
     private final HierarchicalQuizEnrichmentService enrichmentService;
     private final RedisTemplate<String, String> redisTemplate;
+    private final ReviewQuestionCompositionService compositionService;
 
     public AgentResult execute(RagChatState state) {
         DocumentNode node = state.getResolvedNode();
+        String nodeType = node.getNodeType() == null ? "" : node.getNodeType().toLowerCase(Locale.ROOT);
 
+        return switch (nodeType) {
+            case "part" -> fromComposition(compositionService.composeForPart(node));
+            case "document", "subject" -> fromComposition(compositionService.composeForDocument(node));
+            case "summary", "review_questions" -> AgentResult.message(
+                    "Không thể tạo bộ câu hỏi trực tiếp cho node hỗ trợ này. Hãy chọn phần, chương hoặc mục nội dung.");
+            default -> executeNodeLevel(node);
+        };
+    }
+
+    private AgentResult executeNodeLevel(DocumentNode node) {
         Optional<DocumentNodeArtifact> artifact = fetchCompletedQuiz(node.getId());
         if (artifact.isPresent()) {
-            String answer = handlerService.renderQuestions(artifact.get().getContentJsonb(), node);
-            return AgentResult.hit(answer, List.of());
+            return hitFromArtifact(artifact.get(), node);
         }
 
         String lockKey = "artifact-lock:" + node.getId() + ":REVIEW_QUESTION_SET";
@@ -46,6 +61,13 @@ public class QuizAgent {
         }
 
         return generateOnDemand(node, lockKey);
+    }
+
+    private AgentResult fromComposition(ReviewQuestionCompositionService.ReviewQuestionCompositionResult result) {
+        if (result.hasAnyCompletedChapter()) {
+            return AgentResult.hit(result.answer(), result.sources());
+        }
+        return AgentResult.message(result.answer());
     }
 
     private AgentResult generateOnDemand(DocumentNode node, String lockKey) {
@@ -60,14 +82,22 @@ public class QuizAgent {
             QuizGenerationStrategy.QuizInputType inputType =
                     strategy.determine(node, scope.chunks().size());
 
-            enrichmentService.generateAndSaveQuizArtifact(node, inputType);
+            QuizArtifactOutcome outcome = enrichmentService.generateAndSaveQuizArtifact(node, inputType);
 
-            Optional<DocumentNodeArtifact> generated = fetchCompletedQuiz(node.getId());
-            if (generated.isPresent()) {
-                String answer = handlerService.renderQuestions(generated.get().getContentJsonb(), node);
-                return AgentResult.hit(answer, List.of());
+            if (outcome == QuizArtifactOutcome.COMPLETED) {
+                Optional<DocumentNodeArtifact> generated = fetchCompletedQuiz(node.getId());
+                if (generated.isPresent()) {
+                    return hitFromArtifact(generated.get(), node);
+                }
             }
-            return AgentResult.message("Không thể tạo bộ câu hỏi lúc này. Vui lòng thử lại sau.");
+            return switch (outcome) {
+                case RATE_LIMITED -> AgentResult.message(
+                        "Hệ thống AI đang bận, vui lòng thử lại sau vài phút.");
+                case SKIPPED -> AgentResult.message(
+                        "Không tìm thấy nội dung để tạo câu hỏi cho phần này.");
+                default -> AgentResult.message(
+                        "Tạo bộ câu hỏi thất bại, vui lòng thử lại sau.");
+            };
         } finally {
             redisTemplate.delete(lockKey);
         }
@@ -78,5 +108,11 @@ public class QuizAgent {
                 nodeId, DocumentNodeArtifactType.REVIEW_QUESTION_SET,
                 DocumentNodeArtifactStatus.COMPLETED
         ).stream().findFirst();
+    }
+
+    private AgentResult hitFromArtifact(DocumentNodeArtifact artifact, DocumentNode node) {
+        String answer = handlerService.renderQuestions(artifact.getContentJsonb(), node);
+        List<DocumentChunk> sources = handlerService.sourceChunksFromCitations(artifact.getContentJsonb());
+        return AgentResult.hit(answer, sources);
     }
 }

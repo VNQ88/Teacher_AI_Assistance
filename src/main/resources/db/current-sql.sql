@@ -529,6 +529,8 @@ create table document_node_artifacts
     content_jsonb    jsonb default '{}'::jsonb              not null,
     error_message    text,
     token_count      integer,
+    constraint document_node_artifacts_status_check
+        check (status in ('PENDING', 'RUNNING', 'COMPLETED', 'FAILED', 'SKIPPED', 'RATE_LIMITED')),
     constraint uk_node_artifact_version
         unique (document_node_id, artifact_type, prompt_version, model, source_hash)
 );

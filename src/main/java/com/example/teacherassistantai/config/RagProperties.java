@@ -7,6 +7,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 @Data
 @Component
 @Validated
@@ -55,6 +58,8 @@ public class RagProperties {
         @Min(1)
         private int timeoutSeconds = 60;
 
+        private EnrichmentAi enrichment = new EnrichmentAi();
+
         private RateLimit rateLimit = new RateLimit();
 
         @Data
@@ -84,6 +89,34 @@ public class RagProperties {
 
             @Min(1)
             private int backgroundResumeBatchSize = 30;
+
+            @Min(1)
+            private int enrichmentPauseMinutesOn429 = 10;
+
+            @Min(0)
+            private long enrichmentMinRemainingTokensPerMinute = 1_000;
+
+            @Min(0)
+            private long enrichmentMinRemainingTokensPerDay = 10_000;
+        }
+
+        @Data
+        public static class EnrichmentAi {
+            @NotBlank
+            private String baseUrl = "https://inference.do-ai.run";
+
+            private String apiKey = "";
+
+            @NotBlank
+            private String summaryModel = "openai-gpt-5-mini";
+
+            @NotBlank
+            private String reviewQuestionModel = "openai-gpt-oss-120b";
+
+            @Min(1)
+            private int timeoutSeconds = 120;
+
+            private boolean pauseAllOn429 = true;
         }
     }
 
@@ -106,6 +139,16 @@ public class RagProperties {
         @Min(1)
         private int defaultReviewQuestionMaxCount = 20;
 
+        private Map<String, ReviewQuestionCountRange> reviewQuestionCounts = defaultReviewQuestionCounts();
+
+        @Min(1)
+        private int reviewQuestionRequestsPerMinute = 10;
+
+        @Min(1)
+        private int reviewQuestionResumeBatchSize = 10;
+
+        private ReviewQuestionComposition reviewQuestionComposition = new ReviewQuestionComposition();
+
         @Min(1)
         private int maxNodeChunks = 120;
 
@@ -116,7 +159,7 @@ public class RagProperties {
         private int maxConcurrency = 3;
 
         @Min(1)
-        private int intraDocumentConcurrency = 2;
+        private int intraDocumentConcurrency = 4;
 
         private boolean autoRetryOnPartialFailed = true;
 
@@ -140,5 +183,48 @@ public class RagProperties {
 
         @Min(1)
         private int chapterSummaryMaxKeyPoints = 8;
+
+        private static Map<String, ReviewQuestionCountRange> defaultReviewQuestionCounts() {
+            Map<String, ReviewQuestionCountRange> counts = new LinkedHashMap<>();
+            counts.put("subsection_level2", range(5, 10));
+            counts.put("subsection", range(10, 15));
+            counts.put("section", range(15, 20));
+            counts.put("chapter", range(20, 25));
+            return counts;
+        }
+
+        private static ReviewQuestionCountRange range(int min, int max) {
+            ReviewQuestionCountRange range = new ReviewQuestionCountRange();
+            range.setMin(min);
+            range.setMax(max);
+            return range;
+        }
+
+        @Data
+        public static class ReviewQuestionCountRange {
+            @Min(1)
+            private int min;
+
+            @Min(1)
+            private int max;
+        }
+
+        @Data
+        public static class ReviewQuestionComposition {
+            @Min(1)
+            private int maxQuestionsPerChapterInPart = 5;
+
+            @Min(1)
+            private int maxQuestionsPerChapterInDocument = 3;
+
+            @Min(1)
+            private int maxTotalQuestionsInPart = 30;
+
+            @Min(1)
+            private int maxTotalQuestionsInDocument = 50;
+
+            @Min(1)
+            private int maxMissingQueuePerRequest = 10;
+        }
     }
 }

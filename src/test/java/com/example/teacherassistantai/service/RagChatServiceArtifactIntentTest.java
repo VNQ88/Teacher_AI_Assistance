@@ -22,7 +22,6 @@ import com.example.teacherassistantai.service.agent.SummaryAgent;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -52,7 +51,9 @@ class RagChatServiceArtifactIntentTest {
                 factualQaAgent,
                 documentScopeAgent,
                 summaryAgent,
-                mock(QuizAgent.class)
+                mock(QuizAgent.class),
+                new SourceAttributionFormatter(),
+                new InternalCitationSanitizer()
         );
 
         ChatSession session = session();
@@ -68,7 +69,8 @@ class RagChatServiceArtifactIntentTest {
 
         when(chatSessionService.getOwnedSession(5L)).thenReturn(session);
         when(intentRouterService.route("Tóm tắt Chương 1")).thenReturn(RagChatIntent.SECTION_SUMMARY);
-        when(documentScopeAgent.resolve(session, "Tóm tắt Chương 1")).thenReturn(Optional.of(resolvedNode));
+        when(documentScopeAgent.resolveDetailed(session, "Tóm tắt Chương 1"))
+                .thenReturn(ScopeResolution.resolved(resolvedNode, 0.95, "test", List.of(resolvedNode)));
         when(summaryAgent.execute(any())).thenReturn(AgentResult.hit("Tóm tắt từ artifact", List.of()));
         when(chatMessageRepository.save(any(ChatMessage.class))).thenAnswer(invocation -> {
             ChatMessage message = invocation.getArgument(0);

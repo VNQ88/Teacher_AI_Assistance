@@ -127,6 +127,8 @@ public class DocumentEnrichmentPromptBuilder {
         prompt.append("- Phan bo hop ly 3 loai: MULTIPLE_CHOICE, TRUE_FALSE, FILL_BLANK.\n");
         prompt.append("- Moi cau co dap an, giai thich ngan, difficulty neu co the: EASY, MEDIUM, HARD.\n");
         prompt.append("- Citation ngan phai dung chunkId co trong context.\n");
+        prompt.append("- Field citations duoc phep dung chunkId; question, options, correctAnswer va answerExplanation khong duoc nhac chunkId/chunk.\n");
+        prompt.append("- Nguoi dung se thay nguon o phan nguon tham khao rieng, khong chen nguon vao noi dung cau hoi/giai thich.\n");
         prompt.append("- Khong them kien thuc ngoai tai lieu.\n");
         prompt.append("- Chi tra ve mot JSON object hop le, khong boc trong markdown/code fence.\n\n");
         prompt.append("Output JSON schema:\n");

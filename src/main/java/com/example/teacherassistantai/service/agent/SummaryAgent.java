@@ -12,6 +12,8 @@ import com.example.teacherassistantai.integration.ai.AiChatGateway;
 import com.example.teacherassistantai.integration.ai.AiWorkload;
 import com.example.teacherassistantai.repository.DocumentNodeArtifactRepository;
 import com.example.teacherassistantai.repository.DocumentRepository;
+import com.example.teacherassistantai.service.DocumentOutlineSummaryRenderer;
+import com.example.teacherassistantai.service.OriginalSummaryNodeService;
 import com.example.teacherassistantai.service.RagArtifactChatHandlerService;
 import com.example.teacherassistantai.service.VectorRetrievalService;
 import lombok.RequiredArgsConstructor;
@@ -48,9 +50,23 @@ public class SummaryAgent {
     private final RedisTemplate<String, String> redisTemplate;
     private final RagProperties ragProperties;
     private final PlatformTransactionManager transactionManager;
+    private final OriginalSummaryNodeService originalSummaryNodeService;
+    private final DocumentOutlineSummaryRenderer outlineSummaryRenderer;
 
     public AgentResult execute(RagChatState state) {
         DocumentNode node = state.getResolvedNode();
+        Optional<String> outlineSummary = outlineSummaryRenderer.render(node);
+        if (outlineSummary.isPresent()) {
+            return AgentResult.hit(outlineSummary.get(), List.of());
+        }
+        if ("chapter".equals(node.getNodeType())) {
+            Optional<OriginalSummaryNodeService.OriginalSummary> originalSummary =
+                    originalSummaryNodeService.findForChapter(node);
+            if (originalSummary.isPresent()) {
+                return AgentResult.hit(renderOriginalSummary(node, originalSummary.get()), originalSummary.get().sources());
+            }
+        }
+
         Optional<DocumentNodeArtifact> artifact = fetchCompletedSummary(node.getId());
 
         if (artifact.isPresent()) {
@@ -62,6 +78,10 @@ public class SummaryAgent {
 
         log.warn("SummaryAgent: no completed artifact for nodeId={}, using RAG fallback", node.getId());
         return ragFallbackSummary(state, node);
+    }
+
+    private String renderOriginalSummary(DocumentNode chapterNode, OriginalSummaryNodeService.OriginalSummary originalSummary) {
+        return "Tóm tắt " + displayPath(chapterNode) + ":\n\n" + originalSummary.content();
     }
 
     private AgentResult ragFallbackSummary(RagChatState state, DocumentNode node) {
@@ -91,7 +111,7 @@ public class SummaryAgent {
             }
 
             String prompt = buildSummarizationPrompt(node, chunks);
-            String answer = aiChatGateway.generateAnswer(prompt, 0.1, AiWorkload.INTERACTIVE);
+            String answer = aiChatGateway.generateAnswer(prompt, 0.1, AiWorkload.RAG_CHAT);
 
             saveAsCompletedArtifact(node, answer, chunks);
 

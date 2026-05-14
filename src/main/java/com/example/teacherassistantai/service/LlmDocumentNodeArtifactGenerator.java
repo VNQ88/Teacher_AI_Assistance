@@ -2,13 +2,16 @@ package com.example.teacherassistantai.service;
 
 import com.example.teacherassistantai.common.enumerate.DocumentNodeArtifactType;
 import com.example.teacherassistantai.exception.InvalidDataException;
+import com.example.teacherassistantai.integration.ai.AiChatCompletion;
 import com.example.teacherassistantai.integration.ai.AiChatGateway;
 import com.example.teacherassistantai.integration.ai.AiWorkload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -40,11 +43,12 @@ public class LlmDocumentNodeArtifactGenerator implements DocumentNodeArtifactGen
             );
         };
         warnIfLargePrompt(prompt, context.node().getId(), context.node().getNodeType(), context.artifactType().name());
-        String rawResponse = aiChatGateway.generateAnswer(prompt, 0.2, AiWorkload.BACKGROUND);
+        AiChatCompletion completion = aiChatGateway.generate(prompt, 0.2, workloadFor(context.artifactType()));
+        String rawResponse = completion.content();
         Map<String, Object> content = parseOrRepair(context, prompt, rawResponse);
         return new DocumentNodeArtifactGenerationResult(
                 content,
-                estimateTokenCount(prompt, rawResponse)
+                tokenCount(prompt, rawResponse, completion)
         );
     }
 
@@ -70,11 +74,12 @@ public class LlmDocumentNodeArtifactGenerator implements DocumentNodeArtifactGen
             case PART_FROM_CHAPTERS -> promptBuilder.buildPartSummaryPrompt(context);
         };
         warnIfLargePrompt(prompt, context.node().getId(), context.node().getNodeType(), context.summaryMode().name());
-        String rawResponse = aiChatGateway.generateAnswer(prompt, 0.2, AiWorkload.BACKGROUND);
+        AiChatCompletion completion = aiChatGateway.generate(prompt, 0.2, AiWorkload.ENRICH_SUMMARY);
+        String rawResponse = completion.content();
         Map<String, Object> content = parseSummaryOrRepair(context, prompt, rawResponse);
         return new DocumentNodeArtifactGenerationResult(
                 content,
-                estimateTokenCount(prompt, rawResponse)
+                tokenCount(prompt, rawResponse, completion)
         );
     }
 
@@ -85,7 +90,7 @@ public class LlmDocumentNodeArtifactGenerator implements DocumentNodeArtifactGen
             return parse(context, rawResponse);
         } catch (InvalidDataException ex) {
             String repairPrompt = buildRepairPrompt(context, originalPrompt, rawResponse, ex.getMessage());
-            String repairedResponse = aiChatGateway.generateAnswer(repairPrompt, 0.0, AiWorkload.BACKGROUND);
+            String repairedResponse = aiChatGateway.generate(repairPrompt, 0.0, workloadFor(context.artifactType())).content();
             return parse(context, repairedResponse);
         }
     }
@@ -108,7 +113,7 @@ public class LlmDocumentNodeArtifactGenerator implements DocumentNodeArtifactGen
             return parseSummary(context, rawResponse);
         } catch (InvalidDataException ex) {
             String repairPrompt = buildSummaryRepairPrompt(context, originalPrompt, rawResponse, ex.getMessage());
-            String repairedResponse = aiChatGateway.generateAnswer(repairPrompt, 0.0, AiWorkload.BACKGROUND);
+            String repairedResponse = aiChatGateway.generate(repairPrompt, 0.0, AiWorkload.ENRICH_SUMMARY).content();
             return parseSummary(context, repairedResponse);
         }
     }
@@ -134,6 +139,9 @@ public class LlmDocumentNodeArtifactGenerator implements DocumentNodeArtifactGen
         prompt.append("Artifact type: ").append(context.artifactType()).append("\n");
         prompt.append("Node title: ").append(context.node().getTitle()).append("\n");
         prompt.append("Section path: ").append(context.node().getSectionPath()).append("\n\n");
+        if (context.artifactType() == DocumentNodeArtifactType.REVIEW_QUESTION_SET) {
+            prompt.append("Rule hien thi: citations giu chunkId, nhung question/options/correctAnswer/answerExplanation khong duoc nhac chunkId/chunk.\n\n");
+        }
         prompt.append("Schema bat buoc:\n");
         if (context.artifactType() == DocumentNodeArtifactType.SUMMARY) {
             prompt.append("""
@@ -190,34 +198,47 @@ public class LlmDocumentNodeArtifactGenerator implements DocumentNodeArtifactGen
                                             String originalPrompt,
                                             String rawResponse,
                                             String validationError) {
+        SummaryCoverage cov = context.coverage();
+        int expChild = cov != null ? cov.expectedChildCount() : 0;
+        int usedChild = cov != null ? cov.usedChildCount() : 0;
+        int fallback = cov != null ? cov.fallbackChildCount() : 0;
+        int directChunk = cov != null ? cov.directChunkCount() : 0;
+        int usedDirect = cov != null ? cov.usedDirectChunkCount() : 0;
+
         StringBuilder prompt = new StringBuilder();
         prompt.append("Sua JSON summary bottom-up bi loi schema. Chi tra ve mot JSON object hop le, khong markdown/code fence.\n");
         prompt.append("Validation error: ").append(validationError).append("\n");
         prompt.append("Summary mode: ").append(context.summaryMode()).append("\n");
         prompt.append("Node title: ").append(context.node().getTitle()).append("\n");
         prompt.append("Section path: ").append(context.node().getSectionPath()).append("\n\n");
-        prompt.append("""
-                Schema bat buoc:
+        prompt.append("Schema bat buoc (tat ca gia tri so va mang phai khop chinh xac voi cac gia tri sau):\n");
+        prompt.append(String.format("""
                 {
                   "nodeTitle": "string",
                   "sectionPath": "string",
                   "nodeType": "string",
-                  "summaryMode": "string",
+                  "summaryMode": "%s",
                   "summary": "string",
                   "keyPoints": ["string"],
-                  "childSummaries": [],
-                  "childSummaryRefs": [],
+                  "childSummaries": %s,
+                  "childSummaryRefs": %s,
                   "citations": [],
                   "coverage": {
-                    "expectedChildCount": 0,
-                    "usedChildCount": 0,
+                    "expectedChildCount": %d,
+                    "usedChildCount": %d,
+                    "fallbackChildCount": %d,
                     "missingChildNodeIds": [],
-                    "directChunkCount": 0,
-                    "usedDirectChunkCount": 0,
+                    "directChunkCount": %d,
+                    "usedDirectChunkCount": %d,
                     "complete": true
                   }
                 }
-                """);
+                """,
+                context.summaryMode().name(),
+                buildChildSummariesSchema(context.childSummaries()),
+                buildChildSummaryRefsSchema(context.childSummaries()),
+                expChild, usedChild, fallback, directChunk, usedDirect
+        ));
         prompt.append("\nOriginal prompt/context:\n<<<PROMPT>>>\n")
                 .append(originalPrompt)
                 .append("\n<<<END_PROMPT>>>\n");
@@ -237,5 +258,47 @@ public class LlmDocumentNodeArtifactGenerator implements DocumentNodeArtifactGen
     private Integer estimateTokenCount(String prompt, String response) {
         int chars = (prompt == null ? 0 : prompt.length()) + (response == null ? 0 : response.length());
         return Math.max(1, chars / 4);
+    }
+
+    private Integer tokenCount(String prompt, String response, AiChatCompletion completion) {
+        if (completion != null && completion.usage() != null && completion.usage().totalTokens() != null) {
+            return completion.usage().totalTokens();
+        }
+        return estimateTokenCount(prompt, response);
+    }
+
+    private String buildChildSummaryRefsSchema(List<ChildSummary> childSummaries) {
+        if (childSummaries == null || childSummaries.isEmpty()) {
+            return "[]";
+        }
+        String entries = childSummaries.stream()
+                .map(cs -> String.format(
+                        "{\"nodeId\": %d, \"artifactId\": %d, \"sourceHash\": \"%s\"}",
+                        cs.nodeId() != null ? cs.nodeId() : 0,
+                        cs.artifactId() != null ? cs.artifactId() : 0,
+                        cs.sourceHash() != null ? cs.sourceHash().replace("\"", "\\\"") : ""
+                ))
+                .collect(Collectors.joining(", "));
+        return "[" + entries + "]";
+    }
+
+    private String buildChildSummariesSchema(List<ChildSummary> childSummaries) {
+        if (childSummaries == null || childSummaries.isEmpty()) {
+            return "[]";
+        }
+        String entries = childSummaries.stream()
+                .map(cs -> String.format(
+                        "{\"nodeId\": %d, \"summary\": \"<tom tat noi dung cua %s>\"}",
+                        cs.nodeId() != null ? cs.nodeId() : 0,
+                        cs.title() != null ? cs.title().replace("\"", "\\\"") : "node " + cs.nodeId()
+                ))
+                .collect(Collectors.joining(", "));
+        return "[" + entries + "]";
+    }
+
+    private AiWorkload workloadFor(DocumentNodeArtifactType artifactType) {
+        return artifactType == DocumentNodeArtifactType.SUMMARY
+                ? AiWorkload.ENRICH_SUMMARY
+                : AiWorkload.ENRICH_REVIEW_QUESTION;
     }
 }

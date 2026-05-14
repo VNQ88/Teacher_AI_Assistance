@@ -56,15 +56,15 @@ spring:
         max-interval: 40s
       on-http-codes: 424
     openai:
-      api-key: ${DIGITALOCEAN_MODEL_ACCESS_KEY}
+      api-key: ${DIGITALOCEAN_RAG_MODEL_ACCESS_KEY}
       chat:
-        base-url: ${DIGITALOCEAN_BASE_URL}
+        base-url: ${DIGITALOCEAN_RAG_BASE_URL:${DIGITALOCEAN_BASE_URL}}
         completions-path: /v1/chat/completions
         options:
-          model: ${DIGITALOCEAN_CHAT_MODEL}
+          model: ${DIGITALOCEAN_RAG_CHAT_MODEL:${DIGITALOCEAN_CHAT_MODEL}}
           temperature: 0.2
       embedding:
-        base-url: ${DIGITALOCEAN_BASE_URL}
+        base-url: ${DIGITALOCEAN_RAG_BASE_URL:${DIGITALOCEAN_BASE_URL}}
         embeddings-path: /v1/embeddings
         options:
           model: ${DIGITALOCEAN_EMBEDDING_MODEL}
@@ -124,10 +124,31 @@ application:
       review-questions-enabled: true
       default-review-question-min-count: 15
       default-review-question-max-count: 20
+      review-question-counts:
+        subsection_level2:
+          min: 5
+          max: 10
+        subsection:
+          min: 10
+          max: 15
+        section:
+          min: 15
+          max: 20
+        chapter:
+          min: 20
+          max: 25
+      review-question-requests-per-minute: 10
+      review-question-resume-batch-size: 10
+      review-question-composition:
+        max-questions-per-chapter-in-part: 5
+        max-questions-per-chapter-in-document: 3
+        max-total-questions-in-part: 30
+        max-total-questions-in-document: 50
+        max-missing-queue-per-request: 10
       max-node-chunks: 120
       max-node-context-chars: 60000
       max-concurrency: 3
-      intra-document-concurrency: 2
+      intra-document-concurrency: 4
       auto-retry-on-partial-failed: true
       auto-retry-delay-minutes: 35
       auto-retry-max-attempts: 3
@@ -137,10 +158,17 @@ application:
       section-summary-max-key-points: 6
       chapter-summary-max-key-points: 10
     ai:
-      base-url: ${DIGITALOCEAN_BASE_URL}
-      chat-model: ${DIGITALOCEAN_CHAT_MODEL}
+      base-url: ${DIGITALOCEAN_RAG_BASE_URL:${DIGITALOCEAN_BASE_URL}}
+      chat-model: ${DIGITALOCEAN_RAG_CHAT_MODEL:${DIGITALOCEAN_CHAT_MODEL}}
       embedding-model: ${DIGITALOCEAN_EMBEDDING_MODEL}
       timeout-seconds: 80
+      enrichment:
+        base-url: ${DIGITALOCEAN_ENRICHMENT_BASE_URL:${DIGITALOCEAN_BASE_URL}}
+        api-key: ${DIGITALOCEAN_ENRICHMENT_MODEL_ACCESS_KEY}
+        summary-model: ${DIGITALOCEAN_ENRICH_SUMMARY_MODEL:deepseek-3.2}
+        review-question-model: ${DIGITALOCEAN_ENRICH_REVIEW_QUESTION_MODEL:openai-gpt-oss-120b}
+        timeout-seconds: 120
+        pause-all-on-429: true
       rate-limit:
         enabled: true
         total-requests-per-minute: 180
@@ -151,6 +179,9 @@ application:
         background-resume-remaining-threshold: 1000
         background-hourly-pause-minutes: 10
         background-resume-batch-size: 30
+        enrichment-pause-minutes-on-429: 10
+        enrichment-min-remaining-tokens-per-minute: 1000
+        enrichment-min-remaining-tokens-per-day: 10000
 
 logging:
   level:

@@ -11,33 +11,63 @@ import org.springframework.stereotype.Component;
 public class DigitalOceanChatGateway implements AiChatGateway {
 
     private final ChatClient chatClient;
+    private final AiModelRoutingService routingService;
+    private final DigitalOceanEnrichmentChatClient enrichmentChatClient;
     private final DigitalOceanAiRateLimiter rateLimiter;
 
     public DigitalOceanChatGateway(@Qualifier("ragChatClient") ChatClient chatClient,
+                                   AiModelRoutingService routingService,
+                                   DigitalOceanEnrichmentChatClient enrichmentChatClient,
                                    DigitalOceanAiRateLimiter rateLimiter) {
         this.chatClient = chatClient;
+        this.routingService = routingService;
+        this.enrichmentChatClient = enrichmentChatClient;
         this.rateLimiter = rateLimiter;
     }
 
     @Override
     public String generateAnswer(String prompt, Double temperature, AiWorkload workload) {
+        return generate(prompt, temperature, workload).content();
+    }
+
+    @Override
+    public AiChatCompletion generate(String prompt, Double temperature, AiWorkload workload) {
         if (prompt == null || prompt.isBlank()) {
-            return "Khong co cau hoi hop le.";
+            AiWorkload normalized = workload == null ? AiWorkload.RAG_CHAT : workload.normalized();
+            return new AiChatCompletion("Khong co cau hoi hop le.", null, null, null, normalized);
         }
 
-        rateLimiter.acquire(workload);
+        AiModelRoute route = routingService.route(workload == null ? AiWorkload.RAG_CHAT : workload);
+        rateLimiter.acquire(route.workload(), route.accountAlias(), route.model(), null);
 
         try {
+            if (route.enrichment()) {
+                AiChatCompletion completion = enrichmentChatClient.complete(prompt, temperature, route);
+                rateLimiter.recordSuccess(route.workload(), route.accountAlias(), route.model(),
+                        completion.rateLimit(), completion.usage());
+                return completion;
+            }
+
             String content = chatClient.prompt()
                     .user(prompt)
                     .call()
                     .content();
-            return content != null ? content : "Xin loi, he thong tam thoi chua tao duoc cau tra loi.";
+            return new AiChatCompletion(
+                    content != null ? content : "Xin loi, he thong tam thoi chua tao duoc cau tra loi.",
+                    null,
+                    null,
+                    route.model(),
+                    route.workload()
+            );
+        } catch (DigitalOceanEnrichmentRateLimitException ex) {
+            log.warn("429 received workload={} accountAlias={} model={}", route.workload(), route.accountAlias(), route.model());
+            rateLimiter.handle429(route.workload(), route.accountAlias(), route.model(), ex.snapshot());
+            throw ex;
         } catch (Exception ex) {
             if (is429(ex)) {
                 log.warn("429 received workload={}", workload);
-                if (workload == AiWorkload.BACKGROUND) {
-                    rateLimiter.handleBackground429(); // sets pause and throws BackgroundRateLimitedException
+                if (route.workload().enrichment()) {
+                    rateLimiter.handle429(route.workload(), route.accountAlias(), route.model(), null);
                 }
                 throw new AiRateLimitedException("AI provider rate limit exceeded. Please retry later.");
             }

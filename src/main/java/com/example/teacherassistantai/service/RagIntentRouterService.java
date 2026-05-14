@@ -17,6 +17,8 @@ public class RagIntentRouterService {
                 "cau hoi on tap",
                 "tao cau hoi",
                 "bo cau hoi",
+                "de cuong on tap",
+                "de cuong mon hoc",
                 "trac nghiem",
                 "dung sai",
                 "dien khuyet",

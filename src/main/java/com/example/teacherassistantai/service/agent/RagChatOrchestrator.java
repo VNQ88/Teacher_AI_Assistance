@@ -17,8 +17,11 @@ import com.example.teacherassistantai.repository.AgentLogRepository;
 import com.example.teacherassistantai.repository.ChatMessageRepository;
 import com.example.teacherassistantai.repository.DocumentRepository;
 import com.example.teacherassistantai.service.ChatSessionService;
+import com.example.teacherassistantai.service.InternalCitationSanitizer;
 import com.example.teacherassistantai.service.RagChatIntent;
 import com.example.teacherassistantai.service.RagIntentRouterService;
+import com.example.teacherassistantai.service.ScopeResolution;
+import com.example.teacherassistantai.service.SourceAttributionFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,8 +32,8 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -47,6 +50,8 @@ public class RagChatOrchestrator {
     private final DocumentScopeAgent documentScopeAgent;
     private final SummaryAgent summaryAgent;
     private final QuizAgent quizAgent;
+    private final SourceAttributionFormatter sourceAttributionFormatter;
+    private final InternalCitationSanitizer citationSanitizer;
 
     public ChatMessageResponse execute(Long sessionId, SendChatMessageRequest request) {
         long startedAt = System.currentTimeMillis();
@@ -73,31 +78,31 @@ public class RagChatOrchestrator {
         AgentType agentType;
 
         if (intent == RagChatIntent.SECTION_SUMMARY) {
-            Optional<DocumentNode> resolvedNode =
-                    documentScopeAgent.resolve(session, request.getQuestion());
-            if (resolvedNode.isEmpty()) {
-                result = documentScopeAgent.notFound();
+            ScopeResolution resolution =
+                    documentScopeAgent.resolveDetailed(session, request.getQuestion());
+            if (resolution.status() != ScopeResolution.Status.RESOLVED) {
+                result = documentScopeAgent.unresolved(resolution);
             } else {
                 RagChatState state = RagChatState.builder()
                         .question(request.getQuestion())
                         .session(session)
                         .intent(intent)
-                        .resolvedNode(resolvedNode.get())
+                        .resolvedNode(resolution.node())
                         .startedAt(startedAt)
                         .build();
                 result = summaryAgent.execute(state);
             }
             agentType = AgentType.KNOWLEDGE_CHATBOT;
         } else if (intent == RagChatIntent.REVIEW_QUESTION_GENERATION) {
-            Optional<DocumentNode> resolvedNode = documentScopeAgent.resolve(session, request.getQuestion());
-            if (resolvedNode.isEmpty()) {
-                result = documentScopeAgent.notFound();
+            ScopeResolution resolution = documentScopeAgent.resolveDetailed(session, request.getQuestion());
+            if (resolution.status() != ScopeResolution.Status.RESOLVED) {
+                result = documentScopeAgent.unresolved(resolution);
             } else {
                 RagChatState state = RagChatState.builder()
                         .question(request.getQuestion())
                         .session(session)
                         .intent(intent)
-                        .resolvedNode(resolvedNode.get())
+                        .resolvedNode(resolution.node())
                         .startedAt(startedAt)
                         .build();
                 result = quizAgent.execute(state);
@@ -244,26 +249,22 @@ public class RagChatOrchestrator {
     }
 
     private String appendSourcesFooter(String answer, List<DocumentChunk> sources) {
-        if (sources == null || sources.isEmpty()) return answer;
-        Set<String> seen = new LinkedHashSet<>();
-        for (DocumentChunk chunk : sources) {
-            String title = chunk.getDocument() == null ? null : chunk.getDocument().getTitle();
-            if (title == null || title.isBlank()) continue;
-            String pages = pageRange(chunk.getPageFrom(), chunk.getPageTo());
-            seen.add(pages.isBlank() ? title : title + " (trang " + pages + ")");
-        }
-        if (seen.isEmpty()) return answer;
+        String sanitizedAnswer = citationSanitizer.sanitize(answer);
+        if (sanitizedAnswer == null) sanitizedAnswer = "";
+        if (sources == null || sources.isEmpty() || hasSourcesFooter(sanitizedAnswer)) return sanitizedAnswer;
+        List<String> labels = sourceAttributionFormatter.formatSources(sources);
+        if (labels.isEmpty()) return sanitizedAnswer;
         StringBuilder footer = new StringBuilder("\n\n---\n**Nguồn tham khảo:**");
-        for (String entry : seen) {
+        for (String entry : labels) {
             footer.append("\n- ").append(entry);
         }
-        return answer + footer;
+        return sanitizedAnswer + footer;
     }
 
-    private String pageRange(Integer pageFrom, Integer pageTo) {
-        if (pageFrom == null && pageTo == null) return "";
-        if (pageFrom != null && pageTo != null && !pageFrom.equals(pageTo)) return pageFrom + "-" + pageTo;
-        return String.valueOf(pageFrom != null ? pageFrom : pageTo);
+    private boolean hasSourcesFooter(String answer) {
+        if (answer == null || answer.isBlank()) return false;
+        String normalized = answer.toLowerCase(Locale.ROOT);
+        return normalized.contains("nguồn tham khảo:") || normalized.contains("nguon tham khao:");
     }
 
     private List<String> extractDistinctDocumentTitles(List<DocumentChunk> chunks) {
@@ -292,6 +293,8 @@ public class RagChatOrchestrator {
                     .sectionPath(chunk.getSectionPath())
                     .pageFrom(chunk.getPageFrom())
                     .pageTo(chunk.getPageTo())
+                    .sourceLabel(sourceAttributionFormatter.format(chunk))
+                    .pageRange(sourceAttributionFormatter.pageRange(chunk))
                     .chunkType(chunk.getChunkType())
                     .charStart(metadataInt(chunk.getMetadataJsonb(), "charStart"))
                     .charEnd(metadataInt(chunk.getMetadataJsonb(), "charEnd"))

@@ -55,7 +55,9 @@ class RagChatServiceSourceTrackingTest {
                 factualQaAgent,
                 mock(DocumentScopeAgent.class),
                 mock(SummaryAgent.class),
-                mock(QuizAgent.class)
+                mock(QuizAgent.class),
+                new SourceAttributionFormatter(),
+                new InternalCitationSanitizer()
         );
 
         ChatSession session = session();
@@ -76,11 +78,14 @@ class RagChatServiceSourceTrackingTest {
         when(chatMessageRepository.findBySessionIdOrderByCreatedAtDesc(any(), any()))
                 .thenReturn(new PageImpl<>(List.of()));
         when(factualQaAgent.execute(any()))
-                .thenReturn(new AgentResult("Vật chất là ... [Source 1, pages 12-13]",
+                .thenReturn(new AgentResult("Vật chất là ... (chunk 99)",
                         List.of(source), 0.82, "HIGH", false, false));
 
         ChatMessageResponse response = orchestrator.execute(5L, request);
 
+        assertThat(response.getContent()).doesNotContain("chunk 99");
+        assertThat(response.getContent()).contains("**Nguồn tham khảo:**");
+        assertThat(response.getContent()).contains("Giao trinh Triet hoc, Chuong 1 > I. Khai niem (trang 12-13)");
         assertThat(response.getSources()).containsExactly("Giao trinh Triet hoc");
         assertThat(response.getSourceDetails()).hasSize(1);
         assertThat(response.getSourceDetails().getFirst().getSourceIndex()).isEqualTo(1);
@@ -90,6 +95,9 @@ class RagChatServiceSourceTrackingTest {
         assertThat(response.getSourceDetails().getFirst().getSectionPath()).isEqualTo("Chuong 1 > I. Khai niem");
         assertThat(response.getSourceDetails().getFirst().getPageFrom()).isEqualTo(12);
         assertThat(response.getSourceDetails().getFirst().getPageTo()).isEqualTo(13);
+        assertThat(response.getSourceDetails().getFirst().getSourceLabel())
+                .isEqualTo("Giao trinh Triet hoc, Chuong 1 > I. Khai niem (trang 12-13)");
+        assertThat(response.getSourceDetails().getFirst().getPageRange()).isEqualTo("trang 12-13");
         assertThat(response.getSourceDetails().getFirst().getChunkType()).isEqualTo("TEXT");
         assertThat(response.getSourceDetails().getFirst().getCharStart()).isEqualTo(100);
         assertThat(response.getSourceDetails().getFirst().getCharEnd()).isEqualTo(250);
@@ -110,7 +118,9 @@ class RagChatServiceSourceTrackingTest {
                 mock(FactualQaAgent.class),
                 mock(DocumentScopeAgent.class),
                 mock(SummaryAgent.class),
-                mock(QuizAgent.class)
+                mock(QuizAgent.class),
+                new SourceAttributionFormatter(),
+                new InternalCitationSanitizer()
         );
 
         ChatSession session = session();

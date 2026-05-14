@@ -15,130 +15,213 @@ import java.time.Instant;
 @Component
 public class DigitalOceanAiRateLimiter {
 
-    private static final String KEY_BG_PAUSED = "ai:bg:pausedUntil";
+    private static final String ENRICHMENT_ALL_MODELS = "__ALL__";
     private static final String PREFIX_TOTAL_MIN = "ai:rl:total:min:";
-    private static final String PREFIX_BG_MIN = "ai:rl:bg:min:";
     private static final String PREFIX_TOTAL_HOUR = "ai:rl:total:hour:";
-    private static final String PREFIX_BG_HOUR = "ai:rl:bg:hour:";
+    private static final String PREFIX_REVIEW_QUESTION_MIN = "ai:rl:req:min:ENRICH_REVIEW_QUESTION:";
 
     private final RedisTemplate<String, String> redisTemplate;
-    private final RateLimitTracker rateLimitTracker;
     private final RagProperties ragProperties;
+    private final AiModelRoutingService routingService;
+    private final DigitalOceanTokenRateLimitTracker tokenRateLimitTracker;
 
     public DigitalOceanAiRateLimiter(@Qualifier("aiRateLimitRedisTemplate") RedisTemplate<String, String> redisTemplate,
-                                     RateLimitTracker rateLimitTracker,
-                                     RagProperties ragProperties) {
+                                     RagProperties ragProperties,
+                                     AiModelRoutingService routingService,
+                                     DigitalOceanTokenRateLimitTracker tokenRateLimitTracker) {
         this.redisTemplate = redisTemplate;
-        this.rateLimitTracker = rateLimitTracker;
         this.ragProperties = ragProperties;
+        this.routingService = routingService;
+        this.tokenRateLimitTracker = tokenRateLimitTracker;
     }
 
     public void acquire(AiWorkload workload) {
+        AiModelRoute route = routingService.route(workload == null ? AiWorkload.RAG_CHAT : workload);
+        acquire(route.workload(), route.accountAlias(), route.model(), null);
+    }
+
+    public void acquire(AiWorkload workload, String accountAlias, String model, Integer estimatedPromptTokens) {
         RagProperties.Ai.RateLimit cfg = ragProperties.getAi().getRateLimit();
         if (!cfg.isEnabled()) return;
 
-        if (workload == AiWorkload.BACKGROUND) {
-            checkBackgroundNotPaused();
-            checkDoRemainingThreshold(cfg);
-            waitForMinuteBudget(PREFIX_BG_MIN, cfg.getBackgroundRequestsPerMinute(), workload);
-            checkHourBudget(PREFIX_BG_HOUR, cfg.getBackgroundRequestsPerHour(), workload, cfg);
+        AiWorkload normalized = workload == null ? AiWorkload.RAG_CHAT : workload.normalized();
+        if (normalized.enrichment()) {
+            checkEnrichmentNotPaused(normalized, accountAlias, model);
+            checkTokenSnapshotThreshold(normalized, accountAlias, model, cfg);
+            if (normalized == AiWorkload.ENRICH_REVIEW_QUESTION) {
+                checkReviewQuestionRequestCap(cfg);
+            }
+            log.debug("AI limiter acquire workload={} accountAlias={} model={}", normalized, accountAlias, model);
+            return;
         }
 
-        waitForMinuteBudget(PREFIX_TOTAL_MIN, cfg.getTotalRequestsPerMinute(), workload);
-        checkHourBudget(PREFIX_TOTAL_HOUR, cfg.getTotalRequestsPerHour(), workload, cfg);
-
-        log.debug("AI limiter acquire workload={}", workload);
+        waitForMinuteBudget(PREFIX_TOTAL_MIN, cfg.getTotalRequestsPerMinute(), normalized);
+        checkHourBudget(PREFIX_TOTAL_HOUR, cfg.getTotalRequestsPerHour(), normalized);
         incr(PREFIX_TOTAL_MIN + epochMinute(), 90);
         incr(PREFIX_TOTAL_HOUR + epochHour(), 3700);
-        if (workload == AiWorkload.BACKGROUND) {
-            incr(PREFIX_BG_MIN + epochMinute(), 90);
-            incr(PREFIX_BG_HOUR + epochHour(), 3700);
+        log.debug("AI limiter acquire workload={} accountAlias={} model={}", normalized, accountAlias, model);
+    }
+
+    public boolean isPaused(AiWorkload workload, String accountAlias, String model) {
+        AiWorkload normalized = workload == null ? AiWorkload.RAG_CHAT : workload.normalized();
+        if (!normalized.enrichment()) {
+            return false;
         }
+        return pausedUntil(accountAlias, model).isAfter(Instant.now());
     }
 
     public boolean isBackgroundPaused() {
-        String val = redisTemplate.opsForValue().get(KEY_BG_PAUSED);
-        if (val == null) return false;
-        return Instant.ofEpochSecond(Long.parseLong(val)).isAfter(Instant.now());
+        AiModelRoute summaryRoute = routingService.route(AiWorkload.ENRICH_SUMMARY);
+        AiModelRoute reviewRoute = routingService.route(AiWorkload.ENRICH_REVIEW_QUESTION);
+        return isPaused(summaryRoute.workload(), summaryRoute.accountAlias(), summaryRoute.model())
+                || isPaused(reviewRoute.workload(), reviewRoute.accountAlias(), reviewRoute.model());
     }
 
-    // Called by gateway on 429 response; sets pause state and throws for background workload
-    public void handleBackground429() {
-        RagProperties.Ai.RateLimit cfg = ragProperties.getAi().getRateLimit();
-        Instant until = computePausedUntil(cfg);
-        setPausedUntil(until);
-        log.info("Background paused until={} reason=429_received", until);
+    public void handle429(AiWorkload workload,
+                          String accountAlias,
+                          String model,
+                          AiRateLimitSnapshot snapshot) {
+        AiWorkload normalized = workload == null ? AiWorkload.RAG_CHAT : workload.normalized();
+        if (snapshot != null) {
+            tokenRateLimitTracker.update(accountAlias, model, snapshot);
+        }
+        if (!normalized.enrichment()) {
+            throw new AiRateLimitedException("AI provider rate limit exceeded. Please retry later.");
+        }
+
+        Instant until = Instant.now().plusSeconds((long) ragProperties.getAi().getRateLimit().getEnrichmentPauseMinutesOn429() * 60);
+        pause(accountAlias, model, until);
+        log.info("Enrichment paused until={} reason=429_received workload={} accountAlias={} model={}",
+                until, normalized, accountAlias, model);
         throw new BackgroundRateLimitedException(until);
     }
 
-    private void checkBackgroundNotPaused() {
-        String val = redisTemplate.opsForValue().get(KEY_BG_PAUSED);
-        if (val == null) return;
-        Instant pausedUntil = Instant.ofEpochSecond(Long.parseLong(val));
+    public void recordSuccess(AiWorkload workload,
+                              String accountAlias,
+                              String model,
+                              AiRateLimitSnapshot snapshot,
+                              AiUsage usage) {
+        if (snapshot != null) {
+            tokenRateLimitTracker.update(accountAlias, model, snapshot);
+        }
+        if (snapshot != null || usage != null) {
+            log.info("AI response workload={} accountAlias={} model={} promptTokens={} completionTokens={} totalTokens={} remainingTokensPerMinute={} remainingTokensPerDay={} limitTokensPerMinute={} limitTokensPerDay={}",
+                    workload == null ? null : workload.normalized(),
+                    accountAlias,
+                    model,
+                    usage == null ? null : usage.promptTokens(),
+                    usage == null ? null : usage.completionTokens(),
+                    usage == null ? null : usage.totalTokens(),
+                    snapshot == null ? null : snapshot.remainingTokensPerMinute(),
+                    snapshot == null ? null : snapshot.remainingTokensPerDay(),
+                    snapshot == null ? null : snapshot.limitTokensPerMinute(),
+                    snapshot == null ? null : snapshot.limitTokensPerDay());
+        }
+    }
+
+    public void handleBackground429() {
+        AiModelRoute route = routingService.route(AiWorkload.ENRICH_REVIEW_QUESTION);
+        handle429(route.workload(), route.accountAlias(), route.model(), null);
+    }
+
+    private void checkEnrichmentNotPaused(AiWorkload workload, String accountAlias, String model) {
+        Instant pausedUntil = pausedUntil(accountAlias, model);
         if (pausedUntil.isAfter(Instant.now())) {
+            log.info("Enrichment request blocked by pause workload={} accountAlias={} model={} pausedUntil={}",
+                    workload, accountAlias, model, pausedUntil);
             throw new BackgroundRateLimitedException(pausedUntil);
         }
     }
 
-    private void checkDoRemainingThreshold(RagProperties.Ai.RateLimit cfg) {
-        int remaining = rateLimitTracker.getRemaining();
-        if (remaining < cfg.getBackgroundPauseRemainingThreshold()) {
-            Instant until = computePausedUntil(cfg);
-            setPausedUntil(until);
-            log.info("Background paused until={} reason=DO_remaining_threshold remaining={}", until, remaining);
+    private void checkTokenSnapshotThreshold(AiWorkload workload,
+                                             String accountAlias,
+                                             String model,
+                                             RagProperties.Ai.RateLimit cfg) {
+        tokenRateLimitTracker.getSnapshot(accountAlias, model).ifPresent(snapshot -> {
+            boolean minuteLow = snapshot.remainingTokensPerMinute() != null
+                    && snapshot.remainingTokensPerMinute() < cfg.getEnrichmentMinRemainingTokensPerMinute();
+            boolean dayLow = snapshot.remainingTokensPerDay() != null
+                    && snapshot.remainingTokensPerDay() < cfg.getEnrichmentMinRemainingTokensPerDay();
+            if (!minuteLow && !dayLow) {
+                return;
+            }
+            Instant until = Instant.now().plusSeconds((long) cfg.getEnrichmentPauseMinutesOn429() * 60);
+            pause(accountAlias, model, until);
+            log.info("Enrichment paused until={} reason=token_threshold workload={} accountAlias={} model={} remainingTokensPerMinute={} remainingTokensPerDay={}",
+                    until, workload, accountAlias, model,
+                    snapshot.remainingTokensPerMinute(), snapshot.remainingTokensPerDay());
             throw new BackgroundRateLimitedException(until);
+        });
+    }
+
+    private void checkReviewQuestionRequestCap(RagProperties.Ai.RateLimit cfg) {
+        int cap = ragProperties.getEnrichment().getReviewQuestionRequestsPerMinute();
+        String key = PREFIX_REVIEW_QUESTION_MIN + epochMinute();
+        long current = parseLong(redisTemplate.opsForValue().get(key));
+        if (current >= cap) {
+            long waitMs = msUntilNextMinute();
+            log.info("AI limiter review question minute wait waitMs={}", waitMs);
+            sleep(waitMs);
+            key = PREFIX_REVIEW_QUESTION_MIN + epochMinute();
         }
+        incr(key, 90);
+    }
+
+    private void pause(String accountAlias, String model, Instant until) {
+        tokenRateLimitTracker.pause(accountAlias, model, until);
+        if (ragProperties.getAi().getEnrichment().isPauseAllOn429()) {
+            tokenRateLimitTracker.pause(accountAlias, ENRICHMENT_ALL_MODELS, until);
+        }
+    }
+
+    private Instant pausedUntil(String accountAlias, String model) {
+        Instant allModels = tokenRateLimitTracker.pausedUntil(accountAlias, ENRICHMENT_ALL_MODELS).orElse(Instant.EPOCH);
+        Instant specificModel = tokenRateLimitTracker.pausedUntil(accountAlias, model).orElse(Instant.EPOCH);
+        return allModels.isAfter(specificModel) ? allModels : specificModel;
     }
 
     private void waitForMinuteBudget(String keyPrefix, int cap, AiWorkload workload) {
         String key = keyPrefix + epochMinute();
-        String val = redisTemplate.opsForValue().get(key);
-        long current = val != null ? Long.parseLong(val) : 0;
+        long current = parseLong(redisTemplate.opsForValue().get(key));
         if (current >= cap) {
             long waitMs = msUntilNextMinute();
             log.info("AI limiter minute wait workload={} waitMs={}", workload, waitMs);
-            try {
-                Thread.sleep(waitMs);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            sleep(waitMs);
         }
     }
 
-    private void checkHourBudget(String keyPrefix, int cap, AiWorkload workload, RagProperties.Ai.RateLimit cfg) {
+    private void checkHourBudget(String keyPrefix, int cap, AiWorkload workload) {
         String key = keyPrefix + epochHour();
-        String val = redisTemplate.opsForValue().get(key);
-        long current = val != null ? Long.parseLong(val) : 0;
-        if (current < cap) return;
-
-        if (workload == AiWorkload.BACKGROUND) {
-            Instant until = computePausedUntil(cfg);
-            setPausedUntil(until);
-            log.info("Background paused until={} reason=hour_cap", until);
-            throw new BackgroundRateLimitedException(until);
-        } else {
+        long current = parseLong(redisTemplate.opsForValue().get(key));
+        if (current >= cap) {
             log.warn("429 received workload={} reason=total_hour_cap", workload);
             throw new AiRateLimitedException("AI provider rate limit exceeded. Please retry later.");
         }
-    }
-
-    private Instant computePausedUntil(RagProperties.Ai.RateLimit cfg) {
-        Instant resetAt = rateLimitTracker.getResetAt();
-        Instant now = Instant.now();
-        Instant fallback = now.plusSeconds((long) cfg.getBackgroundHourlyPauseMinutes() * 60);
-        return (resetAt != null && resetAt.isAfter(now)) ? resetAt : fallback;
-    }
-
-    private void setPausedUntil(Instant until) {
-        long ttlSeconds = Math.max(60, until.getEpochSecond() - Instant.now().getEpochSecond() + 10);
-        redisTemplate.opsForValue().set(KEY_BG_PAUSED, String.valueOf(until.getEpochSecond()),
-                Duration.ofSeconds(ttlSeconds));
     }
 
     private void incr(String key, long ttlSeconds) {
         Long count = redisTemplate.opsForValue().increment(key);
         if (Long.valueOf(1L).equals(count)) {
             redisTemplate.expire(key, Duration.ofSeconds(ttlSeconds));
+        }
+    }
+
+    private long parseLong(String value) {
+        if (value == null || value.isBlank()) {
+            return 0;
+        }
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException ex) {
+            return 0;
+        }
+    }
+
+    private void sleep(long waitMs) {
+        try {
+            Thread.sleep(waitMs);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 

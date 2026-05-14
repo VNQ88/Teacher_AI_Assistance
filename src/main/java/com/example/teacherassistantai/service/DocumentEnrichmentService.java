@@ -11,6 +11,7 @@ import com.example.teacherassistantai.entity.DocumentNode;
 import com.example.teacherassistantai.entity.DocumentNodeArtifact;
 import com.example.teacherassistantai.exception.BackgroundRateLimitedException;
 import com.example.teacherassistantai.exception.ResourceNotFoundException;
+import com.example.teacherassistantai.integration.ai.AiModelRoutingService;
 import com.example.teacherassistantai.repository.DocumentChunkRepository;
 import com.example.teacherassistantai.repository.DocumentNodeArtifactRepository;
 import com.example.teacherassistantai.repository.DocumentNodeRepository;
@@ -41,6 +42,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 @RequiredArgsConstructor
@@ -48,9 +50,12 @@ import java.util.concurrent.Semaphore;
 public class DocumentEnrichmentService {
 
     private static final Set<String> ENRICHABLE_NODE_TYPES = Set.of("part", "chapter", "section", "subsection", "subsection_level2");
+    private static final Set<String> NON_CONTENT_REVIEW_QUESTION_NODE_TYPES = Set.of("document", "summary", "review_questions");
     private static final List<String> SUMMARY_NODE_ORDER = List.of("subsection_level2", "subsection", "section", "chapter", "part");
     private static final String PHASE_4_GENERATOR_MISSING =
             "Artifact generation is not available until Phase 4 prompt/LLM generator is implemented";
+    private static final String REVIEW_QUESTION_DEFERRED_FOR_SUMMARY_BACKLOG =
+            "Review question enrichment deferred because summary backlog exists";
 
     private final DocumentRepository documentRepository;
     private final DocumentNodeRepository documentNodeRepository;
@@ -62,6 +67,9 @@ public class DocumentEnrichmentService {
     private final TransactionTemplate transactionTemplate;
     private final RedisTemplate<String, String> redisTemplate;
     private final com.example.teacherassistantai.service.quiz.HierarchicalQuizEnrichmentService quizEnrichmentService;
+    private final DocumentEnrichmentBacklogService backlogService;
+    private final ReviewQuestionCountResolver reviewQuestionCountResolver;
+    private final AiModelRoutingService aiModelRoutingService;
 
     @Async("documentEnrichmentExecutor")
     public void enqueueDocumentEnrichment(Long documentId) {
@@ -129,9 +137,28 @@ public class DocumentEnrichmentService {
         List<DocumentNodeArtifactType> nonSummaryArtifactTypes = artifactTypes.stream()
                 .filter(artifactType -> artifactType != DocumentNodeArtifactType.SUMMARY)
                 .toList();
+        if (nonSummaryArtifactTypes.contains(DocumentNodeArtifactType.REVIEW_QUESTION_SET)
+                && backlogService.hasSummaryBacklog(documentId)) {
+            log.info("Defer REVIEW_QUESTION_SET enrichment because summary backlog exists: documentId={}", documentId);
+            outcomes.add(ArtifactOutcome.generatedSkipped(REVIEW_QUESTION_DEFERRED_FOR_SUMMARY_BACKLOG));
+            nonSummaryArtifactTypes = nonSummaryArtifactTypes.stream()
+                    .filter(artifactType -> artifactType != DocumentNodeArtifactType.REVIEW_QUESTION_SET)
+                    .toList();
+        }
+        boolean stopNonSummaryBatch = false;
         for (DocumentNode node : nodes) {
+            if (stopNonSummaryBatch) {
+                break;
+            }
             for (DocumentNodeArtifactType artifactType : nonSummaryArtifactTypes) {
-                outcomes.add(enrichArtifact(node.getId(), artifactType, forceRegenerate));
+                ArtifactOutcome outcome = enrichArtifact(node.getId(), artifactType, forceRegenerate);
+                outcomes.add(outcome);
+                if (outcome.rateLimited()) {
+                    log.info("Stop document non-summary enrichment batch because rate limit was reached: documentId={}, nodeId={}, artifactType={}",
+                            documentId, node.getId(), artifactType);
+                    stopNonSummaryBatch = true;
+                    break;
+                }
             }
         }
 
@@ -140,10 +167,10 @@ public class DocumentEnrichmentService {
         // After SUMMARISING → READY: retry FAILED section summaries once (enables chain regen)
         if (wasSummarising
                 && artifactTypes.contains(DocumentNodeArtifactType.SUMMARY)
-                && outcomes.stream().anyMatch(ArtifactOutcome::failed)) {
+                && outcomes.stream().anyMatch(ArtifactOutcome::failedOrRateLimited)) {
             Document after = documentRepository.findById(documentId).orElse(null);
             if (after != null && after.getStatus() == DocumentStatus.READY) {
-                long failedCount = outcomes.stream().filter(ArtifactOutcome::failed).count();
+                long failedCount = outcomes.stream().filter(ArtifactOutcome::failedOrRateLimited).count();
                 log.info("SUMMARISING→READY with {} failed nodes — retrying failed section summaries: documentId={}",
                         failedCount, documentId);
                 enqueueDocumentEnrichment(documentId, false, List.of(DocumentNodeArtifactType.SUMMARY));
@@ -226,7 +253,7 @@ public class DocumentEnrichmentService {
             Document document = loadDocumentForNode(node);
             String sourceHash = scope.sourceHash();
             String promptVersion = ragProperties.getEnrichment().getPromptVersion();
-            String model = ragProperties.getAi().getChatModel();
+            String model = aiModelRoutingService.enrichmentModelFor(artifactType);
 
             DocumentNodeArtifact existing = artifactRepository
                     .findByDocumentNodeIdAndArtifactTypeAndPromptVersionAndModelAndSourceHash(
@@ -275,32 +302,53 @@ public class DocumentEnrichmentService {
         List<ArtifactOutcome> outcomes = Collections.synchronizedList(new ArrayList<>());
         Set<Long> chaptersNeedingRegen = Collections.synchronizedSet(new LinkedHashSet<>());
         int concurrency = ragProperties.getEnrichment().getIntraDocumentConcurrency();
+        AtomicBoolean stopBatch = new AtomicBoolean(false);
 
         for (String nodeType : SUMMARY_NODE_ORDER) {
+            if (stopBatch.get()) {
+                log.info("Stop summary enrichment before nodeType={} because rate limit was reached: documentId={}",
+                        nodeType, document.getId());
+                break;
+            }
             List<DocumentNode> nodes = documentNodeRepository.findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(
                     document.getId(), nodeType);
             if (nodes.isEmpty()) continue;
 
             Semaphore semaphore = new Semaphore(concurrency);
-            List<Thread> threads = nodes.stream().map(node ->
-                Thread.ofVirtual().start(() -> {
+            List<Thread> threads = new ArrayList<>();
+            for (DocumentNode node : nodes) {
+                if (stopBatch.get()) {
+                    break;
+                }
+                try {
+                    semaphore.acquire();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+                if (stopBatch.get()) {
+                    semaphore.release();
+                    break;
+                }
+                Thread thread = Thread.ofVirtual().start(() -> {
                     try {
-                        semaphore.acquire();
-                        try {
-                            ArtifactOutcome outcome = enrichSummaryArtifact(node, forceRegenerate);
-                            outcomes.add(outcome);
-                            if ("section".equals(nodeType) && outcome.completed()) {
-                                Long chapterId = findChapterIdNeedingRegen(node);
-                                if (chapterId != null) chaptersNeedingRegen.add(chapterId);
-                            }
-                        } finally {
-                            semaphore.release();
+                        ArtifactOutcome outcome = enrichSummaryArtifact(node, forceRegenerate);
+                        outcomes.add(outcome);
+                        if (outcome.rateLimited()) {
+                            stopBatch.set(true);
+                            log.info("Stop summary enrichment batch because rate limit was reached: documentId={}, nodeId={}",
+                                    document.getId(), node.getId());
                         }
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
+                        if ("section".equals(nodeType) && outcome.completed()) {
+                            Long chapterId = findChapterIdNeedingRegen(node);
+                            if (chapterId != null) chaptersNeedingRegen.add(chapterId);
+                        }
+                    } finally {
+                        semaphore.release();
                     }
-                })
-            ).toList();
+                });
+                threads.add(thread);
+            }
 
             for (Thread t : threads) {
                 try { t.join(); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
@@ -308,11 +356,19 @@ public class DocumentEnrichmentService {
         }
 
         // Regen chapters once after all sections complete — deduped, no blocking the section loop
-        for (Long chapterId : chaptersNeedingRegen) {
-            DocumentNode chapter = documentNodeRepository.findById(chapterId).orElse(null);
-            if (chapter != null) {
-                log.info("Post-section chapter regen: chapterId={} (sections now have summaries)", chapterId);
-                outcomes.add(enrichSummaryArtifact(chapter, false));
+        if (!stopBatch.get()) {
+            for (Long chapterId : chaptersNeedingRegen) {
+                DocumentNode chapter = documentNodeRepository.findById(chapterId).orElse(null);
+                if (chapter != null) {
+                    log.info("Post-section chapter regen: chapterId={} (sections now have summaries)", chapterId);
+                    ArtifactOutcome outcome = enrichSummaryArtifact(chapter, false);
+                    outcomes.add(outcome);
+                    if (outcome.rateLimited()) {
+                        log.info("Stop post-section chapter regen because rate limit was reached: documentId={}, chapterId={}",
+                                document.getId(), chapterId);
+                        break;
+                    }
+                }
             }
         }
 
@@ -328,7 +384,7 @@ public class DocumentEnrichmentService {
         Optional<DocumentNodeArtifact> chapterArtifact = artifactRepository.findLatestCompletedSummaryByNodeId(
                 parent.getId(),
                 ragProperties.getEnrichment().getPromptVersion(),
-                ragProperties.getAi().getChatModel()
+                aiModelRoutingService.enrichmentModelFor(DocumentNodeArtifactType.SUMMARY)
         );
         if (chapterArtifact.isEmpty()) return null;
         Map<String, Object> content = chapterArtifact.get().getContentJsonb();
@@ -343,7 +399,7 @@ public class DocumentEnrichmentService {
         SummaryInput input = resolveSummaryInput(document, node);
         String sourceHash = summarySourceHash(node, input);
         String promptVersion = ragProperties.getEnrichment().getPromptVersion();
-        String model = ragProperties.getAi().getChatModel();
+        String model = aiModelRoutingService.enrichmentModelFor(DocumentNodeArtifactType.SUMMARY);
 
         DocumentNodeArtifact existing = artifactRepository
                 .findByDocumentNodeIdAndArtifactTypeAndPromptVersionAndModelAndSourceHash(
@@ -392,7 +448,7 @@ public class DocumentEnrichmentService {
             log.info("Artifact RATE_LIMITED nodeId={} until={}", node.getId(), ex.getPausedUntil());
             upsertArtifact(existing, document, node, DocumentNodeArtifactType.SUMMARY, promptVersion, model, sourceHash,
                     DocumentNodeArtifactStatus.RATE_LIMITED, rateLimitContent(node, DocumentNodeArtifactType.SUMMARY, sourceHash, ex), ex.getMessage(), null);
-            return ArtifactOutcome.generatedFailed();
+            return ArtifactOutcome.generatedRateLimited();
         } catch (Exception ex) {
             log.warn("Document summary artifact generation failed: documentId={}, nodeId={}, summaryMode={}",
                     document.getId(), node.getId(), input.summaryMode(), ex);
@@ -465,7 +521,7 @@ public class DocumentEnrichmentService {
             Optional<DocumentNodeArtifact> artifact = artifactRepository.findLatestCompletedSummaryByNodeId(
                     child.getId(),
                     ragProperties.getEnrichment().getPromptVersion(),
-                    ragProperties.getAi().getChatModel()
+                    aiModelRoutingService.enrichmentModelFor(DocumentNodeArtifactType.SUMMARY)
             );
             if (artifact.isPresent()) {
                 available.add(toChildSummary(child, artifact.get()));
@@ -576,7 +632,7 @@ public class DocumentEnrichmentService {
             Optional<DocumentNodeArtifact> artifact = artifactRepository.findLatestCompletedSummaryByNodeId(
                     child.getId(),
                     ragProperties.getEnrichment().getPromptVersion(),
-                    ragProperties.getAi().getChatModel()
+                    aiModelRoutingService.enrichmentModelFor(DocumentNodeArtifactType.SUMMARY)
             );
             if (artifact.isEmpty()) {
                 missingNodeIds.add(child.getId());
@@ -634,9 +690,22 @@ public class DocumentEnrichmentService {
         DocumentNodeScopeService.NodeScope scope = nodeScopeService.getScope(documentNodeId);
         DocumentNode node = scope.rootNode();
         Document document = loadDocumentForNode(node);
+        if (artifactType == DocumentNodeArtifactType.REVIEW_QUESTION_SET
+                && NON_CONTENT_REVIEW_QUESTION_NODE_TYPES.contains(node.getNodeType())) {
+            String reason = "Review question enrichment is not supported for node type: " + node.getNodeType();
+            log.info("Skip REVIEW_QUESTION_SET enrichment: documentId={}, nodeId={}, nodeType={}",
+                    document.getId(), documentNodeId, node.getNodeType());
+            return ArtifactOutcome.generatedSkipped(reason);
+        }
+        if (artifactType == DocumentNodeArtifactType.REVIEW_QUESTION_SET
+                && backlogService.hasSummaryBacklog(document.getId())) {
+            log.info("Defer REVIEW_QUESTION_SET enrichment because summary backlog exists: documentId={}, nodeId={}",
+                    document.getId(), documentNodeId);
+            return ArtifactOutcome.generatedSkipped(REVIEW_QUESTION_DEFERRED_FOR_SUMMARY_BACKLOG);
+        }
         String sourceHash = scope.sourceHash();
         String promptVersion = ragProperties.getEnrichment().getPromptVersion();
-        String model = ragProperties.getAi().getChatModel();
+        String model = aiModelRoutingService.enrichmentModelFor(artifactType);
 
         DocumentNodeArtifact existing = artifactRepository
                 .findByDocumentNodeIdAndArtifactTypeAndPromptVersionAndModelAndSourceHash(
@@ -661,6 +730,7 @@ public class DocumentEnrichmentService {
         try {
             existing = upsertArtifact(existing, document, node, artifactType, promptVersion, model, sourceHash,
                     DocumentNodeArtifactStatus.RUNNING, pendingContent(node, artifactType, sourceHash), null, null);
+            ReviewQuestionCountResolver.CountRange questionCountRange = reviewQuestionCountResolver.resolve(node.getNodeType());
             DocumentNodeArtifactGenerationContext context = new DocumentNodeArtifactGenerationContext(
                     document,
                     node,
@@ -669,8 +739,8 @@ public class DocumentEnrichmentService {
                     sourceHash,
                     promptVersion,
                     model,
-                    ragProperties.getEnrichment().getDefaultReviewQuestionMinCount(),
-                    ragProperties.getEnrichment().getDefaultReviewQuestionMaxCount(),
+                    questionCountRange.min(),
+                    questionCountRange.max(),
                     ragProperties.getEnrichment().getMaxNodeContextChars()
             );
             DocumentNodeArtifactGenerationResult result = generator.generate(context);
@@ -681,7 +751,7 @@ public class DocumentEnrichmentService {
             log.info("Artifact RATE_LIMITED nodeId={} artifactType={} until={}", documentNodeId, artifactType, ex.getPausedUntil());
             upsertArtifact(existing, document, node, artifactType, promptVersion, model, sourceHash,
                     DocumentNodeArtifactStatus.RATE_LIMITED, rateLimitContent(node, artifactType, sourceHash, ex), ex.getMessage(), null);
-            return ArtifactOutcome.generatedFailed();
+            return ArtifactOutcome.generatedRateLimited();
         } catch (Exception ex) {
             log.warn("Document enrichment artifact generation failed: documentId={}, nodeId={}, artifactType={}",
                     document.getId(), documentNodeId, artifactType, ex);
@@ -959,21 +1029,29 @@ public class DocumentEnrichmentService {
     }
 
 
-    private record ArtifactOutcome(boolean completed, boolean failed, boolean skipped, String skippedReason) {
+    private record ArtifactOutcome(boolean completed, boolean failed, boolean skipped, boolean rateLimited, String skippedReason) {
         static ArtifactOutcome generatedCompleted() {
-            return new ArtifactOutcome(true, false, false, null);
+            return new ArtifactOutcome(true, false, false, false, null);
         }
 
         static ArtifactOutcome existingCompleted() {
-            return new ArtifactOutcome(true, false, false, null);
+            return new ArtifactOutcome(true, false, false, false, null);
         }
 
         static ArtifactOutcome generatedFailed() {
-            return new ArtifactOutcome(false, true, false, null);
+            return new ArtifactOutcome(false, true, false, false, null);
+        }
+
+        static ArtifactOutcome generatedRateLimited() {
+            return new ArtifactOutcome(false, false, false, true, null);
         }
 
         static ArtifactOutcome generatedSkipped(String reason) {
-            return new ArtifactOutcome(false, false, true, reason);
+            return new ArtifactOutcome(false, false, true, false, reason);
+        }
+
+        boolean failedOrRateLimited() {
+            return failed || rateLimited;
         }
     }
 
@@ -981,7 +1059,7 @@ public class DocumentEnrichmentService {
         static ArtifactSummary from(List<ArtifactOutcome> outcomes) {
             List<ArtifactOutcome> safeOutcomes = outcomes == null ? List.of() : outcomes;
             int completed = (int) safeOutcomes.stream().filter(ArtifactOutcome::completed).count();
-            int failed = (int) safeOutcomes.stream().filter(ArtifactOutcome::failed).count();
+            int failed = (int) safeOutcomes.stream().filter(ArtifactOutcome::failedOrRateLimited).count();
             int skipped = (int) safeOutcomes.stream().filter(ArtifactOutcome::skipped).count();
             List<String> skippedReasons = safeOutcomes.stream()
                     .filter(ArtifactOutcome::skipped)

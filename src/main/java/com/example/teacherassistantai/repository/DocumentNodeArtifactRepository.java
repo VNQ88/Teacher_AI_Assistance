@@ -36,6 +36,17 @@ public interface DocumentNodeArtifactRepository extends JpaRepository<DocumentNo
             DocumentNodeArtifactStatus status
     );
 
+    @Query("""
+            SELECT COUNT(a) > 0
+            FROM DocumentNodeArtifact a
+            WHERE a.document.id = :documentId
+              AND a.artifactType = :artifactType
+              AND a.status IN :statuses
+            """)
+    boolean existsByDocumentIdAndArtifactTypeAndStatusIn(@Param("documentId") Long documentId,
+                                                         @Param("artifactType") DocumentNodeArtifactType artifactType,
+                                                         @Param("statuses") Collection<DocumentNodeArtifactStatus> statuses);
+
     List<DocumentNodeArtifact> findByDocumentNodeIdOrderByArtifactTypeAscUpdatedAtDesc(Long documentNodeId);
 
     @Modifying
@@ -97,10 +108,24 @@ public interface DocumentNodeArtifactRepository extends JpaRepository<DocumentNo
             SELECT a
             FROM DocumentNodeArtifact a
             JOIN FETCH a.documentNode n
+            JOIN FETCH n.document d
             WHERE a.status = com.example.teacherassistantai.common.enumerate.DocumentNodeArtifactStatus.RATE_LIMITED
             ORDER BY a.updatedAt ASC
             """)
     List<DocumentNodeArtifact> findRateLimitedOrderByUpdatedAtAsc();
+
+    @Query("""
+            SELECT a
+            FROM DocumentNodeArtifact a
+            JOIN FETCH a.documentNode n
+            JOIN FETCH n.document d
+            WHERE a.artifactType = :artifactType
+              AND a.status = com.example.teacherassistantai.common.enumerate.DocumentNodeArtifactStatus.RATE_LIMITED
+            ORDER BY a.updatedAt ASC
+            """)
+    List<DocumentNodeArtifact> findRateLimitedByArtifactTypeOrderByUpdatedAtAsc(
+            @Param("artifactType") DocumentNodeArtifactType artifactType
+    );
 
     @Query("""
             SELECT a
@@ -112,4 +137,20 @@ public interface DocumentNodeArtifactRepository extends JpaRepository<DocumentNo
             ORDER BY n.orderIndex ASC, a.updatedAt DESC
             """)
     List<DocumentNodeArtifact> findCompletedSummariesByNodeIds(@Param("nodeIds") Collection<Long> nodeIds);
+
+    @Query("""
+            SELECT a
+            FROM DocumentNodeArtifact a
+            JOIN FETCH a.documentNode n
+            JOIN FETCH a.document d
+            WHERE n.id IN :nodeIds
+              AND a.artifactType = :artifactType
+              AND a.status = :status
+            ORDER BY n.orderIndex ASC, a.updatedAt DESC
+            """)
+    List<DocumentNodeArtifact> findByNodeIdsAndArtifactTypeAndStatusOrderByNodeOrderAndUpdatedAt(
+            @Param("nodeIds") Collection<Long> nodeIds,
+            @Param("artifactType") DocumentNodeArtifactType artifactType,
+            @Param("status") DocumentNodeArtifactStatus status
+    );
 }

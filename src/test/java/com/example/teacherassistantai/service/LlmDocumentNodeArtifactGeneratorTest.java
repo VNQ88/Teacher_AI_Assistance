@@ -6,7 +6,10 @@ import com.example.teacherassistantai.entity.Document;
 import com.example.teacherassistantai.entity.DocumentChunk;
 import com.example.teacherassistantai.entity.DocumentNode;
 import com.example.teacherassistantai.exception.InvalidDataException;
+import com.example.teacherassistantai.integration.ai.AiChatCompletion;
 import com.example.teacherassistantai.integration.ai.AiChatGateway;
+import com.example.teacherassistantai.integration.ai.AiUsage;
+import com.example.teacherassistantai.integration.ai.AiWorkload;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
@@ -144,6 +147,99 @@ class LlmDocumentNodeArtifactGeneratorTest {
 
         assertThat(callCount).hasValue(2);
         assertThat(result.contentJsonb()).containsEntry("summary", "Tóm tắt sau khi repair.");
+    }
+
+    @Test
+    void generateSummary_usesEnrichSummaryWorkloadAndUsageTokenCount() {
+        AtomicInteger calls = new AtomicInteger();
+        LlmDocumentNodeArtifactGenerator generator = generator(new AiChatGateway() {
+            @Override
+            public String generateAnswer(String prompt, Double temperature, AiWorkload workload) {
+                throw new AssertionError("generate should be used");
+            }
+
+            @Override
+            public AiChatCompletion generate(String prompt, Double temperature, AiWorkload workload) {
+                calls.incrementAndGet();
+                assertThat(workload).isEqualTo(AiWorkload.ENRICH_SUMMARY);
+                return new AiChatCompletion("""
+                        {
+                          "summaryMode": "CHAPTER_FALLBACK",
+                          "summary": "Tóm tắt hợp lệ.",
+                          "keyPoints": ["Ý chính"],
+                          "childSummaries": [],
+                          "childSummaryRefs": [],
+                          "citations": [{"chunkId": 200}],
+                          "coverage": {
+                            "expectedChildCount": 0,
+                            "usedChildCount": 0,
+                            "missingChildNodeIds": [],
+                            "directChunkCount": 1,
+                            "usedDirectChunkCount": 1,
+                            "complete": true
+                          }
+                        }
+                        """, new AiUsage(10, 20, 30), null, "summary-model", workload);
+            }
+        });
+        Fixture fixture = fixture();
+
+        DocumentNodeArtifactGenerationResult result = generator.generateSummary(new SummaryGenerationContext(
+                fixture.document(),
+                fixture.node(),
+                SummaryMode.CHAPTER_FALLBACK,
+                List.of(fixture.chunk()),
+                List.of(),
+                SummaryCoverage.chunksOnly(1, 1)
+        ));
+
+        assertThat(calls).hasValue(1);
+        assertThat(result.tokenCount()).isEqualTo(30);
+    }
+
+    @Test
+    void generateReviewQuestions_usesReviewQuestionWorkload() {
+        LlmDocumentNodeArtifactGenerator generator = generator(new AiChatGateway() {
+            @Override
+            public String generateAnswer(String prompt, Double temperature, AiWorkload workload) {
+                throw new AssertionError("generate should be used");
+            }
+
+            @Override
+            public AiChatCompletion generate(String prompt, Double temperature, AiWorkload workload) {
+                assertThat(workload).isEqualTo(AiWorkload.ENRICH_REVIEW_QUESTION);
+                return new AiChatCompletion("""
+                        {
+                          "questions": [
+                            {
+                              "type": "TRUE_FALSE",
+                              "difficulty": "EASY",
+                              "question": "Nhận định này đúng hay sai?",
+                              "correctAnswer": true,
+                              "answerExplanation": "Dựa trên tài liệu.",
+                              "citations": [{"chunkId": 200}]
+                            }
+                          ]
+                        }
+                        """, null, null, "question-model", workload);
+            }
+        });
+        Fixture fixture = fixture();
+
+        DocumentNodeArtifactGenerationResult result = generator.generate(new DocumentNodeArtifactGenerationContext(
+                fixture.document(),
+                fixture.node(),
+                DocumentNodeArtifactType.REVIEW_QUESTION_SET,
+                List.of(fixture.chunk()),
+                "hash",
+                "enrichment-v1",
+                "question-model",
+                1,
+                3,
+                60000
+        ));
+
+        assertThat(result.contentJsonb()).containsEntry("questionCount", 1);
     }
 
     private LlmDocumentNodeArtifactGenerator generator(AiChatGateway aiChatGateway) {

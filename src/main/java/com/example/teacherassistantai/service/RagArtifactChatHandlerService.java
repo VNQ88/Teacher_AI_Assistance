@@ -26,6 +26,7 @@ public class RagArtifactChatHandlerService {
     private final DocumentNodeArtifactRepository artifactRepository;
     private final DocumentChunkRepository documentChunkRepository;
     private final DocumentEnrichmentService documentEnrichmentService;
+    private final InternalCitationSanitizer citationSanitizer;
 
     public ArtifactChatResult handle(ChatSession session, String question, RagChatIntent intent) {
         Optional<DocumentNode> resolvedNode = scopeResolverService.resolve(session, question);
@@ -95,7 +96,9 @@ public class RagArtifactChatHandlerService {
         String summary = asString(content.get("summary"));
         StringBuilder answer = new StringBuilder();
         answer.append("Tóm tắt ").append(displayPath(node)).append(":\n\n");
-        answer.append(summary == null || summary.isBlank() ? "Chưa có nội dung tóm tắt hợp lệ." : summary);
+        answer.append(summary == null || summary.isBlank()
+                ? "Chưa có nội dung tóm tắt hợp lệ."
+                : citationSanitizer.sanitize(summary));
         appendKeyPoints(answer, content);
         appendChildSummaryParagraphs(answer, content);
         return answer.toString();
@@ -111,7 +114,7 @@ public class RagArtifactChatHandlerService {
         for (Object keyPoint : keyPoints) {
             String value = asString(keyPoint);
             if (value != null && !value.isBlank()) {
-                answer.append("\n- ").append(value);
+                answer.append("\n- ").append(citationSanitizer.sanitize(value));
             }
         }
     }
@@ -141,7 +144,7 @@ public class RagArtifactChatHandlerService {
             if (title != null && !title.isBlank()) {
                 answer.append(title).append(": ");
             }
-            answer.append(childContent);
+            answer.append(citationSanitizer.sanitize(childContent));
         }
     }
 
@@ -170,14 +173,14 @@ public class RagArtifactChatHandlerService {
                     .append(asString(question.get("type")))
                     .append(difficultySuffix(question))
                     .append("] ");
-            questionSection.append(asString(question.get("question"))).append('\n');
+            questionSection.append(citationSanitizer.sanitize(asString(question.get("question")))).append('\n');
             appendOptions(questionSection, question.get("options"));
 
             answerSection.append("\n").append(questionIndex).append(". ");
             answerSection.append("Đáp án: ").append(formatAnswer(question.get("correctAnswer"))).append('\n');
             String explanation = asString(question.get("answerExplanation"));
             if (explanation != null && !explanation.isBlank()) {
-                answerSection.append("   Giải thích: ").append(explanation).append('\n');
+                answerSection.append("   Giải thích: ").append(citationSanitizer.sanitize(explanation)).append('\n');
             }
         }
 
@@ -195,7 +198,7 @@ public class RagArtifactChatHandlerService {
                 answer.append("- ")
                         .append(asString(optionMap.get("label")))
                         .append(". ")
-                        .append(asString(optionMap.get("content")))
+                        .append(citationSanitizer.sanitize(asString(optionMap.get("content"))))
                         .append('\n');
             }
         }
@@ -210,7 +213,7 @@ public class RagArtifactChatHandlerService {
         if (answer instanceof Boolean booleanAnswer) {
             return booleanAnswer ? "Đúng" : "Sai";
         }
-        return asString(answer);
+        return citationSanitizer.sanitize(asString(answer));
     }
 
     @SuppressWarnings("unchecked")

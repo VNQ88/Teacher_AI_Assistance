@@ -33,7 +33,7 @@ public class FactualQaAgent {
         String prompt = promptBuilderService.buildPrompt(
                 state.getQuestion(), state.getHistory(), sources);
 
-        String answer = aiChatGateway.generateAnswer(prompt, state.getRequestedTemperature(), AiWorkload.INTERACTIVE);
+        String answer = aiChatGateway.generateAnswer(prompt, state.getRequestedTemperature(), AiWorkload.RAG_CHAT);
 
         double score = confidenceService.score(state.getQuestion(), sources, answer);
         String level = confidenceService.level(score);

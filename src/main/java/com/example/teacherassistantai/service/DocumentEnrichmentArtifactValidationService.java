@@ -63,6 +63,10 @@ public class DocumentEnrichmentArtifactValidationService {
         content.putIfAbsent("nodeTitle", node.getTitle());
         content.putIfAbsent("sectionPath", node.getSectionPath());
         content.putIfAbsent("nodeType", node.getNodeType());
+        if (artifactType == DocumentNodeArtifactType.REVIEW_QUESTION_SET) {
+            content.put("requestedQuestionMinCount", minQuestionCount);
+            content.put("requestedQuestionMaxCount", maxQuestionCount);
+        }
         content.put("generated", true);
         return content;
     }

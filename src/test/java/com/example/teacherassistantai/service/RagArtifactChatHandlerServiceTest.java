@@ -34,7 +34,8 @@ class RagArtifactChatHandlerServiceTest {
                 scopeResolverService,
                 artifactRepository,
                 chunkRepository,
-                documentEnrichmentService
+                documentEnrichmentService,
+                new InternalCitationSanitizer()
         );
         DocumentNode node = node();
         DocumentChunk chunk = chunk();
@@ -72,7 +73,8 @@ class RagArtifactChatHandlerServiceTest {
                 scopeResolverService,
                 artifactRepository,
                 chunkRepository,
-                documentEnrichmentService
+                documentEnrichmentService,
+                new InternalCitationSanitizer()
         );
         DocumentNode node = partNode();
         DocumentNodeArtifact artifact = DocumentNodeArtifact.builder()
@@ -122,7 +124,8 @@ class RagArtifactChatHandlerServiceTest {
                 scopeResolverService,
                 artifactRepository,
                 mock(DocumentChunkRepository.class),
-                documentEnrichmentService
+                documentEnrichmentService,
+                new InternalCitationSanitizer()
         );
         DocumentNode node = node();
 
@@ -143,6 +146,59 @@ class RagArtifactChatHandlerServiceTest {
                 false,
                 List.of(DocumentNodeArtifactType.REVIEW_QUESTION_SET)
         );
+    }
+
+    @Test
+    void renderQuestions_sanitizesInternalChunkReferences() {
+        RagArtifactChatHandlerService handlerService = new RagArtifactChatHandlerService(
+                mock(RagScopeResolverService.class),
+                mock(DocumentNodeArtifactRepository.class),
+                mock(DocumentChunkRepository.class),
+                mock(DocumentEnrichmentService.class),
+                new InternalCitationSanitizer()
+        );
+
+        String answer = handlerService.renderQuestions(Map.of(
+                "questions", List.of(Map.of(
+                        "type", "TRUE_FALSE",
+                        "difficulty", "EASY",
+                        "question", "Nhận định này đúng hay sai? (chunk 200)",
+                        "correctAnswer", true,
+                        "answerExplanation", "Dựa trên nội dung tài liệu chunkId: 200.",
+                        "citations", List.of(Map.of("chunkId", 200L))
+                ))
+        ), node());
+
+        assertThat(answer).doesNotContain("chunk 200");
+        assertThat(answer).doesNotContain("chunkId");
+        assertThat(answer).contains("Nhận định này đúng hay sai?");
+        assertThat(answer).contains("Dựa trên nội dung tài liệu.");
+    }
+
+    @Test
+    void sourceChunksFromCitations_dedupesAndKeepsCitationOrder() {
+        DocumentChunkRepository chunkRepository = mock(DocumentChunkRepository.class);
+        RagArtifactChatHandlerService handlerService = new RagArtifactChatHandlerService(
+                mock(RagScopeResolverService.class),
+                mock(DocumentNodeArtifactRepository.class),
+                chunkRepository,
+                mock(DocumentEnrichmentService.class),
+                new InternalCitationSanitizer()
+        );
+        DocumentChunk first = chunk();
+        DocumentChunk second = chunk();
+        second.setId(201L);
+
+        when(chunkRepository.findAllById(any())).thenReturn(List.of(second, first));
+
+        List<DocumentChunk> sources = handlerService.sourceChunksFromCitations(Map.of(
+                "questions", List.of(
+                        Map.of("citations", List.of(Map.of("chunkId", 200L), Map.of("chunkId", 201L))),
+                        Map.of("citations", List.of(Map.of("chunkId", 200L)))
+                )
+        ));
+
+        assertThat(sources).containsExactly(first, second);
     }
 
     private DocumentNode node() {

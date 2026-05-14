@@ -113,6 +113,7 @@ class DocumentEnrichmentPromptBuilderTest {
         assertThat(prompt).contains("TRUE_FALSE");
         assertThat(prompt).contains("FILL_BLANK");
         assertThat(prompt).contains("\"correctAnswer\": true");
+        assertThat(prompt).contains("question, options, correctAnswer va answerExplanation khong duoc nhac chunkId/chunk");
         assertThat(prompt).contains("chunkId: 200");
     }
 
