@@ -25,8 +25,10 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.SimpleTransactionStatus;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -38,6 +40,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -56,6 +59,9 @@ class DocumentEnrichmentServiceTest {
     private AiModelRoutingService aiModelRoutingService;
     private OriginalSummaryNodeService originalSummaryNodeService;
     private com.example.teacherassistantai.service.quiz.HierarchicalQuizEnrichmentService quizEnrichmentService;
+    private DocumentReadinessService documentReadinessService;
+    private RedisTemplate<String, String> redisTemplate;
+    private TransactionTemplate transactionTemplate;
     private RagProperties ragProperties;
 
     @BeforeEach
@@ -71,6 +77,15 @@ class DocumentEnrichmentServiceTest {
         originalSummaryNodeService = mock(OriginalSummaryNodeService.class);
         quizEnrichmentService = mock(com.example.teacherassistantai.service.quiz.HierarchicalQuizEnrichmentService.class);
         ragProperties = new RagProperties();
+        transactionTemplate = new TransactionTemplate(new NoOpTransactionManager());
+        redisTemplate = redisTemplate();
+        documentReadinessService = new DocumentReadinessService(
+                documentRepository,
+                documentNodeRepository,
+                artifactRepository,
+                ragProperties,
+                transactionTemplate
+        );
         when(aiModelRoutingService.enrichmentModelFor(any())).thenReturn(ragProperties.getAi().getChatModel());
     }
 
@@ -152,6 +167,16 @@ class DocumentEnrichmentServiceTest {
                 eq(DocumentNodeArtifactType.SUMMARY),
                 eq(DocumentNodeArtifactStatus.COMPLETED)
         )).thenReturn(List.of(completedSummaryArtifact(fixture.document(), fixture.node(), "Tóm tắt chương")));
+        when(artifactRepository.findByNodeIdsAndArtifactTypeAndStatusOrderByNodeOrderAndUpdatedAt(
+                any(),
+                eq(DocumentNodeArtifactType.REVIEW_QUESTION_SET),
+                eq(DocumentNodeArtifactStatus.COMPLETED)
+        )).thenReturn(List.of(completedQuestionArtifact(fixture.document(), fixture.node())));
+        when(artifactRepository.findByNodeIdsAndArtifactTypeAndStatusOrderByNodeOrderAndUpdatedAt(
+                any(),
+                eq(DocumentNodeArtifactType.REVIEW_QUESTION_SET),
+                eq(DocumentNodeArtifactStatus.SKIPPED)
+        )).thenReturn(List.of());
 
         service.enrichDocument(fixture.document().getId(), false);
 
@@ -167,7 +192,7 @@ class DocumentEnrichmentServiceTest {
     }
 
     @Test
-    void enrichDocument_whenChapterSummaryCompletionAtLeast75Percent_marksDocumentReady() {
+    void enrichDocument_whenChapterSummaryReadyButQuestionNotReady_keepsDocumentSummarising() {
         Fixture fixture = fixture();
         List<DocumentNode> chapters = List.of(
                 node(fixture.document(), 301L, "chapter", "Chương 1", null),
@@ -183,9 +208,9 @@ class DocumentEnrichmentServiceTest {
 
         service.enrichDocument(fixture.document().getId(), false, List.of(DocumentNodeArtifactType.SUMMARY));
 
-        assertThat(fixture.document().getStatus()).isEqualTo(DocumentStatus.READY);
+        assertThat(fixture.document().getStatus()).isEqualTo(DocumentStatus.SUMMARISING);
         assertThat(fixture.document().getEnrichmentStatus()).isEqualTo(DocumentEnrichmentStatus.PARTIAL_FAILED);
-        assertThat(fixture.document().getEnrichmentError()).contains("3/4");
+        assertThat(fixture.document().getEnrichmentError()).contains("question readiness").contains("0/4");
     }
 
     @Test
@@ -853,6 +878,21 @@ class DocumentEnrichmentServiceTest {
         return artifact;
     }
 
+    private DocumentNodeArtifact completedQuestionArtifact(Document document, DocumentNode node) {
+        DocumentNodeArtifact artifact = DocumentNodeArtifact.builder()
+                .document(document)
+                .documentNode(node)
+                .artifactType(DocumentNodeArtifactType.REVIEW_QUESTION_SET)
+                .status(DocumentNodeArtifactStatus.COMPLETED)
+                .promptVersion("enrichment-v2-bottom-up")
+                .model("openai-gpt-oss-120b")
+                .sourceHash("question-source-hash-" + node.getId())
+                .contentJsonb(Map.of("questions", List.of()))
+                .build();
+        artifact.setId(1900L + node.getId());
+        return artifact;
+    }
+
     private DocumentEnrichmentService service(List<DocumentNodeArtifactGenerator> generators) {
         return new DocumentEnrichmentService(
                 documentRepository,
@@ -862,13 +902,23 @@ class DocumentEnrichmentServiceTest {
                 nodeScopeService,
                 ragProperties,
                 objectProvider(generators),
-                new TransactionTemplate(new NoOpTransactionManager()),
-                mock(RedisTemplate.class),
+                transactionTemplate,
+                redisTemplate,
                 quizEnrichmentService,
                 reviewQuestionCountResolver,
                 aiModelRoutingService,
-                originalSummaryNodeService
+                originalSummaryNodeService,
+                documentReadinessService
         );
+    }
+
+    @SuppressWarnings("unchecked")
+    private RedisTemplate<String, String> redisTemplate() {
+        RedisTemplate<String, String> template = mock(RedisTemplate.class);
+        ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
+        when(template.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.setIfAbsent(anyString(), anyString(), any(Duration.class))).thenReturn(true);
+        return template;
     }
 
     private Fixture fixture() {

@@ -14,6 +14,7 @@ import com.example.teacherassistantai.repository.DocumentNodeRepository;
 import com.example.teacherassistantai.repository.DocumentRepository;
 import com.example.teacherassistantai.service.DocumentEnrichmentBacklogService;
 import com.example.teacherassistantai.service.DocumentNodeScopeService;
+import com.example.teacherassistantai.service.DocumentReadinessService;
 import com.example.teacherassistantai.service.LlmDocumentNodeArtifactGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -79,7 +80,8 @@ class HierarchicalQuizEnrichmentServiceTest {
                 rateLimiter,
                 mock(DocumentEnrichmentBacklogService.class),
                 mock(com.example.teacherassistantai.integration.ai.AiModelRoutingService.class),
-                mock(ReviewQuestionInputResolver.class)
+                mock(ReviewQuestionInputResolver.class),
+                mock(DocumentReadinessService.class)
         );
 
         service.enrichQuizPhase1(1L);

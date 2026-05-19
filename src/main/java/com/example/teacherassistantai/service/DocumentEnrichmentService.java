@@ -53,7 +53,6 @@ public class DocumentEnrichmentService {
     private static final Set<String> ENRICHABLE_NODE_TYPES = Set.of("part", "chapter", "section", "subsection", "subsection_level2");
     private static final Set<String> NON_CONTENT_REVIEW_QUESTION_NODE_TYPES = Set.of("document", "summary", "review_questions");
     private static final List<String> SUMMARY_NODE_ORDER = List.of("subsection_level2", "subsection", "section", "chapter", "part");
-    private static final int READY_CHAPTER_SUMMARY_PERCENT = 75;
     private static final String PHASE_4_GENERATOR_MISSING =
             "Artifact generation is not available until Phase 4 prompt/LLM generator is implemented";
 
@@ -70,6 +69,7 @@ public class DocumentEnrichmentService {
     private final ReviewQuestionCountResolver reviewQuestionCountResolver;
     private final AiModelRoutingService aiModelRoutingService;
     private final OriginalSummaryNodeService originalSummaryNodeService;
+    private final DocumentReadinessService documentReadinessService;
 
     @Async("documentEnrichmentExecutor")
     public void enqueueDocumentEnrichment(Long documentId) {
@@ -156,24 +156,28 @@ public class DocumentEnrichmentService {
 
         finalizeDocumentStatus(documentId, outcomes);
 
-        // After SUMMARISING → READY: retry FAILED section summaries once (enables chain regen)
+        DocumentReadinessService.DocumentReadySnapshot readySnapshot = documentReadinessService.snapshot(documentId);
+
+        // After summary readiness is reached: retry FAILED section summaries once (enables chain regen)
         if (wasSummarising
                 && artifactTypes.contains(DocumentNodeArtifactType.SUMMARY)
                 && outcomes.stream().anyMatch(ArtifactOutcome::failedOrRateLimited)) {
             Document after = documentRepository.findById(documentId).orElse(null);
-            if (after != null && after.getStatus() == DocumentStatus.READY) {
+            if (after != null && readySnapshot.summaryReadiness().ready()) {
                 long failedCount = outcomes.stream().filter(ArtifactOutcome::failedOrRateLimited).count();
-                log.info("SUMMARISING→READY with {} failed nodes — retrying failed section summaries: documentId={}",
+                log.info("Summary readiness reached with {} failed nodes — retrying failed section summaries: documentId={}",
                         failedCount, documentId);
                 enqueueDocumentEnrichment(documentId, false, List.of(DocumentNodeArtifactType.SUMMARY));
             }
         }
 
-        // Trigger BG quiz enrichment phase 1 after first SUMMARISING→READY
+        // Trigger BG quiz enrichment after summary readiness; READY now waits for chapter question readiness too.
         if (wasSummarising && ragProperties.getEnrichment().isReviewQuestionsEnabled()
                 && artifactTypes.contains(DocumentNodeArtifactType.SUMMARY)) {
-            Document afterStatus = documentRepository.findById(documentId).orElse(null);
-            if (afterStatus != null && afterStatus.getStatus() == DocumentStatus.READY) {
+            if (readySnapshot.summaryReadiness().ready()
+                    && !readySnapshot.questionReadiness().ready()
+                    && !readySnapshot.retryMaxReached()
+                    && tryAcquireQuizTrigger(documentId)) {
                 quizEnrichmentService.enrichQuizPhase1(documentId);
             }
         }
@@ -1096,75 +1100,29 @@ public class DocumentEnrichmentService {
     }
 
     private void finalizeDocumentStatus(Long documentId, List<ArtifactOutcome> outcomes) {
-        transactionTemplate.executeWithoutResult(status -> {
-            Document document = documentRepository.findById(documentId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + documentId));
-            ArtifactSummary summary = ArtifactSummary.from(outcomes);
-            ChapterSummaryReadiness readiness = chapterSummaryReadiness(documentId);
-            document.setEnrichmentCompletedAt(LocalDateTime.now());
-            if (summary.total() == 0 || summary.skipped() == summary.total()) {
+        ArtifactSummary summary = ArtifactSummary.from(outcomes);
+        if (summary.total() == 0 || summary.skipped() == summary.total()) {
+            transactionTemplate.executeWithoutResult(status -> {
+                Document document = documentRepository.findById(documentId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + documentId));
                 document.setEnrichmentStatus(DocumentEnrichmentStatus.SKIPPED);
                 document.setEnrichmentError(summary.primarySkippedReason());
-            } else if (readiness.ready() && readiness.allCompleted() && summary.failed() == 0) {
-                document.setStatus(DocumentStatus.READY);
-                document.setEnrichmentStatus(DocumentEnrichmentStatus.ENRICHED);
-                document.setEnrichmentError(null);
-            } else if (readiness.ready()) {
-                document.setStatus(DocumentStatus.READY);
-                document.setEnrichmentStatus(DocumentEnrichmentStatus.PARTIAL_FAILED);
-                document.setEnrichmentError("Chapter summary readiness reached %d/%d; remaining artifacts will continue in background"
-                        .formatted(readiness.completedChapters(), readiness.totalChapters()));
-            } else {
-                if (document.getStatus() != DocumentStatus.FAILED) {
-                    document.setStatus(DocumentStatus.SUMMARISING);
-                }
-                document.setEnrichmentStatus(DocumentEnrichmentStatus.PARTIAL_FAILED);
-                document.setEnrichmentError("Chapter summary readiness is %d/%d; document requires at least %d%% completed chapter summaries"
-                        .formatted(readiness.completedChapters(), readiness.totalChapters(), READY_CHAPTER_SUMMARY_PERCENT));
-            }
-            documentRepository.save(document);
-        });
-    }
-
-    private ChapterSummaryReadiness chapterSummaryReadiness(Long documentId) {
-        List<DocumentNode> chapters = documentNodeRepository.findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(
-                documentId,
-                "chapter"
-        );
-        if (chapters == null || chapters.isEmpty()) {
-            return new ChapterSummaryReadiness(0, 0, true);
+                documentRepository.save(document);
+            });
+            return;
         }
-
-        List<Long> chapterIds = chapters.stream()
-                .map(DocumentNode::getId)
-                .filter(java.util.Objects::nonNull)
-                .toList();
-        if (chapterIds.isEmpty()) {
-            return new ChapterSummaryReadiness(0, chapters.size(), false);
-        }
-
-        List<DocumentNodeArtifact> completedArtifacts = artifactRepository
-                .findByNodeIdsAndArtifactTypeAndStatusOrderByNodeOrderAndUpdatedAt(
-                        chapterIds,
-                        DocumentNodeArtifactType.SUMMARY,
-                        DocumentNodeArtifactStatus.COMPLETED
-                );
-        Set<Long> completedChapterIds = (completedArtifacts == null ? List.<DocumentNodeArtifact>of() : completedArtifacts)
-                .stream()
-                .map(DocumentNodeArtifact::getDocumentNode)
-                .filter(java.util.Objects::nonNull)
-                .map(DocumentNode::getId)
-                .filter(chapterIds::contains)
-                .collect(java.util.stream.Collectors.toSet());
-
-        int completed = completedChapterIds.size();
-        int total = chapterIds.size();
-        boolean ready = completed * 100 >= total * READY_CHAPTER_SUMMARY_PERCENT;
-        return new ChapterSummaryReadiness(completed, total, ready);
+        documentReadinessService.refreshDocumentReadyStatus(documentId);
     }
 
     private boolean isEnrichableDocumentStatus(DocumentStatus status) {
         return status == DocumentStatus.SUMMARISING || status == DocumentStatus.READY;
+    }
+
+    private boolean tryAcquireQuizTrigger(Long documentId) {
+        String key = "document-quiz-trigger:" + documentId;
+        long ttlMinutes = Math.max(5, ragProperties.getEnrichment().getAutoRetryDelayMinutes());
+        return Boolean.TRUE.equals(redisTemplate.opsForValue()
+                .setIfAbsent(key, "1", Duration.ofMinutes(ttlMinutes)));
     }
 
 

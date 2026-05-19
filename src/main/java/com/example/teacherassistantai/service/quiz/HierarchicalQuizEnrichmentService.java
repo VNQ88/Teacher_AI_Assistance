@@ -20,6 +20,7 @@ import com.example.teacherassistantai.repository.DocumentRepository;
 import com.example.teacherassistantai.service.DocumentEnrichmentBacklogService;
 import com.example.teacherassistantai.service.DocumentNodeArtifactGenerationContext;
 import com.example.teacherassistantai.service.DocumentNodeScopeService;
+import com.example.teacherassistantai.service.DocumentReadinessService;
 import com.example.teacherassistantai.service.LlmDocumentNodeArtifactGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +58,7 @@ public class HierarchicalQuizEnrichmentService {
     private final DocumentEnrichmentBacklogService backlogService;
     private final AiModelRoutingService aiModelRoutingService;
     private final ReviewQuestionInputResolver inputResolver;
+    private final DocumentReadinessService documentReadinessService;
 
     @Async("documentEnrichmentExecutor")
     public void enrichQuizPhase1(Long documentId) {
@@ -126,6 +128,7 @@ public class HierarchicalQuizEnrichmentService {
             return generateAndSaveQuizArtifactInternal(node, inputType, false, true);
         } finally {
             redisTemplate.delete(lock);
+            refreshDocumentReadyStatus(node);
         }
     }
 
@@ -193,22 +196,35 @@ public class HierarchicalQuizEnrichmentService {
             return generateAndSaveQuizArtifactInternal(node, inputType, false, false);
         } finally {
             redisTemplate.delete(lock);
+            refreshDocumentReadyStatus(node);
         }
     }
 
     public QuizArtifactOutcome generateAndSaveQuizArtifact(DocumentNode node, QuizGenerationStrategy.QuizInputType inputType) {
-        return generateAndSaveQuizArtifactInternal(node, inputType, false, false);
+        try {
+            return generateAndSaveQuizArtifactInternal(node, inputType, false, false);
+        } finally {
+            refreshDocumentReadyStatus(node);
+        }
     }
 
     public QuizArtifactOutcome generateAndSaveQuizArtifact(DocumentNode node,
                                                            QuizGenerationStrategy.QuizInputType inputType,
                                                            boolean forceRegenerate) {
-        return generateAndSaveQuizArtifactInternal(node, inputType, forceRegenerate, false);
+        try {
+            return generateAndSaveQuizArtifactInternal(node, inputType, forceRegenerate, false);
+        } finally {
+            refreshDocumentReadyStatus(node);
+        }
     }
 
     public QuizArtifactOutcome generateAndSaveQuizArtifactOnDemand(DocumentNode node,
                                                                    QuizGenerationStrategy.QuizInputType inputType) {
-        return generateAndSaveQuizArtifactInternal(node, inputType, false, true);
+        try {
+            return generateAndSaveQuizArtifactInternal(node, inputType, false, true);
+        } finally {
+            refreshDocumentReadyStatus(node);
+        }
     }
 
     private QuizArtifactOutcome generateAndSaveQuizArtifactInternal(DocumentNode node,
@@ -232,6 +248,8 @@ public class HierarchicalQuizEnrichmentService {
 
         if (!reviewContext.hasUsableContext()) {
             log.warn("BG Quiz: no usable review question context for nodeId={}, skipping", node.getId());
+            upsert(existing, document, node, promptVersion, model, sourceHash,
+                    DocumentNodeArtifactStatus.SKIPPED, noUsableContextContent(reviewContext), "No usable review question context", null);
             return QuizArtifactOutcome.SKIPPED;
         }
 
@@ -297,6 +315,13 @@ public class HierarchicalQuizEnrichmentService {
         }
     }
 
+    private void refreshDocumentReadyStatus(DocumentNode node) {
+        Long documentId = node == null || node.getDocument() == null ? null : node.getDocument().getId();
+        if (documentId != null) {
+            documentReadinessService.refreshDocumentReadyStatus(documentId);
+        }
+    }
+
     private boolean isRedisFactoryStoppedError(Throwable ex) {
         Throwable cause = ex;
         for (int depth = 0; cause != null && depth < 5; depth++) {
@@ -324,6 +349,18 @@ public class HierarchicalQuizEnrichmentService {
         content.put("errorType", ex.getErrorType() == null ? "TRANSIENT_AI_ERROR" : ex.getErrorType());
         content.put("retryAfter", ex.getRetryAfter() == null ? null : ex.getRetryAfter().toString());
         content.put("message", ex.getMessage());
+        return content;
+    }
+
+    private Map<String, Object> noUsableContextContent(ReviewQuestionGenerationContext context) {
+        Map<String, Object> content = new java.util.LinkedHashMap<>();
+        content.put("errorType", "NO_USABLE_CONTEXT");
+        content.put("inputMode", context.inputMode() == null ? null : context.inputMode().name());
+        content.put("rawChunkCount", context.rawChunks().size());
+        content.put("childSummaryCount", context.childSummaries().size());
+        content.put("fallbackChildCount", context.fallbackRawChunks().size());
+        content.put("representativeChildCount", context.representativeChildChunks().size());
+        content.put("allowedCitationChunkCount", context.allowedCitationChunks().size());
         return content;
     }
 
