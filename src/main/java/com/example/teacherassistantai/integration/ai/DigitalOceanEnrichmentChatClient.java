@@ -1,6 +1,7 @@
 package com.example.teacherassistantai.integration.ai;
 
 import com.example.teacherassistantai.config.RagProperties;
+import com.example.teacherassistantai.exception.BackgroundTransientAiException;
 import com.example.teacherassistantai.exception.InvalidDataException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -13,8 +14,10 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 
+import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -67,8 +70,39 @@ public class DigitalOceanEnrichmentChatClient {
             if (ex.getStatusCode().value() == 429) {
                 throw new DigitalOceanEnrichmentRateLimitException(headerParser.parse(ex.getResponseHeaders()), ex);
             }
+            if (isTransientStatus(ex.getStatusCode().value())) {
+                throw new BackgroundTransientAiException(
+                        "TRANSIENT_AI_ERROR",
+                        "DigitalOcean enrichment transient HTTP " + ex.getStatusCode().value(),
+                        ex
+                );
+            }
             throw ex;
+        } catch (RestClientException ex) {
+            if (isTimeout(ex)) {
+                throw new BackgroundTransientAiException("TIMEOUT", "DigitalOcean enrichment request timed out", ex);
+            }
+            throw new BackgroundTransientAiException("TRANSIENT_AI_ERROR", "DigitalOcean enrichment request failed", ex);
         }
+    }
+
+    private boolean isTransientStatus(int status) {
+        return status == 502 || status == 503 || status == 504;
+    }
+
+    private boolean isTimeout(Throwable ex) {
+        Throwable current = ex;
+        while (current != null) {
+            if (current instanceof SocketTimeoutException) {
+                return true;
+            }
+            String message = current.getMessage();
+            if (message != null && message.toLowerCase(java.util.Locale.ROOT).contains("timed out")) {
+                return true;
+            }
+            current = current.getCause();
+        }
+        return false;
     }
 
     private JsonNode parseBody(String body) {

@@ -5,14 +5,11 @@ import com.example.teacherassistantai.common.response.PageResponse;
 import com.example.teacherassistantai.dto.request.CreateChatSessionRequest;
 import com.example.teacherassistantai.dto.response.ChatSessionResponse;
 import com.example.teacherassistantai.entity.ChatSession;
-import com.example.teacherassistantai.entity.Classroom;
 import com.example.teacherassistantai.entity.Subject;
 import com.example.teacherassistantai.entity.User;
-import com.example.teacherassistantai.exception.InvalidDataException;
 import com.example.teacherassistantai.exception.ResourceNotFoundException;
 import com.example.teacherassistantai.repository.ChatMessageRepository;
 import com.example.teacherassistantai.repository.ChatSessionRepository;
-import com.example.teacherassistantai.repository.ClassroomRepository;
 import com.example.teacherassistantai.repository.SubjectRepository;
 import com.example.teacherassistantai.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +30,6 @@ public class ChatSessionService {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatSessionRepository chatSessionRepository;
     private final SubjectRepository subjectRepository;
-    private final ClassroomRepository classroomRepository;
     private final UserRepository userRepository;
 
     @Transactional
@@ -42,20 +38,10 @@ public class ChatSessionService {
         Subject subject = subjectRepository.findById(request.getSubjectId())
                 .orElseThrow(() -> new ResourceNotFoundException("Subject not found with id: " + request.getSubjectId()));
 
-        Classroom classroom = null;
-        if (request.getClassroomId() != null) {
-            classroom = classroomRepository.findById(request.getClassroomId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Classroom not found with id: " + request.getClassroomId()));
-            if (!classroom.getSubject().getId().equals(subject.getId())) {
-                throw new InvalidDataException("Classroom does not belong to provided subject");
-            }
-        }
-
         ChatSession session = ChatSession.builder()
                 .user(current)
                 .sessionType(ChatSessionType.KNOWLEDGE_QA)
                 .subject(subject)
-                .classroom(classroom)
                 .title(request.getTitle())
                 .active(true)
                 .build();
@@ -131,8 +117,6 @@ public class ChatSessionService {
                 .id(session.getId())
                 .subjectId(session.getSubject() != null ? session.getSubject().getId() : null)
                 .subjectName(session.getSubject() != null ? session.getSubject().getName() : null)
-                .classroomId(session.getClassroom() != null ? session.getClassroom().getId() : null)
-                .classroomName(session.getClassroom() != null ? session.getClassroom().getName() : null)
                 .title(session.getTitle())
                 .active(session.getActive())
                 .createdAt(session.getCreatedAt())

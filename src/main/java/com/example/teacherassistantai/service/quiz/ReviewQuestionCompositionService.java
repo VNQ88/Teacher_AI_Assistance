@@ -6,10 +6,10 @@ import com.example.teacherassistantai.config.RagProperties;
 import com.example.teacherassistantai.entity.DocumentChunk;
 import com.example.teacherassistantai.entity.DocumentNode;
 import com.example.teacherassistantai.entity.DocumentNodeArtifact;
+import com.example.teacherassistantai.integration.ai.AiWorkload;
 import com.example.teacherassistantai.integration.ai.DigitalOceanAiRateLimiter;
 import com.example.teacherassistantai.repository.DocumentNodeArtifactRepository;
 import com.example.teacherassistantai.repository.DocumentNodeRepository;
-import com.example.teacherassistantai.service.DocumentEnrichmentBacklogService;
 import com.example.teacherassistantai.service.InternalCitationSanitizer;
 import com.example.teacherassistantai.service.RagArtifactChatHandlerService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,6 @@ public class ReviewQuestionCompositionService {
     private final DocumentNodeRepository nodeRepository;
     private final DocumentNodeArtifactRepository artifactRepository;
     private final HierarchicalQuizEnrichmentService enrichmentService;
-    private final DocumentEnrichmentBacklogService backlogService;
     private final DigitalOceanAiRateLimiter rateLimiter;
     private final RagProperties ragProperties;
     private final RagArtifactChatHandlerService handlerService;
@@ -48,6 +47,30 @@ public class ReviewQuestionCompositionService {
     public ReviewQuestionCompositionResult composeForDocument(DocumentNode documentNode) {
         List<ChapterGroup> groups = chapterGroupsForDocument(documentNode);
         return compose(documentNode, ScopeKind.DOCUMENT, groups);
+    }
+
+    public ReviewQuestionCompositionResult composeForChapter(DocumentNode chapterNode) {
+        DocumentNodeArtifact artifact = artifactRepository.findLatestByNodeTypeAndStatus(
+                chapterNode.getId(),
+                DocumentNodeArtifactType.REVIEW_QUESTION_SET,
+                DocumentNodeArtifactStatus.COMPLETED
+        ).stream().findFirst().orElse(null);
+        if (artifact != null) {
+            Map<String, Object> content = artifact.getContentJsonb();
+            return new ReviewQuestionCompositionResult(
+                    handlerService.renderQuestions(content, chapterNode),
+                    handlerService.sourceChunksFromCitations(content),
+                    List.of(),
+                    List.of(),
+                    true,
+                    true
+            );
+        }
+
+        List<DocumentNode> missing = List.of(chapterNode);
+        List<DocumentNode> queued = queueMissingChapters(missing);
+        String answer = "Bộ câu hỏi chương này đang được tạo. Vui lòng hỏi lại sau ít phút.";
+        return new ReviewQuestionCompositionResult(answer, List.of(), missing, queued, false, false);
     }
 
     private ReviewQuestionCompositionResult compose(DocumentNode scopeNode,
@@ -68,19 +91,18 @@ public class ReviewQuestionCompositionService {
                 .filter(chapter -> !artifactsByChapterId.containsKey(chapter.getId()))
                 .toList();
 
-        boolean summaryBacklog = hasSummaryBacklog(scopeNode);
-        boolean ratePaused = rateLimiter.isBackgroundPaused();
-        List<DocumentNode> queuedChapters = queueMissingChapters(missingChapters, summaryBacklog, ratePaused);
+        boolean ratePaused = rateLimiter.isPaused(AiWorkload.ENRICH_REVIEW_QUESTION);
+        List<DocumentNode> queuedChapters = queueMissingChapters(missingChapters);
 
         Selection selection = selectQuestions(groups, artifactsByChapterId, scopeKind);
         if (selection.sections().isEmpty()) {
             return new ReviewQuestionCompositionResult(
-                    emptySelectionMessage(summaryBacklog, ratePaused, missingChapters),
+                    emptySelectionMessage(ratePaused, missingChapters),
                     List.of(), missingChapters, queuedChapters, false, missingChapters.isEmpty()
             );
         }
 
-        String answer = render(scopeNode, scopeKind, selection.sections(), missingChapters, summaryBacklog, ratePaused);
+        String answer = render(scopeNode, scopeKind, selection.sections(), missingChapters, ratePaused);
         List<DocumentChunk> sources = handlerService.sourceChunksFromCitations(
                 Map.of("questions", selection.selectedQuestions())
         );
@@ -118,10 +140,8 @@ public class ReviewQuestionCompositionService {
         return latest;
     }
 
-    private List<DocumentNode> queueMissingChapters(List<DocumentNode> missingChapters,
-                                                    boolean summaryBacklog,
-                                                    boolean ratePaused) {
-        if (missingChapters.isEmpty() || summaryBacklog || ratePaused) {
+    private List<DocumentNode> queueMissingChapters(List<DocumentNode> missingChapters) {
+        if (missingChapters.isEmpty()) {
             return List.of();
         }
         int limit = ragProperties.getEnrichment()
@@ -129,7 +149,7 @@ public class ReviewQuestionCompositionService {
                 .getMaxMissingQueuePerRequest();
         List<DocumentNode> queued = missingChapters.stream().limit(limit).toList();
         for (DocumentNode chapter : queued) {
-            enrichmentService.enqueueChapterQuizGeneration(chapter.getId());
+            enrichmentService.enqueueChapterQuizGeneration(chapter.getId(), true);
         }
         return queued;
     }
@@ -169,7 +189,6 @@ public class ReviewQuestionCompositionService {
                           ScopeKind scopeKind,
                           List<ChapterQuestionSection> sections,
                           List<DocumentNode> missingChapters,
-                          boolean summaryBacklog,
                           boolean ratePaused) {
         StringBuilder questionSection = new StringBuilder();
         StringBuilder answerSection = new StringBuilder();
@@ -204,7 +223,7 @@ public class ReviewQuestionCompositionService {
             }
         }
 
-        appendMissingNote(answerSection, missingChapters, summaryBacklog, ratePaused);
+        appendMissingNote(answerSection, missingChapters, ratePaused);
         return (questionSection.toString() + answerSection).trim();
     }
 
@@ -241,15 +260,12 @@ public class ReviewQuestionCompositionService {
 
     private void appendMissingNote(StringBuilder builder,
                                    List<DocumentNode> missingChapters,
-                                   boolean summaryBacklog,
                                    boolean ratePaused) {
         if (missingChapters.isEmpty()) {
             return;
         }
         builder.append("\n\nGhi chú:\n");
-        if (summaryBacklog) {
-            builder.append("Các chương sau sẽ được tạo câu hỏi sau khi summary sẵn sàng: ");
-        } else if (ratePaused) {
+        if (ratePaused) {
             builder.append("Các chương sau sẽ tiếp tục được tạo sau khi hết giới hạn AI: ");
         } else {
             builder.append("Các chương sau đang được tạo thêm câu hỏi: ");
@@ -308,17 +324,8 @@ public class ReviewQuestionCompositionService {
         return chapters;
     }
 
-    private boolean hasSummaryBacklog(DocumentNode scopeNode) {
-        Long documentId = scopeNode.getDocument() == null ? null : scopeNode.getDocument().getId();
-        return documentId != null && backlogService.hasSummaryBacklog(documentId);
-    }
-
-    private String emptySelectionMessage(boolean summaryBacklog,
-                                         boolean ratePaused,
+    private String emptySelectionMessage(boolean ratePaused,
                                          List<DocumentNode> missingChapters) {
-        if (summaryBacklog) {
-            return "Tài liệu vẫn đang hoàn tất tóm tắt. Bộ câu hỏi ôn tập sẽ được tạo sau khi summary sẵn sàng.";
-        }
         if (ratePaused) {
             return "Bộ câu hỏi ôn tập đang tạm dừng do giới hạn AI và sẽ tiếp tục tự động sau.";
         }

@@ -1,0 +1,426 @@
+<mxfile host="drawio-plugin" modified="2026-05-18T08:33:10.661Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" etag="z1nGzo5nZeB4OtxMe-Qe" version="22.1.22" type="embed" pages="6">
+  <diagram id="overview-v2" name="1. Tổng quan">
+    <mxGraphModel dx="608" dy="504" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="760" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ov-title" value="Use Case Tổng quan - Teacher Assistant AI" style="text;html=1;align=center;verticalAlign=middle;fontSize=18;fontStyle=1;fontColor=#172B4D;" parent="1" vertex="1">
+          <mxGeometry x="250" y="20" width="700" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-system" value="Teacher Assistant AI" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=14;fillColor=none;strokeColor=#333333;" parent="1" vertex="1">
+          <mxGeometry x="330" y="85" width="530" height="575" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-guest" value="Khách" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="180" y="120" width="60" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-auth" value="Người dùng đăng nhập" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="162" y="250" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-student" value="Học sinh" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="80" y="408.5" width="60" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-manager" value="Người quản lý học liệu" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;fontStyle=2;" parent="1" vertex="1">
+          <mxGeometry x="183.5" y="408.5" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-teacher" value="Giáo viên" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="123.5" y="541.5" width="60" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-admin" value="Quản trị viên" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="250" y="545" width="60" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-email" value="Dịch vụ Email" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="940" y="135" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-ai" value="DigitalOcean AI" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="940" y="328" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-worker" value="Tác vụ nền" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="949" y="482" width="60" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-auth-uc" value="Xác thực" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#DAE8FC;strokeColor=#6C8EBF;" parent="1" vertex="1">
+          <mxGeometry x="390" y="135" width="145" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-profile-uc" value="Quản lý &lt;br&gt;Hồ sơ cá nhân" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#DAE8FC;strokeColor=#6C8EBF;" parent="1" vertex="1">
+          <mxGeometry x="590" y="200" width="145" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-subject-uc" value="Quản lý Môn học" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#D5E8D4;strokeColor=#82B366;" parent="1" vertex="1">
+          <mxGeometry x="417.5" y="312.5" width="145" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-doc-uc" value="Quản lý Tài liệu" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#FFE6CC;strokeColor=#D79B00;" parent="1" vertex="1">
+          <mxGeometry x="417.5" y="400" width="145" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-process-uc" value="Xử lý tài liệu" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#FFE6CC;strokeColor=#D79B00;" parent="1" vertex="1">
+          <mxGeometry x="640" y="450" width="145" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-chat-uc" value="Chat học liệu" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#F8CECC;strokeColor=#B85450;" parent="1" vertex="1">
+          <mxGeometry x="640" y="278" width="145" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-admin-uc" value="Quản lý người dùng" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#E1D5E7;strokeColor=#9673A6;" parent="1" vertex="1">
+          <mxGeometry x="410" y="510" width="160" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-gen-student" style="endArrow=block;endFill=0;html=1;" parent="1" source="ov-student" target="ov-auth" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-gen-manager" style="endArrow=block;endFill=0;html=1;" parent="1" source="ov-manager" target="ov-auth" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-gen-teacher" style="endArrow=block;endFill=0;html=1;" parent="1" source="ov-teacher" target="ov-manager" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-gen-admin" style="endArrow=block;endFill=0;html=1;" parent="1" source="ov-admin" target="ov-manager" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-a1" style="endArrow=none;html=1;" parent="1" source="ov-guest" target="ov-auth-uc" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-a2" style="endArrow=none;html=1;" parent="1" source="ov-auth" target="ov-profile-uc" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-a3" style="endArrow=none;html=1;" parent="1" source="ov-auth" target="ov-chat-uc" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-a5" style="endArrow=none;html=1;" parent="1" source="ov-manager" target="ov-subject-uc" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-a6" style="endArrow=none;html=1;" parent="1" source="ov-manager" target="ov-doc-uc" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-a7" style="endArrow=none;html=1;" parent="1" source="ov-admin" target="ov-admin-uc" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-a8" style="endArrow=none;html=1;" parent="1" source="ov-worker" target="ov-process-uc" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-a9" style="endArrow=none;html=1;" parent="1" source="ov-auth-uc" target="ov-email" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-a11" style="endArrow=none;html=1;" parent="1" source="ov-process-uc" target="ov-ai" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov-a12" style="endArrow=none;html=1;" parent="1" source="ov-chat-uc" target="ov-ai" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="auth-v2" name="2. Xác thực">
+    <mxGraphModel dx="969" dy="504" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="760" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="auth-title" value="Use Case - Xác thực" style="text;html=1;align=center;verticalAlign=middle;fontSize=18;fontStyle=1;fontColor=#172B4D;" parent="1" vertex="1">
+          <mxGeometry x="250" y="20" width="700" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-system" value="Xác thực" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=14;fillColor=none;strokeColor=#333333;" parent="1" vertex="1">
+          <mxGeometry x="315" y="95" width="505" height="505" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-guest" value="Khách" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="90" y="235" width="60" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-user" value="Người dùng đăng nhập" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="90" y="455" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-register" value="Đăng ký" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#DAE8FC;strokeColor=#6C8EBF;" parent="1" vertex="1">
+          <mxGeometry x="390" y="145" width="145" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-login" value="Đăng nhập" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#DAE8FC;strokeColor=#6C8EBF;" parent="1" vertex="1">
+          <mxGeometry x="640" y="145" width="145" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-activate" value="Kích hoạt tài khoản" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#DAE8FC;strokeColor=#6C8EBF;" parent="1" vertex="1">
+          <mxGeometry x="385" y="313" width="155" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-forgot" value="Quên mật khẩu" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#DAE8FC;strokeColor=#6C8EBF;" parent="1" vertex="1">
+          <mxGeometry x="545" y="250" width="145" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-reset" value="Đặt lại mật khẩu" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#DAE8FC;strokeColor=#6C8EBF;" parent="1" vertex="1">
+          <mxGeometry x="390" y="405" width="155" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-logout" value="Đăng xuất" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#D5E8D4;strokeColor=#82B366;" parent="1" vertex="1">
+          <mxGeometry x="395" y="500" width="145" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-a1" style="endArrow=none;html=1;" parent="1" source="auth-guest" target="auth-register" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-a2" style="endArrow=none;html=1;" parent="1" source="auth-guest" target="auth-login" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-a3" style="endArrow=none;html=1;" parent="1" source="auth-guest" target="auth-activate" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-a4" style="endArrow=none;html=1;" parent="1" source="auth-guest" target="auth-forgot" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-a5" style="endArrow=none;html=1;" parent="1" source="auth-guest" target="auth-reset" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-a6" style="endArrow=none;html=1;" parent="1" source="auth-user" target="auth-logout" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="user-v2" name="3. Người dùng">
+    <mxGraphModel dx="969" dy="504" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="760" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="usr-title" value="Use Case - Người dùng" style="text;html=1;align=center;verticalAlign=middle;fontSize=18;fontStyle=1;fontColor=#172B4D;" parent="1" vertex="1">
+          <mxGeometry x="250" y="20" width="700" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="usr-system" value="Quản lý Người dùng" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=14;fillColor=none;strokeColor=#333333;" parent="1" vertex="1">
+          <mxGeometry x="330" y="100" width="510" height="460" as="geometry" />
+        </mxCell>
+        <mxCell id="usr-auth" value="Người dùng đăng nhập" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="80" y="185" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="usr-student" value="Học sinh" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="45" y="430" width="60" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="usr-teacher" value="Giáo viên" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="120" y="430" width="60" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="usr-admin" value="Quản trị viên" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="200" y="430" width="60" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="usr-profile" value="Hồ sơ cá nhân" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#D5E8D4;strokeColor=#82B366;" parent="1" vertex="1">
+          <mxGeometry x="430" y="160" width="155" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="usr-password" value="Đổi mật khẩu" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#D5E8D4;strokeColor=#82B366;" parent="1" vertex="1">
+          <mxGeometry x="430" y="240" width="155" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="usr-list" value="Xem người dùng" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#E1D5E7;strokeColor=#9673A6;" parent="1" vertex="1">
+          <mxGeometry x="430" y="320" width="155" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="usr-create" value="Tạo người dùng" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#E1D5E7;strokeColor=#9673A6;" parent="1" vertex="1">
+          <mxGeometry x="640" y="320" width="155" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="usr-grant" value="Cấp quyền Teacher" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#E1D5E7;strokeColor=#9673A6;" parent="1" vertex="1">
+          <mxGeometry x="430" y="490" width="155" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="usr-delete" value="Xóa người dùng" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#E1D5E7;strokeColor=#9673A6;" parent="1" vertex="1">
+          <mxGeometry x="630" y="430" width="155" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="usr-gen-student" style="endArrow=block;endFill=0;html=1;" parent="1" source="usr-student" target="usr-auth" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="usr-gen-teacher" style="endArrow=block;endFill=0;html=1;" parent="1" source="usr-teacher" target="usr-auth" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="174.5" y="448" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="usr-gen-admin" style="endArrow=block;endFill=0;html=1;" parent="1" source="usr-admin" target="usr-auth" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="224.79500000000007" y="448" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="usr-a1" style="endArrow=none;html=1;" parent="1" source="usr-auth" target="usr-profile" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="usr-a2" style="endArrow=none;html=1;" parent="1" source="usr-auth" target="usr-password" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="usr-a3" style="endArrow=none;html=1;" parent="1" source="usr-admin" target="usr-list" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="usr-a4" style="endArrow=none;html=1;" parent="1" source="usr-admin" target="usr-create" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="usr-a5" style="endArrow=none;html=1;" parent="1" source="usr-admin" target="usr-grant" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="usr-a6" style="endArrow=none;html=1;" parent="1" source="usr-admin" target="usr-delete" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="subject-v2" name="4. Môn học">
+    <mxGraphModel dx="969" dy="504" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="760" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="sb-system" value="Quản lý Môn học" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=14;fillColor=none;strokeColor=#333333;" parent="1" vertex="1">
+          <mxGeometry x="350" y="110" width="390" height="460" as="geometry" />
+        </mxCell>
+        <mxCell id="sb-auth" value="Người dùng đăng nhập" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="141" y="168.5" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="sb-student" value="Học sinh" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="95" y="328.5" width="60" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="sb-manager" value="Người quản lý học liệu" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;fontStyle=2;" parent="1" vertex="1">
+          <mxGeometry x="203.5" y="328.5" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="sb-teacher" value="Giáo viên" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="170" y="475" width="60" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="sb-admin" value="Quản trị viên" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="262.5" y="475" width="60" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="sb-view" value="Xem môn học" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#D5E8D4;strokeColor=#82B366;" parent="1" vertex="1">
+          <mxGeometry x="470" y="168.5" width="150" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="sb-create" value="Tạo môn học" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#FFF2CC;strokeColor=#D6B656;" parent="1" vertex="1">
+          <mxGeometry x="470" y="273.5" width="150" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="sb-update" value="Cập nhật môn học" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#FFF2CC;strokeColor=#D6B656;" parent="1" vertex="1">
+          <mxGeometry x="470" y="375" width="150" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="sb-delete" value="Xóa môn học" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#FFF2CC;strokeColor=#D6B656;" parent="1" vertex="1">
+          <mxGeometry x="470" y="475" width="150" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="sb-gen-student" style="endArrow=block;endFill=0;html=1;" parent="1" source="sb-student" target="sb-auth" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="sb-gen-manager" style="endArrow=block;endFill=0;html=1;" parent="1" source="sb-manager" target="sb-auth" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="sb-gen-teacher" style="endArrow=block;endFill=0;html=1;" parent="1" source="sb-teacher" target="sb-manager" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="sb-gen-admin" style="endArrow=block;endFill=0;html=1;" parent="1" source="sb-admin" target="sb-manager" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="sb-a1" style="endArrow=none;html=1;" parent="1" source="sb-auth" target="sb-view" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="sb-a2" style="endArrow=none;html=1;" parent="1" source="sb-manager" target="sb-create" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="sb-a3" style="endArrow=none;html=1;" parent="1" source="sb-manager" target="sb-update" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="sb-a4" style="endArrow=none;html=1;" parent="1" source="sb-manager" target="sb-delete" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="document-v2" name="5. Tài liệu và Học liệu">
+    <mxGraphModel dx="969" dy="504" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="760" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="dc-system" value="Quản lý tài liệu" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=14;fillColor=none;strokeColor=#333333;" parent="1" vertex="1">
+          <mxGeometry x="330" y="90" width="540" height="460" as="geometry" />
+        </mxCell>
+        <mxCell id="dc-auth" value="Người dùng đăng nhập" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="199.8" y="152.8" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="dc-manager" value="Người quản lý học liệu" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;fontStyle=2;" parent="1" vertex="1">
+          <mxGeometry x="210" y="287" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="dc-teacher" value="Giáo viên" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="139.8" y="430" width="60" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="dc-admin" value="Quản trị viên" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="250" y="430" width="60" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="dc-view" value="Xem tài liệu" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#D5E8D4;strokeColor=#82B366;" parent="1" vertex="1">
+          <mxGeometry x="420" y="140" width="155" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="dc-upload" value="Upload tài liệu" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#FFE6CC;strokeColor=#D79B00;" parent="1" vertex="1">
+          <mxGeometry x="510" y="348" width="155" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="dc-reprocess" value="Xử lý lại tài liệu" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#FFE6CC;strokeColor=#D79B00;" parent="1" vertex="1">
+          <mxGeometry x="420" y="270" width="155" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="dc-delete" value="Xóa tài liệu" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#FFE6CC;strokeColor=#D79B00;" parent="1" vertex="1">
+          <mxGeometry x="420" y="420" width="155" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="dc-process" value="Xử lý tài liệu nền" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#F8CECC;strokeColor=#B85450;" parent="1" vertex="1">
+          <mxGeometry x="665" y="250" width="155" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="dc-gen-teacher" style="endArrow=block;endFill=0;html=1;" parent="1" source="dc-teacher" target="dc-manager" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dc-gen-admin" style="endArrow=block;endFill=0;html=1;" parent="1" source="dc-admin" target="dc-manager" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dc-a1" style="endArrow=none;html=1;" parent="1" source="dc-auth" target="dc-view" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dc-a2" style="endArrow=none;html=1;" parent="1" source="dc-manager" target="dc-upload" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dc-a3" style="endArrow=none;html=1;" parent="1" source="dc-manager" target="dc-reprocess" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dc-a4" style="endArrow=none;html=1;" parent="1" source="dc-manager" target="dc-delete" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dc-inc1" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;dashed=1;html=1;fontSize=11;" parent="1" source="dc-upload" target="dc-process" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dc-inc2" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;dashed=1;html=1;fontSize=11;" parent="1" source="dc-reprocess" target="dc-process" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="chat-v2" name="6. Chat học liệu">
+    <mxGraphModel dx="969" dy="504" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="760" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ch-title" value="Use Case - Chat học liệu" style="text;html=1;align=center;verticalAlign=middle;fontSize=18;fontStyle=1;fontColor=#172B4D;" parent="1" vertex="1">
+          <mxGeometry x="250" y="20" width="700" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ch-system" value="Quản lý phiên chat" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=14;fillColor=none;strokeColor=#333333;" parent="1" vertex="1">
+          <mxGeometry x="330" y="90" width="560" height="480" as="geometry" />
+        </mxCell>
+        <mxCell id="ch-auth" value="Người dùng đăng nhập" style="shape=umlActor;verticalLabelPosition=bottom;labelPosition=center;verticalAlign=top;html=1;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="160" y="302" width="78" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="ch-create" value="Tạo phiên chat" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#F8CECC;strokeColor=#B85450;" parent="1" vertex="1">
+          <mxGeometry x="420" y="135" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ch-read" value="Xem phiên chat" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#F8CECC;strokeColor=#B85450;" parent="1" vertex="1">
+          <mxGeometry x="640" y="135" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ch-delete" value="Xóa phiên chat" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#F8CECC;strokeColor=#B85450;" parent="1" vertex="1">
+          <mxGeometry x="410" y="270" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ch-history" value="Xem Lịch sử chat" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#F8CECC;strokeColor=#B85450;" parent="1" vertex="1">
+          <mxGeometry x="640" y="302" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ch-send" value="Gửi tin nhắn chat" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#F8CECC;strokeColor=#B85450;" parent="1" vertex="1">
+          <mxGeometry x="525" y="355" width="160" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="ch-qa" value="Hỏi đáp học liệu" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#FFF2CC;strokeColor=#D6B656;" parent="1" vertex="1">
+          <mxGeometry x="380" y="440" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ch-summary" value="Tóm tắt học liệu" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#FFF2CC;strokeColor=#D6B656;" parent="1" vertex="1">
+          <mxGeometry x="535" y="490" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ch-quiz" value="Tạo câu hỏi ôn tập" style="ellipse;whiteSpace=wrap;html=1;fontSize=12;fillColor=#FFF2CC;strokeColor=#D6B656;" parent="1" vertex="1">
+          <mxGeometry x="700" y="440" width="155" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ch-a1" style="endArrow=none;html=1;" parent="1" source="ch-auth" target="ch-create" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ch-a2" style="endArrow=none;html=1;" parent="1" source="ch-auth" target="ch-read" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ch-a3" style="endArrow=none;html=1;" parent="1" source="ch-auth" target="ch-delete" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ch-a4" style="endArrow=none;html=1;" parent="1" source="ch-auth" target="ch-history" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ch-a5" style="endArrow=none;html=1;" parent="1" source="ch-auth" target="ch-send" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ch-ext1" value="&lt;&lt;extend&gt;&gt;" style="endArrow=open;dashed=1;html=1;fontSize=11;" parent="1" source="ch-qa" target="ch-send" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ch-ext2" value="&lt;&lt;extend&gt;&gt;" style="endArrow=open;dashed=1;html=1;fontSize=11;" parent="1" source="ch-summary" target="ch-send" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ch-ext3" value="&lt;&lt;extend&gt;&gt;" style="endArrow=open;dashed=1;html=1;fontSize=11;" parent="1" source="ch-quiz" target="ch-send" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

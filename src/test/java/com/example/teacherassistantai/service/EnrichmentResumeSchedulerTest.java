@@ -27,7 +27,6 @@ class EnrichmentResumeSchedulerTest {
     private DocumentEnrichmentService enrichmentService;
     private DigitalOceanAiRateLimiter rateLimiter;
     private RagProperties ragProperties;
-    private DocumentEnrichmentBacklogService backlogService;
     private AiModelRoutingService aiModelRoutingService;
     private EnrichmentResumeScheduler scheduler;
 
@@ -54,14 +53,12 @@ class EnrichmentResumeSchedulerTest {
         enrichmentService = mock(DocumentEnrichmentService.class);
         rateLimiter = mock(DigitalOceanAiRateLimiter.class);
         ragProperties = new RagProperties();
-        backlogService = mock(DocumentEnrichmentBacklogService.class);
         aiModelRoutingService = mock(AiModelRoutingService.class);
         scheduler = new EnrichmentResumeScheduler(
                 artifactRepository,
                 enrichmentService,
                 rateLimiter,
                 ragProperties,
-                backlogService,
                 aiModelRoutingService
         );
 
@@ -86,7 +83,6 @@ class EnrichmentResumeSchedulerTest {
         );
         verify(artifactRepository, never())
                 .findRateLimitedByArtifactTypeOrderByUpdatedAtAsc(DocumentNodeArtifactType.REVIEW_QUESTION_SET);
-        verify(backlogService, never()).hasSummaryBacklog(203L);
     }
 
     @Test
@@ -96,7 +92,6 @@ class EnrichmentResumeSchedulerTest {
         when(rateLimiter.isPaused(reviewRoute.workload(), reviewRoute.accountAlias(), reviewRoute.model())).thenReturn(false);
         when(artifactRepository.findRateLimitedByArtifactTypeOrderByUpdatedAtAsc(DocumentNodeArtifactType.REVIEW_QUESTION_SET))
                 .thenReturn(List.of(review));
-        when(backlogService.hasSummaryBacklog(203L)).thenReturn(false);
 
         scheduler.resumeRateLimitedArtifacts();
 

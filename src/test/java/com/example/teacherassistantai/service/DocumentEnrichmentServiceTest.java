@@ -28,6 +28,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -50,9 +52,10 @@ class DocumentEnrichmentServiceTest {
     private DocumentChunkRepository documentChunkRepository;
     private DocumentNodeArtifactRepository artifactRepository;
     private DocumentNodeScopeService nodeScopeService;
-    private DocumentEnrichmentBacklogService backlogService;
     private ReviewQuestionCountResolver reviewQuestionCountResolver;
     private AiModelRoutingService aiModelRoutingService;
+    private OriginalSummaryNodeService originalSummaryNodeService;
+    private com.example.teacherassistantai.service.quiz.HierarchicalQuizEnrichmentService quizEnrichmentService;
     private RagProperties ragProperties;
 
     @BeforeEach
@@ -62,10 +65,11 @@ class DocumentEnrichmentServiceTest {
         documentChunkRepository = mock(DocumentChunkRepository.class);
         artifactRepository = mock(DocumentNodeArtifactRepository.class);
         nodeScopeService = mock(DocumentNodeScopeService.class);
-        backlogService = mock(DocumentEnrichmentBacklogService.class);
         reviewQuestionCountResolver = mock(ReviewQuestionCountResolver.class);
         when(reviewQuestionCountResolver.resolve(any())).thenReturn(new ReviewQuestionCountResolver.CountRange(15, 20));
         aiModelRoutingService = mock(AiModelRoutingService.class);
+        originalSummaryNodeService = mock(OriginalSummaryNodeService.class);
+        quizEnrichmentService = mock(com.example.teacherassistantai.service.quiz.HierarchicalQuizEnrichmentService.class);
         ragProperties = new RagProperties();
         when(aiModelRoutingService.enrichmentModelFor(any())).thenReturn(ragProperties.getAi().getChatModel());
     }
@@ -75,11 +79,16 @@ class DocumentEnrichmentServiceTest {
         Fixture fixture = fixture();
         DocumentEnrichmentService service = service(List.of());
         mockCommonScope(fixture);
+        when(quizEnrichmentService.generateAndSaveQuizArtifact(
+                eq(fixture.node()),
+                any(),
+                eq(false)
+        )).thenReturn(com.example.teacherassistantai.service.quiz.HierarchicalQuizEnrichmentService.QuizArtifactOutcome.SKIPPED);
 
         service.enrichDocument(fixture.document().getId(), false);
 
         ArgumentCaptor<DocumentNodeArtifact> artifactCaptor = ArgumentCaptor.forClass(DocumentNodeArtifact.class);
-        verify(artifactRepository, times(2)).save(artifactCaptor.capture());
+        verify(artifactRepository, times(1)).save(artifactCaptor.capture());
         assertThat(artifactCaptor.getAllValues())
                 .extracting(DocumentNodeArtifact::getStatus)
                 .containsOnly(DocumentNodeArtifactStatus.SKIPPED);
@@ -126,6 +135,11 @@ class DocumentEnrichmentServiceTest {
         };
         DocumentEnrichmentService service = service(List.of(generator));
         mockCommonScope(fixture);
+        when(quizEnrichmentService.generateAndSaveQuizArtifact(
+                eq(fixture.node()),
+                any(),
+                eq(false)
+        )).thenReturn(com.example.teacherassistantai.service.quiz.HierarchicalQuizEnrichmentService.QuizArtifactOutcome.COMPLETED);
         List<DocumentNodeArtifactStatus> savedStatuses = new ArrayList<>();
         when(artifactRepository.save(any(DocumentNodeArtifact.class)))
                 .thenAnswer(invocation -> {
@@ -133,13 +147,16 @@ class DocumentEnrichmentServiceTest {
                     savedStatuses.add(artifact.getStatus());
                     return artifact;
                 });
+        when(artifactRepository.findByNodeIdsAndArtifactTypeAndStatusOrderByNodeOrderAndUpdatedAt(
+                any(),
+                eq(DocumentNodeArtifactType.SUMMARY),
+                eq(DocumentNodeArtifactStatus.COMPLETED)
+        )).thenReturn(List.of(completedSummaryArtifact(fixture.document(), fixture.node(), "Tóm tắt chương")));
 
         service.enrichDocument(fixture.document().getId(), false);
 
-        verify(artifactRepository, times(4)).save(any(DocumentNodeArtifact.class));
+        verify(artifactRepository, times(2)).save(any(DocumentNodeArtifact.class));
         assertThat(savedStatuses).containsExactly(
-                DocumentNodeArtifactStatus.RUNNING,
-                DocumentNodeArtifactStatus.COMPLETED,
                 DocumentNodeArtifactStatus.RUNNING,
                 DocumentNodeArtifactStatus.COMPLETED
         );
@@ -147,6 +164,51 @@ class DocumentEnrichmentServiceTest {
         assertThat(fixture.document().getStatus()).isEqualTo(DocumentStatus.READY);
         assertThat(fixture.document().getEnrichmentStatus()).isEqualTo(DocumentEnrichmentStatus.ENRICHED);
         assertThat(fixture.document().getEnrichmentError()).isNull();
+    }
+
+    @Test
+    void enrichDocument_whenChapterSummaryCompletionAtLeast75Percent_marksDocumentReady() {
+        Fixture fixture = fixture();
+        List<DocumentNode> chapters = List.of(
+                node(fixture.document(), 301L, "chapter", "Chương 1", null),
+                node(fixture.document(), 302L, "chapter", "Chương 2", null),
+                node(fixture.document(), 303L, "chapter", "Chương 3", null),
+                node(fixture.document(), 304L, "chapter", "Chương 4", null)
+        );
+        DocumentEnrichmentService service = service(List.of(failingSummaryGenerator(List.of(304L))));
+        mockDocument(fixture.document());
+        mockChapterSummaryBatch(fixture.document(), chapters);
+        List<DocumentNodeArtifact> savedArtifacts = captureSavedArtifacts();
+        mockCompletedChapterSummaryLookup(savedArtifacts);
+
+        service.enrichDocument(fixture.document().getId(), false, List.of(DocumentNodeArtifactType.SUMMARY));
+
+        assertThat(fixture.document().getStatus()).isEqualTo(DocumentStatus.READY);
+        assertThat(fixture.document().getEnrichmentStatus()).isEqualTo(DocumentEnrichmentStatus.PARTIAL_FAILED);
+        assertThat(fixture.document().getEnrichmentError()).contains("3/4");
+    }
+
+    @Test
+    void enrichDocument_whenChapterSummaryCompletionBelow75Percent_keepsDocumentSummarising() {
+        Fixture fixture = fixture();
+        fixture.document().setStatus(DocumentStatus.SUMMARISING);
+        List<DocumentNode> chapters = List.of(
+                node(fixture.document(), 401L, "chapter", "Chương 1", null),
+                node(fixture.document(), 402L, "chapter", "Chương 2", null),
+                node(fixture.document(), 403L, "chapter", "Chương 3", null),
+                node(fixture.document(), 404L, "chapter", "Chương 4", null)
+        );
+        DocumentEnrichmentService service = service(List.of(failingSummaryGenerator(List.of(403L, 404L))));
+        mockDocument(fixture.document());
+        mockChapterSummaryBatch(fixture.document(), chapters);
+        List<DocumentNodeArtifact> savedArtifacts = captureSavedArtifacts();
+        mockCompletedChapterSummaryLookup(savedArtifacts);
+
+        service.enrichDocument(fixture.document().getId(), false, List.of(DocumentNodeArtifactType.SUMMARY));
+
+        assertThat(fixture.document().getStatus()).isEqualTo(DocumentStatus.SUMMARISING);
+        assertThat(fixture.document().getEnrichmentStatus()).isEqualTo(DocumentEnrichmentStatus.PARTIAL_FAILED);
+        assertThat(fixture.document().getEnrichmentError()).contains("2/4");
     }
 
     @Test
@@ -494,6 +556,47 @@ class DocumentEnrichmentServiceTest {
     }
 
     @Test
+    void enrichNode_chapterSummary_prefersCleanedOriginalSummaryNode() {
+        Fixture fixture = fixture();
+        DocumentNode chapter = node(fixture.document(), 212L, "chapter", "Chương 1", null);
+        DocumentNode summaryNode = node(fixture.document(), 213L, "summary", "TÓM TẮT CHƯƠNG 1", chapter);
+        DocumentChunk source = chunk(fixture.document(), summaryNode, 312L, "Nội dung tóm tắt gốc đã clean");
+        List<SummaryGenerationContext> contexts = new ArrayList<>();
+        DocumentEnrichmentService service = service(List.of(summaryContextGenerator(contexts)));
+        mockDocument(fixture.document());
+        when(documentNodeRepository.findById(chapter.getId())).thenReturn(Optional.of(chapter));
+        when(originalSummaryNodeService.findForChapter(chapter))
+                .thenReturn(Optional.of(new OriginalSummaryNodeService.OriginalSummary(
+                        summaryNode,
+                        "Nội dung tóm tắt gốc đã clean",
+                        List.of(source),
+                        List.of(source),
+                        new OriginalSummaryTextCleaner.CleaningStats(100, 32, 1, 1, 1)
+                )));
+        when(artifactRepository.findByDocumentNodeIdAndArtifactTypeAndPromptVersionAndModelAndSourceHash(
+                anyLong(), any(), any(), any(), any()))
+                .thenReturn(Optional.empty());
+        when(artifactRepository.save(any(DocumentNodeArtifact.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        service.enrichNode(chapter.getId(), false, List.of(DocumentNodeArtifactType.SUMMARY));
+
+        assertThat(contexts).hasSize(1);
+        SummaryGenerationContext context = contexts.getFirst();
+        assertThat(context.summaryMode()).isEqualTo(SummaryMode.CHAPTER_FROM_ORIGINAL_SUMMARY);
+        assertThat(context.directChunks()).containsExactly(source);
+        assertThat(context.childSummaries()).isEmpty();
+
+        ArgumentCaptor<DocumentNodeArtifact> artifactCaptor = ArgumentCaptor.forClass(DocumentNodeArtifact.class);
+        verify(artifactRepository, times(2)).save(artifactCaptor.capture());
+        DocumentNodeArtifact completed = artifactCaptor.getAllValues().getLast();
+        assertThat(completed.getContentJsonb())
+                .containsEntry("sourceMode", "ORIGINAL_SUMMARY_NODE")
+                .containsEntry("originalSummaryNodeId", summaryNode.getId())
+                .containsEntry("generatedVia", "original_summary_llm");
+    }
+
+    @Test
     void enrichNode_partSummary_usesChapterSummaries() {
         Fixture fixture = fixture();
         DocumentNode part = node(fixture.document(), 220L, "part", "Phần I", null);
@@ -653,6 +756,88 @@ class DocumentEnrichmentServiceTest {
         };
     }
 
+    private DocumentNodeArtifactGenerator failingSummaryGenerator(List<Long> failingNodeIds) {
+        return new DocumentNodeArtifactGenerator() {
+            @Override
+            public boolean supports(DocumentNodeArtifactType artifactType) {
+                return artifactType == DocumentNodeArtifactType.SUMMARY;
+            }
+
+            @Override
+            public boolean supportsSummaryMode(SummaryMode summaryMode) {
+                return true;
+            }
+
+            @Override
+            public DocumentNodeArtifactGenerationResult generate(DocumentNodeArtifactGenerationContext context) {
+                throw new AssertionError("Legacy generation should not be used for bottom-up summary");
+            }
+
+            @Override
+            public DocumentNodeArtifactGenerationResult generateSummary(SummaryGenerationContext context) {
+                if (failingNodeIds.contains(context.node().getId())) {
+                    throw new RuntimeException("rate or model failure");
+                }
+                return new DocumentNodeArtifactGenerationResult(
+                        Map.of(
+                                "summaryMode", context.summaryMode().name(),
+                                "summary", "Tóm tắt " + context.node().getTitle(),
+                                "generated", true
+                        ),
+                        42
+                );
+            }
+        };
+    }
+
+    private void mockChapterSummaryBatch(Document document, List<DocumentNode> chapters) {
+        when(documentNodeRepository.findByDocumentIdAndNodeTypeInOrderByOrderIndexAsc(anyLong(), any()))
+                .thenReturn(chapters);
+        when(documentNodeRepository.findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(document.getId(), "subsection_level2"))
+                .thenReturn(List.of());
+        when(documentNodeRepository.findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(document.getId(), "subsection"))
+                .thenReturn(List.of());
+        when(documentNodeRepository.findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(document.getId(), "section"))
+                .thenReturn(List.of());
+        when(documentNodeRepository.findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(document.getId(), "chapter"))
+                .thenReturn(chapters);
+        when(documentNodeRepository.findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(document.getId(), "part"))
+                .thenReturn(List.of());
+        for (DocumentNode chapter : chapters) {
+            DocumentChunk chunk = chunk(document, chapter, 800L + chapter.getId(), "Nội dung " + chapter.getTitle());
+            when(documentNodeRepository.findByParentIdOrderByOrderIndexAsc(chapter.getId())).thenReturn(List.of());
+            when(documentChunkRepository.findByDocumentIdAndNodeIdOrderBySourceOrderAsc(document.getId(), chapter.getId()))
+                    .thenReturn(List.of(chunk));
+            when(nodeScopeService.getScope(chapter.getId()))
+                    .thenReturn(new DocumentNodeScopeService.NodeScope(chapter, List.of(chunk), "source-hash-" + chapter.getId()));
+        }
+        when(artifactRepository.findByDocumentNodeIdAndArtifactTypeAndPromptVersionAndModelAndSourceHash(
+                anyLong(), any(), any(), any(), any()))
+                .thenReturn(Optional.empty());
+    }
+
+    private List<DocumentNodeArtifact> captureSavedArtifacts() {
+        List<DocumentNodeArtifact> savedArtifacts = Collections.synchronizedList(new ArrayList<>());
+        when(artifactRepository.save(any(DocumentNodeArtifact.class)))
+                .thenAnswer(invocation -> {
+                    DocumentNodeArtifact artifact = invocation.getArgument(0);
+                    savedArtifacts.add(artifact);
+                    return artifact;
+                });
+        return savedArtifacts;
+    }
+
+    private void mockCompletedChapterSummaryLookup(List<DocumentNodeArtifact> savedArtifacts) {
+        when(artifactRepository.findByNodeIdsAndArtifactTypeAndStatusOrderByNodeOrderAndUpdatedAt(
+                any(),
+                eq(DocumentNodeArtifactType.SUMMARY),
+                eq(DocumentNodeArtifactStatus.COMPLETED)
+        )).thenAnswer(invocation -> savedArtifacts.stream()
+                .filter(artifact -> artifact.getArtifactType() == DocumentNodeArtifactType.SUMMARY)
+                .filter(artifact -> artifact.getStatus() == DocumentNodeArtifactStatus.COMPLETED)
+                .toList());
+    }
+
     private DocumentNodeArtifact completedSummaryArtifact(Document document, DocumentNode node, String summary) {
         DocumentNodeArtifact artifact = DocumentNodeArtifact.builder()
                 .document(document)
@@ -679,10 +864,10 @@ class DocumentEnrichmentServiceTest {
                 objectProvider(generators),
                 new TransactionTemplate(new NoOpTransactionManager()),
                 mock(RedisTemplate.class),
-                mock(com.example.teacherassistantai.service.quiz.HierarchicalQuizEnrichmentService.class),
-                backlogService,
+                quizEnrichmentService,
                 reviewQuestionCountResolver,
-                aiModelRoutingService
+                aiModelRoutingService,
+                originalSummaryNodeService
         );
     }
 

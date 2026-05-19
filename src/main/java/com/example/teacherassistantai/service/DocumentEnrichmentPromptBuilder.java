@@ -4,6 +4,9 @@ import com.example.teacherassistantai.config.RagProperties;
 import com.example.teacherassistantai.entity.Document;
 import com.example.teacherassistantai.entity.DocumentChunk;
 import com.example.teacherassistantai.entity.DocumentNode;
+import com.example.teacherassistantai.service.quiz.QuizInputMode;
+import com.example.teacherassistantai.service.quiz.ReviewQuestionCoverage;
+import com.example.teacherassistantai.service.quiz.ReviewQuestionGenerationContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -94,6 +97,27 @@ public class DocumentEnrichmentPromptBuilder {
         return prompt.toString();
     }
 
+    public String buildOriginalSummaryPrompt(SummaryGenerationContext context) {
+        StringBuilder prompt = basePrompt(context.document(), context.node());
+        prompt.append("Nhiem vu: Chuan hoa summary goc cua chapter thanh summary artifact ngan gon.\n");
+        prompt.append("Yeu cau rieng:\n");
+        prompt.append("- Viet bang tieng Viet.\n");
+        prompt.append("- Chi dua vao cleaned original summary chunks ben duoi.\n");
+        prompt.append("- Khong giu breadcrumb/path noi bo hoac heading lap nhu TOM TAT CHUONG.\n");
+        prompt.append("- Tong hop lai, khong chep nguyen van neu noi dung dai hoac trung lap.\n");
+        prompt.append("- Truong 'summary' gom 4-6 cau, bao quat cac y chinh cua chapter.\n");
+        prompt.append("- Output gom 6 den ").append(ragProperties.getEnrichment().getChapterSummaryMaxKeyPoints())
+                .append(" keyPoints.\n");
+        prompt.append("- Khong them kien thuc ngoai input.\n");
+        prompt.append("- Citation ngan phai dung chunkId co trong context.\n");
+        prompt.append("- Chi tra ve mot JSON object hop le, khong boc trong markdown/code fence.\n\n");
+        int maxKp = ragProperties.getEnrichment().getChapterSummaryMaxKeyPoints();
+        appendSummarySchema(prompt, context, "4-6 cau tom tat + 6-" + maxKp + " y chinh tu original summary");
+        appendCoverageContract(prompt, context);
+        appendContext(prompt, context.directChunks());
+        return prompt.toString();
+    }
+
     public String buildPartSummaryPrompt(SummaryGenerationContext context) {
         StringBuilder prompt = basePrompt(context.document(), context.node());
         prompt.append("Nhiem vu: Tao summary part theo huong bottom-up.\n");
@@ -179,6 +203,186 @@ public class DocumentEnrichmentPromptBuilder {
                 """);
         appendContext(prompt, chunks);
         return prompt.toString();
+    }
+
+    private void appendReviewQuestionSchema(StringBuilder prompt, boolean mixed) {
+        prompt.append("Output JSON schema:\n");
+        if (mixed) {
+            prompt.append("""
+                    {
+                      "nodeTitle": "string",
+                      "sectionPath": "string",
+                      "nodeType": "string",
+                      "inputMode": "MIXED_CHILD_SUMMARIES_AND_REPRESENTATIVE_CHUNKS",
+                      "questionCount": 15,
+                      "summaryBasedTargetCount": 7,
+                      "representativeTargetCount": 8,
+                      "childSummaryRefs": [
+                        {"nodeId": 101, "artifactId": 9001, "sourceHash": "string"}
+                      ],
+                      "coverage": {
+                        "expectedChildCount": 0,
+                        "usedChildSummaryCount": 0,
+                        "fallbackChildCount": 0,
+                        "representativeChildCount": 0,
+                        "rawChunkCount": 0,
+                        "allowedCitationChunkCount": 1,
+                        "complete": true
+                      },
+                      "questions": [
+                        {
+                          "sourceMode": "CHILD_SUMMARY|FALLBACK_CHUNK|REPRESENTATIVE_CHUNK",
+                          "type": "MULTIPLE_CHOICE",
+                          "difficulty": "MEDIUM",
+                          "question": "string",
+                          "options": [
+                            {"label": "A", "content": "string"},
+                            {"label": "B", "content": "string"},
+                            {"label": "C", "content": "string"},
+                            {"label": "D", "content": "string"}
+                          ],
+                          "correctAnswer": "A",
+                          "answerExplanation": "string",
+                          "citations": [
+                            {"chunkId": 123, "pageFrom": 1, "pageTo": 2}
+                          ]
+                        }
+                      ]
+                    }
+                    """);
+            return;
+        }
+        prompt.append("""
+                {
+                  "nodeTitle": "string",
+                  "sectionPath": "string",
+                  "questionCount": 15,
+                  "questions": [
+                    {
+                      "type": "MULTIPLE_CHOICE|TRUE_FALSE|FILL_BLANK",
+                      "difficulty": "EASY|MEDIUM|HARD",
+                      "question": "string",
+                      "options": [{"label": "A", "content": "string"}],
+                      "correctAnswer": "string or boolean",
+                      "answerExplanation": "string",
+                      "citations": [{"chunkId": 123, "pageFrom": 1, "pageTo": 2}]
+                    }
+                  ]
+                }
+                """);
+    }
+
+    public String buildReviewQuestionPrompt(Document document, ReviewQuestionGenerationContext context) {
+        if (context == null || context.inputMode() == QuizInputMode.RAW_CHUNKS) {
+            return buildReviewQuestionPrompt(
+                    document,
+                    context == null ? null : context.node(),
+                    context == null ? List.of() : context.rawChunks(),
+                    context == null ? 1 : context.minQuestionCount(),
+                    context == null ? 1 : context.maxQuestionCount()
+            );
+        }
+
+        StringBuilder prompt = basePrompt(document, context.node());
+        prompt.append("Nhiem vu: Tao bo cau hoi on tap bang mixed input cho node hierarchy duoc yeu cau.\n");
+        prompt.append("Yeu cau rieng:\n");
+        prompt.append("- Viet bang tieng Viet.\n");
+        prompt.append("- Tao tu ").append(context.minQuestionCount()).append(" den ")
+                .append(context.maxQuestionCount()).append(" cau neu context du noi dung.\n");
+        prompt.append("- Khoang ").append(context.summaryBasedTargetCount())
+                .append(" cau dua tren CHILD_SUMMARIES va FALLBACK_CHUNKS.\n");
+        prompt.append("- Khoang ").append(context.representativeTargetCount())
+                .append(" cau dua tren REPRESENTATIVE_CHILD_CHUNKS.\n");
+        prompt.append("- Day la muc tieu mem; uu tien khong lap y va dung bang chung.\n");
+        prompt.append("- Neu child co summary thi dung summary truoc; chi dung fallback chunks cho child thieu summary.\n");
+        prompt.append("- Representative chunks dung de bo sung chi tiet va kiem tra diem quan trong o moi child.\n");
+        prompt.append("- Moi cau phai co sourceMode: CHILD_SUMMARY, FALLBACK_CHUNK hoac REPRESENTATIVE_CHUNK.\n");
+        prompt.append("- question, options, correctAnswer va answerExplanation khong duoc nhac chunkId/chunk/sourceMode/ten block noi bo.\n");
+        prompt.append("- citations chi duoc dung chunkId nam trong allowed citation ids.\n");
+        prompt.append("- Khong them kien thuc ngoai input.\n");
+        prompt.append("- Chi tra ve mot JSON object hop le, khong boc trong markdown/code fence.\n\n");
+        appendReviewQuestionSchema(prompt, true);
+        appendReviewQuestionCoverage(prompt, context.coverage());
+        appendAllowedCitationIds(prompt, context.allowedCitationChunks());
+        appendMixedChildSummaries(prompt, context.childSummaries());
+        appendMixedChunkMap(prompt, "Fallback chunks cho child thieu summary", "FALLBACK_CHUNKS", context.fallbackRawChunks());
+        appendMixedChunkMap(prompt, "Representative chunks cua moi child", "REPRESENTATIVE_CHILD_CHUNKS", context.representativeChildChunks());
+        return prompt.toString();
+    }
+
+    private void appendReviewQuestionCoverage(StringBuilder prompt, ReviewQuestionCoverage coverage) {
+        prompt.append("Coverage metadata bat buoc:\n");
+        prompt.append("- expectedChildCount: ").append(coverage == null ? 0 : coverage.expectedChildCount()).append('\n');
+        prompt.append("- usedChildSummaryCount: ").append(coverage == null ? 0 : coverage.usedChildSummaryCount()).append('\n');
+        prompt.append("- fallbackChildCount: ").append(coverage == null ? 0 : coverage.fallbackChildCount()).append('\n');
+        prompt.append("- representativeChildCount: ").append(coverage == null ? 0 : coverage.representativeChildCount()).append('\n');
+        prompt.append("- rawChunkCount: ").append(coverage == null ? 0 : coverage.rawChunkCount()).append('\n');
+        prompt.append("- allowedCitationChunkCount: ").append(coverage == null ? 0 : coverage.allowedCitationChunkCount()).append('\n');
+        prompt.append("- complete: ").append(coverage != null && coverage.complete()).append("\n\n");
+    }
+
+    private void appendAllowedCitationIds(StringBuilder prompt, List<DocumentChunk> chunks) {
+        prompt.append("Allowed citation chunkIds:\n");
+        prompt.append((chunks == null ? List.<DocumentChunk>of() : chunks).stream()
+                .map(DocumentChunk::getId)
+                .filter(java.util.Objects::nonNull)
+                .toList());
+        prompt.append("\n\n");
+    }
+
+    private void appendMixedChildSummaries(StringBuilder prompt, List<ChildSummary> childSummaries) {
+        prompt.append("Child summaries:\n");
+        prompt.append("<<<CHILD_SUMMARIES>>>\n");
+        int maxChars = ragProperties.getEnrichment().getReviewQuestionMixedInput().getMaxChildSummaryChars();
+        for (ChildSummary childSummary : childSummaries == null ? List.<ChildSummary>of() : childSummaries) {
+            if (childSummary == null) {
+                continue;
+            }
+            prompt.append("[childSummary]\n");
+            prompt.append("nodeId: ").append(childSummary.nodeId()).append('\n');
+            prompt.append("nodeType: ").append(valueOrFallback(childSummary.nodeType(), "N/A")).append('\n');
+            prompt.append("title: ").append(valueOrFallback(childSummary.title(), "N/A")).append('\n');
+            prompt.append("sectionPath: ").append(valueOrFallback(childSummary.sectionPath(), "N/A")).append('\n');
+            prompt.append("artifactId: ").append(childSummary.artifactId()).append('\n');
+            prompt.append("sourceHash: ").append(valueOrFallback(childSummary.sourceHash(), "N/A")).append('\n');
+            prompt.append("citations: ").append(childSummary.citations() == null ? List.of() : childSummary.citations()).append('\n');
+            prompt.append("summary:\n").append(limitText(childSummary.summary(), maxChars)).append("\n[/childSummary]\n\n");
+        }
+        prompt.append("<<<END_CHILD_SUMMARIES>>>\n\n");
+    }
+
+    private void appendMixedChunkMap(StringBuilder prompt,
+                                     String title,
+                                     String blockName,
+                                     Map<Long, List<DocumentChunk>> chunksByNode) {
+        prompt.append(title).append(":\n");
+        prompt.append("<<<").append(blockName).append(">>>\n");
+        int remainingChars = Math.max(1, ragProperties.getEnrichment().getReviewQuestionMixedInput().getMaxTotalContextChars());
+        for (Map.Entry<Long, List<DocumentChunk>> entry : chunksByNode == null ? Map.<Long, List<DocumentChunk>>of().entrySet() : chunksByNode.entrySet()) {
+            if (remainingChars <= 0) {
+                break;
+            }
+            prompt.append("[child]\n");
+            prompt.append("childNodeId: ").append(entry.getKey()).append('\n');
+            for (DocumentChunk chunk : entry.getValue()) {
+                if (chunk == null || remainingChars <= 0) {
+                    break;
+                }
+                String content = valueOrFallback(chunk.getContent(), "");
+                String emittedContent = content.length() > remainingChars
+                        ? content.substring(0, remainingChars)
+                        : content;
+                remainingChars -= emittedContent.length();
+                prompt.append("[chunk]\n");
+                prompt.append("chunkId: ").append(chunk.getId()).append('\n');
+                prompt.append("path: ").append(valueOrFallback(chunk.getSectionPath(), "N/A")).append('\n');
+                prompt.append("pages: ").append(pageRange(chunk)).append('\n');
+                prompt.append("chunkType: ").append(valueOrFallback(chunk.getChunkType(), "TEXT")).append('\n');
+                prompt.append("content:\n").append(emittedContent).append("\n[/chunk]\n");
+            }
+            prompt.append("[/child]\n\n");
+        }
+        prompt.append("<<<END_").append(blockName).append(">>>\n\n");
     }
 
     private StringBuilder basePrompt(Document document, DocumentNode node) {
@@ -364,6 +568,11 @@ public class DocumentEnrichmentPromptBuilder {
     private String limitChildSummary(String value) {
         String summary = valueOrFallback(value, "");
         int maxChars = ragProperties.getEnrichment().getParentSummaryMaxChildChars();
+        return limitText(summary, maxChars);
+    }
+
+    private String limitText(String value, int maxChars) {
+        String summary = valueOrFallback(value, "");
         if (summary.length() <= maxChars) {
             return summary;
         }

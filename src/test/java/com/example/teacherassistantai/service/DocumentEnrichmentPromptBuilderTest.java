@@ -4,8 +4,12 @@ import com.example.teacherassistantai.config.RagProperties;
 import com.example.teacherassistantai.entity.Document;
 import com.example.teacherassistantai.entity.DocumentChunk;
 import com.example.teacherassistantai.entity.DocumentNode;
+import com.example.teacherassistantai.service.quiz.QuizInputMode;
+import com.example.teacherassistantai.service.quiz.ReviewQuestionCoverage;
+import com.example.teacherassistantai.service.quiz.ReviewQuestionGenerationContext;
 import org.junit.jupiter.api.Test;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -115,6 +119,50 @@ class DocumentEnrichmentPromptBuilderTest {
         assertThat(prompt).contains("\"correctAnswer\": true");
         assertThat(prompt).contains("question, options, correctAnswer va answerExplanation khong duoc nhac chunkId/chunk");
         assertThat(prompt).contains("chunkId: 200");
+    }
+
+    @Test
+    void buildReviewQuestionPrompt_mixedInputIncludesSourceBlocksAndTargets() {
+        Fixture fixture = fixture();
+        Map<Long, List<DocumentChunk>> fallback = new LinkedHashMap<>();
+        fallback.put(101L, List.of(fixture.chunk()));
+        Map<Long, List<DocumentChunk>> representative = new LinkedHashMap<>();
+        representative.put(101L, List.of(fixture.chunk()));
+        ReviewQuestionGenerationContext context = new ReviewQuestionGenerationContext(
+                fixture.document(),
+                fixture.node(),
+                QuizInputMode.MIXED_CHILD_SUMMARIES_AND_REPRESENTATIVE_CHUNKS,
+                List.of(),
+                List.of(new ChildSummary(
+                        101L,
+                        "section",
+                        "1.1",
+                        "Chương 1 > 1.1",
+                        901L,
+                        "hash-1",
+                        "Tóm tắt section.",
+                        List.of(Map.of("chunkId", 200L))
+                )),
+                fallback,
+                representative,
+                List.of(fixture.chunk()),
+                20,
+                25,
+                12,
+                13,
+                new ReviewQuestionCoverage(1, 1, 0, 1, 0, 1, true),
+                "hash"
+        );
+
+        String prompt = promptBuilder.buildReviewQuestionPrompt(context);
+
+        assertThat(prompt).contains("Khoang 12 cau");
+        assertThat(prompt).contains("Khoang 13 cau");
+        assertThat(prompt).contains("<<<CHILD_SUMMARIES>>>");
+        assertThat(prompt).contains("<<<FALLBACK_CHUNKS>>>");
+        assertThat(prompt).contains("<<<REPRESENTATIVE_CHILD_CHUNKS>>>");
+        assertThat(prompt).contains("\"sourceMode\"");
+        assertThat(prompt).contains("Allowed citation chunkIds");
     }
 
     private Fixture fixture() {

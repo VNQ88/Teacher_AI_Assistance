@@ -7,30 +7,23 @@ import com.example.teacherassistantai.dto.response.SubjectResponse;
 import com.example.teacherassistantai.entity.Role;
 import com.example.teacherassistantai.entity.Subject;
 import com.example.teacherassistantai.entity.User;
+import com.example.teacherassistantai.exception.AccessDeniedOperationException;
 import com.example.teacherassistantai.exception.InvalidDataException;
 import com.example.teacherassistantai.exception.ResourceNotFoundException;
-import com.example.teacherassistantai.repository.ExamQuestionRepository;
-import com.example.teacherassistantai.repository.QuestionBankRepository;
-import com.example.teacherassistantai.repository.QuestionRepository;
-import com.example.teacherassistantai.repository.StudentAnswerRepository;
 import com.example.teacherassistantai.repository.SubjectRepository;
 import com.example.teacherassistantai.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import java.util.List;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class SubjectService {
 
     private final SubjectRepository subjectRepository;
-    private final QuestionBankRepository questionBankRepository;
-    private final QuestionRepository questionRepository;
-    private final ExamQuestionRepository examQuestionRepository;
-    private final StudentAnswerRepository studentAnswerRepository;
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
@@ -75,12 +68,14 @@ public class SubjectService {
         Subject subject = subjectRepository.findById(subjectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Subject not found with id: " + subjectId));
 
+        validateSubjectOwnership(subject, getCurrentUser());
+
         subject.setName(request.getName().trim());
         subject.setDescription(request.getDescription());
         subject.setActive(request.getActive());
 
         SubjectType subjectType = request.getSubjectType();
-        if  (subjectType == null)
+        if (subjectType == null)
             subjectType = SubjectType.TEXT_BASED;
         subject.setSubjectType(subjectType);
         return toResponse(subjectRepository.save(subject));
@@ -91,35 +86,26 @@ public class SubjectService {
         Subject subject = subjectRepository.findById(subjectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Subject not found with id: " + subjectId));
 
-        User currentUser = getCurrentUser();
+        validateSubjectOwnership(subject, getCurrentUser());
+
+        subjectRepository.delete(subject);
+    }
+
+    public void validateSubjectOwnershipById(Long subjectId) {
+        Subject subject = subjectRepository.findById(subjectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Subject not found with id: " + subjectId));
+        validateSubjectOwnership(subject, getCurrentUser());
+    }
+
+    private void validateSubjectOwnership(Subject subject, User currentUser) {
         boolean isAdmin = currentUser.getRoles().stream()
                 .map(Role::getName)
                 .anyMatch("ADMIN"::equalsIgnoreCase);
-
-        Long ownerId = subject.getOwnerId();
-        boolean isOwner = ownerId != null && ownerId.equals(currentUser.getId());
-
+        boolean isOwner = subject.getOwnerId() != null
+                && subject.getOwnerId().equals(currentUser.getId());
         if (!isAdmin && !isOwner) {
-            throw new InvalidDataException("You don't have permission to delete this subject");
+            throw new AccessDeniedOperationException("You don't have permission to modify this subject");
         }
-
-        var questionBanks = questionBankRepository.findBySubject_Id(subjectId);
-        if (!questionBanks.isEmpty()) {
-            for (var questionBank : questionBanks) {
-                List<Long> questionIds = questionRepository.findIdsByQuestionBankId(questionBank.getId());
-                if (!questionIds.isEmpty()) {
-                    List<Long> examQuestionIds = examQuestionRepository.findIdsByQuestionIdIn(questionIds);
-                    if (!examQuestionIds.isEmpty()) {
-                        studentAnswerRepository.deleteByExamQuestionIdIn(examQuestionIds);
-                    }
-                    examQuestionRepository.deleteByQuestionIdIn(questionIds);
-                }
-                questionRepository.deleteByQuestionBankId(questionBank.getId());
-            }
-            questionBankRepository.deleteAll(questionBanks);
-        }
-
-        subjectRepository.delete(subject);
     }
 
     private User getCurrentUser() {

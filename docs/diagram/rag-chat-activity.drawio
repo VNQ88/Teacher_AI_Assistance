@@ -1,0 +1,117 @@
+<mxfile host="app.diagrams.net" agent="codex" version="24.0.0">
+  <diagram id="rag_chat_activity" name="RAG Chat Activity">
+    <mxGraphModel dx="1200" dy="820" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1180" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="title" value="Activity Diagram - Chat với RAG" style="text;html=1;align=center;verticalAlign=middle;fontSize=18;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="250" y="20" width="680" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- Swimlane backgrounds -->
+        <mxCell id="lane_user" value="User / Client" style="swimlane;html=1;horizontal=0;startSize=30;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="280" height="760" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane_backend" value="Backend RAG Chat" style="swimlane;html=1;horizontal=0;startSize=30;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="320" y="80" width="520" height="760" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane_ai" value="Retrieval / AI" style="swimlane;html=1;horizontal=0;startSize=30;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="840" y="80" width="300" height="760" as="geometry"/>
+        </mxCell>
+
+        <!-- User lane -->
+        <mxCell id="start" value="" style="ellipse;html=1;shape=startState;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="165" y="115" width="30" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="user_input" value="Nhập câu hỏi trong phiên chat" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="90" y="175" width="180" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="show_answer" value="Hiển thị câu trả lời và nguồn tham khảo" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="85" y="710" width="190" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="end" value="" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="165" y="805" width="30" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- Backend lane -->
+        <mxCell id="receive" value="Nhận POST /api/chat/sessions/{id}/messages" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="470" y="175" width="220" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="validate" value="Kiểm tra quyền sở hữu session" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="485" y="260" width="190" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="save_user" value="Lưu USER message" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="500" y="340" width="160" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="ready_decision" value="Tài liệu của môn học đã READY?" style="rhombus;whiteSpace=wrap;html=1;fontSize=12;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="485" y="420" width="190" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="notice" value="Lưu thông báo: tài liệu chưa sẵn sàng" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="385" y="555" width="190" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="build_prompt" value="Build prompt từ câu hỏi + lịch sử + context" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="625" y="555" width="190" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="save_assistant" value="Lưu ASSISTANT message, sources và AgentLog" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="485" y="665" width="190" height="65" as="geometry"/>
+        </mxCell>
+
+        <!-- Retrieval / AI lane -->
+        <mxCell id="retrieve" value="Tạo embedding và tìm chunks liên quan bằng pgvector" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="890" y="420" width="210" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="rerank" value="Rerank local và chọn context tốt nhất" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="900" y="515" width="190" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="call_ai" value="Gọi AI provider để sinh câu trả lời" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="900" y="635" width="190" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- Edges -->
+        <mxCell id="e1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=1.5;" edge="1" parent="1" source="start" target="user_input">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=1.5;" edge="1" parent="1" source="user_input" target="receive">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=1.5;" edge="1" parent="1" source="receive" target="validate">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=1.5;" edge="1" parent="1" source="validate" target="save_user">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=1.5;" edge="1" parent="1" source="save_user" target="ready_decision">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e6" value="Không" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=1.5;fontSize=11;" edge="1" parent="1" source="ready_decision" target="notice">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e7" value="Có" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=1.5;fontSize=11;" edge="1" parent="1" source="ready_decision" target="retrieve">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=1.5;" edge="1" parent="1" source="retrieve" target="rerank">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e9" value="context" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=1.5;fontSize=11;" edge="1" parent="1" source="rerank" target="build_prompt">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e10" value="prompt" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=1.5;fontSize=11;" edge="1" parent="1" source="build_prompt" target="call_ai">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e11" value="answer" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=1.5;fontSize=11;" edge="1" parent="1" source="call_ai" target="save_assistant">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=1.5;" edge="1" parent="1" source="notice" target="show_answer">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=1.5;" edge="1" parent="1" source="save_assistant" target="show_answer">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeWidth=1.5;" edge="1" parent="1" source="show_answer" target="end">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

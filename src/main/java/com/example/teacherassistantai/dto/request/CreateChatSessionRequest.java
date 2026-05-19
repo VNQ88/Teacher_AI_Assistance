@@ -11,9 +11,6 @@ public class CreateChatSessionRequest {
     @Min(1)
     private Long subjectId;
 
-    @Min(1)
-    private Long classroomId;
-
     private String title;
 }
 

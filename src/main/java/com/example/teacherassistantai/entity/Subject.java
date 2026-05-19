@@ -7,12 +7,6 @@ import lombok.experimental.FieldDefaults;
 
 import java.util.ArrayList;
 import java.util.List;
-
-/**
- * Môn học — trung tâm phân loại toàn bộ tài liệu, lớp học, câu hỏi.
- * Giúp hệ thống hỗ trợ nhiều môn học (Tiếng Anh, Toán, Văn, ...)
- * mà không bị trộn lẫn kiến thức khi RAG agent trả lời.
- */
 @Getter
 @Setter
 @Builder
@@ -47,11 +41,6 @@ public class Subject extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     Boolean active = true;
-
-    // Một Subject có nhiều Classroom
-    @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    List<Classroom> classrooms = new ArrayList<>();
 
     // Một Subject có nhiều Document (tài liệu chính thống của môn)
     @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -67,7 +67,12 @@ public class DigitalOceanAiRateLimiter {
         if (!normalized.enrichment()) {
             return false;
         }
-        return pausedUntil(accountAlias, model).isAfter(Instant.now());
+        return pausedUntil(normalized, accountAlias, model).isAfter(Instant.now());
+    }
+
+    public boolean isPaused(AiWorkload workload) {
+        AiModelRoute route = routingService.route(workload == null ? AiWorkload.RAG_CHAT : workload);
+        return isPaused(route.workload(), route.accountAlias(), route.model());
     }
 
     public boolean isBackgroundPaused() {
@@ -83,14 +88,14 @@ public class DigitalOceanAiRateLimiter {
                           AiRateLimitSnapshot snapshot) {
         AiWorkload normalized = workload == null ? AiWorkload.RAG_CHAT : workload.normalized();
         if (snapshot != null) {
-            tokenRateLimitTracker.update(accountAlias, model, snapshot);
+            tokenRateLimitTracker.update(accountAlias, workloadModelKey(normalized, model), snapshot);
         }
         if (!normalized.enrichment()) {
             throw new AiRateLimitedException("AI provider rate limit exceeded. Please retry later.");
         }
 
         Instant until = Instant.now().plusSeconds((long) ragProperties.getAi().getRateLimit().getEnrichmentPauseMinutesOn429() * 60);
-        pause(accountAlias, model, until);
+        pause(normalized, accountAlias, model, until);
         log.info("Enrichment paused until={} reason=429_received workload={} accountAlias={} model={}",
                 until, normalized, accountAlias, model);
         throw new BackgroundRateLimitedException(until);
@@ -102,7 +107,8 @@ public class DigitalOceanAiRateLimiter {
                               AiRateLimitSnapshot snapshot,
                               AiUsage usage) {
         if (snapshot != null) {
-            tokenRateLimitTracker.update(accountAlias, model, snapshot);
+            AiWorkload normalized = workload == null ? AiWorkload.RAG_CHAT : workload.normalized();
+            tokenRateLimitTracker.update(accountAlias, workloadModelKey(normalized, model), snapshot);
         }
         if (snapshot != null || usage != null) {
             log.info("AI response workload={} accountAlias={} model={} promptTokens={} completionTokens={} totalTokens={} remainingTokensPerMinute={} remainingTokensPerDay={} limitTokensPerMinute={} limitTokensPerDay={}",
@@ -125,7 +131,7 @@ public class DigitalOceanAiRateLimiter {
     }
 
     private void checkEnrichmentNotPaused(AiWorkload workload, String accountAlias, String model) {
-        Instant pausedUntil = pausedUntil(accountAlias, model);
+        Instant pausedUntil = pausedUntil(workload, accountAlias, model);
         if (pausedUntil.isAfter(Instant.now())) {
             log.info("Enrichment request blocked by pause workload={} accountAlias={} model={} pausedUntil={}",
                     workload, accountAlias, model, pausedUntil);
@@ -137,7 +143,7 @@ public class DigitalOceanAiRateLimiter {
                                              String accountAlias,
                                              String model,
                                              RagProperties.Ai.RateLimit cfg) {
-        tokenRateLimitTracker.getSnapshot(accountAlias, model).ifPresent(snapshot -> {
+        tokenRateLimitTracker.getSnapshot(accountAlias, workloadModelKey(workload, model)).ifPresent(snapshot -> {
             boolean minuteLow = snapshot.remainingTokensPerMinute() != null
                     && snapshot.remainingTokensPerMinute() < cfg.getEnrichmentMinRemainingTokensPerMinute();
             boolean dayLow = snapshot.remainingTokensPerDay() != null
@@ -146,7 +152,7 @@ public class DigitalOceanAiRateLimiter {
                 return;
             }
             Instant until = Instant.now().plusSeconds((long) cfg.getEnrichmentPauseMinutesOn429() * 60);
-            pause(accountAlias, model, until);
+            pause(workload, accountAlias, model, until);
             log.info("Enrichment paused until={} reason=token_threshold workload={} accountAlias={} model={} remainingTokensPerMinute={} remainingTokensPerDay={}",
                     until, workload, accountAlias, model,
                     snapshot.remainingTokensPerMinute(), snapshot.remainingTokensPerDay());
@@ -167,17 +173,24 @@ public class DigitalOceanAiRateLimiter {
         incr(key, 90);
     }
 
-    private void pause(String accountAlias, String model, Instant until) {
-        tokenRateLimitTracker.pause(accountAlias, model, until);
+    private void pause(AiWorkload workload, String accountAlias, String model, Instant until) {
+        AiWorkload normalized = workload == null ? AiWorkload.RAG_CHAT : workload.normalized();
+        tokenRateLimitTracker.pause(accountAlias, workloadModelKey(normalized, model), until);
         if (ragProperties.getAi().getEnrichment().isPauseAllOn429()) {
-            tokenRateLimitTracker.pause(accountAlias, ENRICHMENT_ALL_MODELS, until);
+            tokenRateLimitTracker.pause(accountAlias, workloadModelKey(normalized, ENRICHMENT_ALL_MODELS), until);
         }
     }
 
-    private Instant pausedUntil(String accountAlias, String model) {
-        Instant allModels = tokenRateLimitTracker.pausedUntil(accountAlias, ENRICHMENT_ALL_MODELS).orElse(Instant.EPOCH);
-        Instant specificModel = tokenRateLimitTracker.pausedUntil(accountAlias, model).orElse(Instant.EPOCH);
+    private Instant pausedUntil(AiWorkload workload, String accountAlias, String model) {
+        AiWorkload normalized = workload == null ? AiWorkload.RAG_CHAT : workload.normalized();
+        Instant allModels = tokenRateLimitTracker.pausedUntil(accountAlias, workloadModelKey(normalized, ENRICHMENT_ALL_MODELS)).orElse(Instant.EPOCH);
+        Instant specificModel = tokenRateLimitTracker.pausedUntil(accountAlias, workloadModelKey(normalized, model)).orElse(Instant.EPOCH);
         return allModels.isAfter(specificModel) ? allModels : specificModel;
+    }
+
+    private String workloadModelKey(AiWorkload workload, String model) {
+        AiWorkload normalized = workload == null ? AiWorkload.RAG_CHAT : workload.normalized();
+        return normalized.name() + ":" + model;
     }
 
     private void waitForMinuteBudget(String keyPrefix, int cap, AiWorkload workload) {

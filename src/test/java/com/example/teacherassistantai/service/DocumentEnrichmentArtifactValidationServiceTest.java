@@ -5,6 +5,9 @@ import com.example.teacherassistantai.entity.Document;
 import com.example.teacherassistantai.entity.DocumentChunk;
 import com.example.teacherassistantai.entity.DocumentNode;
 import com.example.teacherassistantai.exception.InvalidDataException;
+import com.example.teacherassistantai.service.quiz.QuizInputMode;
+import com.example.teacherassistantai.service.quiz.ReviewQuestionCoverage;
+import com.example.teacherassistantai.service.quiz.ReviewQuestionGenerationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
@@ -381,6 +384,90 @@ class DocumentEnrichmentArtifactValidationServiceTest {
                 .hasMessageContaining("correctAnswer must be boolean");
     }
 
+    @Test
+    void parseAndValidateReviewQuestions_acceptsMixedSourceModesAndAllowedCitationChunks() {
+        Fixture fixture = fixture("Nội dung đủ dài. ".repeat(100));
+
+        Map<String, Object> content = validationService.parseAndValidateReviewQuestions(
+                """
+                        {
+                          "questions": [
+                            {
+                              "sourceMode": "CHILD_SUMMARY",
+                              "type": "TRUE_FALSE",
+                              "difficulty": "EASY",
+                              "question": "Nhận định này đúng hay sai?",
+                              "correctAnswer": true,
+                              "answerExplanation": "Dựa trên tài liệu.",
+                              "citations": [{"chunkId": 200}]
+                            }
+                          ]
+                        }
+                        """,
+                mixedContext(fixture)
+        );
+
+        assertThat(content).containsEntry("inputMode", "MIXED_CHILD_SUMMARIES_AND_REPRESENTATIVE_CHUNKS");
+        assertThat(content).containsEntry("summaryBasedTargetCount", 1);
+        assertThat(content).containsEntry("representativeTargetCount", 1);
+        assertThat(content).containsKey("coverage");
+    }
+
+    @Test
+    void parseAndValidateReviewQuestions_rejectsMissingSourceModeInMixedMode() {
+        Fixture fixture = fixture("Ngắn.");
+
+        assertThatThrownBy(() -> validationService.parseAndValidateReviewQuestions(
+                """
+                        {
+                          "questions": [
+                            {
+                              "type": "TRUE_FALSE",
+                              "difficulty": "EASY",
+                              "question": "Nhận định này đúng hay sai?",
+                              "correctAnswer": true,
+                              "answerExplanation": "Dựa trên tài liệu.",
+                              "citations": [{"chunkId": 200}]
+                            }
+                          ]
+                        }
+                        """,
+                mixedContext(fixture)
+        ))
+                .isInstanceOf(InvalidDataException.class)
+                .hasMessageContaining("sourceMode is required");
+    }
+
+    @Test
+    void parseAndValidate_escapesRawNewlineInsideJsonString() {
+        Fixture fixture = fixture("Ngắn.");
+
+        Map<String, Object> content = validationService.parseAndValidate(
+                DocumentNodeArtifactType.REVIEW_QUESTION_SET,
+                """
+                        {
+                          "questions": [
+                            {
+                              "type": "TRUE_FALSE",
+                              "difficulty": "EASY",
+                              "question": "Dòng 1
+                        Dòng 2",
+                              "correctAnswer": true,
+                              "answerExplanation": "Dựa trên tài liệu.",
+                              "citations": [{"chunkId": 200}]
+                            }
+                          ]
+                        }
+                        """,
+                fixture.node(),
+                List.of(fixture.chunk()),
+                1,
+                3
+        );
+
+        assertThat(content).containsEntry("questionCount", 1);
+    }
+
     private Fixture fixture(String content) {
         Document document = Document.builder()
                 .title("Giáo trình")
@@ -432,6 +519,34 @@ class DocumentEnrichmentArtifactValidationServiceTest {
                   "questions": [%s]
                 }
                 """.formatted(questions);
+    }
+
+    private ReviewQuestionGenerationContext mixedContext(Fixture fixture) {
+        return new ReviewQuestionGenerationContext(
+                fixture.node().getDocument(),
+                fixture.node(),
+                QuizInputMode.MIXED_CHILD_SUMMARIES_AND_REPRESENTATIVE_CHUNKS,
+                List.of(),
+                List.of(new ChildSummary(
+                        101L,
+                        "section",
+                        "1.1",
+                        "Chương 1 > 1.1",
+                        901L,
+                        "hash-1",
+                        "Tóm tắt section đủ dài. ".repeat(100),
+                        List.of(Map.of("chunkId", 200L))
+                )),
+                Map.of(),
+                Map.of(101L, List.of(fixture.chunk())),
+                List.of(fixture.chunk()),
+                1,
+                3,
+                1,
+                1,
+                new ReviewQuestionCoverage(1, 1, 0, 1, 0, 1, true),
+                "hash"
+        );
     }
 
     private record Fixture(Document document, DocumentNode node, DocumentChunk chunk) {

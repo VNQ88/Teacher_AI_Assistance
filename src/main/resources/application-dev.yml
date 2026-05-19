@@ -126,17 +126,17 @@ application:
       default-review-question-max-count: 20
       review-question-counts:
         subsection_level2:
-          min: 5
+          min: 4
           max: 10
         subsection:
-          min: 10
+          min: 6
           max: 15
         section:
-          min: 15
+          min: 8
           max: 20
         chapter:
-          min: 20
-          max: 25
+          min: 12
+          max: 30
       review-question-requests-per-minute: 10
       review-question-resume-batch-size: 10
       review-question-composition:
@@ -167,7 +167,7 @@ application:
         api-key: ${DIGITALOCEAN_ENRICHMENT_MODEL_ACCESS_KEY}
         summary-model: ${DIGITALOCEAN_ENRICH_SUMMARY_MODEL:deepseek-3.2}
         review-question-model: ${DIGITALOCEAN_ENRICH_REVIEW_QUESTION_MODEL:openai-gpt-oss-120b}
-        timeout-seconds: 120
+        timeout-seconds: 150
         pause-all-on-429: true
       rate-limit:
         enabled: true

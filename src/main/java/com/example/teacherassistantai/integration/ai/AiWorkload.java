@@ -5,6 +5,8 @@ public enum AiWorkload {
     EMBEDDING,
     ENRICH_SUMMARY,
     ENRICH_REVIEW_QUESTION,
+    /** On-demand quiz generation: uses enrichment client (120s timeout) but RAG_CHAT rate limit bucket (180/min). */
+    ENRICH_REVIEW_QUESTION_ONDEMAND,
 
     @Deprecated
     INTERACTIVE,
@@ -16,6 +18,7 @@ public enum AiWorkload {
         return switch (this) {
             case INTERACTIVE -> RAG_CHAT;
             case BACKGROUND -> ENRICH_REVIEW_QUESTION;
+            case ENRICH_REVIEW_QUESTION_ONDEMAND -> RAG_CHAT;
             default -> this;
         };
     }

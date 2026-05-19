@@ -21,6 +21,7 @@ public class OriginalSummaryNodeService {
 
     private final DocumentNodeRepository documentNodeRepository;
     private final DocumentChunkRepository documentChunkRepository;
+    private final OriginalSummaryTextCleaner textCleaner;
 
     public Optional<OriginalSummary> findForChapter(DocumentNode chapterNode) {
         if (chapterNode == null || !"chapter".equals(chapterNode.getNodeType()) || chapterNode.getId() == null) {
@@ -53,17 +54,22 @@ public class OriginalSummaryNodeService {
                 : documentChunkRepository.findByDocumentIdAndNodeIdOrderBySourceOrderAsc(
                         summaryNode.getDocument().getId(), summaryNode.getId());
         String content = summaryNode.getContent();
-        if (content == null || content.isBlank()) {
-            content = chunks.stream()
-                    .map(DocumentChunk::getContent)
-                    .filter(value -> value != null && !value.isBlank())
-                    .reduce((left, right) -> left + "\n\n" + right)
-                    .orElse("");
+        OriginalSummaryTextCleaner.CleanedOriginalSummary cleanedFromChunks =
+                textCleaner.clean(summaryNode, chunks);
+        List<DocumentChunk> cleanedChunks = cleanedFromChunks.cleanedChunks();
+        OriginalSummaryTextCleaner.CleaningStats cleaningStats = cleanedFromChunks.stats();
+
+        if (content != null && !content.isBlank()) {
+            OriginalSummaryTextCleaner.CleanedText cleanedText = textCleaner.cleanText(summaryNode, content);
+            content = cleanedText.text();
+            cleaningStats = cleanedText.stats();
+        } else {
+            content = cleanedFromChunks.cleanedText();
         }
         if (content == null || content.isBlank()) {
             return Optional.empty();
         }
-        return Optional.of(new OriginalSummary(summaryNode, content.trim(), chunks));
+        return Optional.of(new OriginalSummary(summaryNode, content.trim(), chunks, cleanedChunks, cleaningStats));
     }
 
     private boolean matchesChapter(DocumentNode summaryNode, DocumentNode chapterNode) {
@@ -149,7 +155,21 @@ public class OriginalSummaryNodeService {
         return value == null ? "" : value;
     }
 
-    public record OriginalSummary(DocumentNode summaryNode, String content, List<DocumentChunk> sources) {
+    public record OriginalSummary(
+            DocumentNode summaryNode,
+            String content,
+            List<DocumentChunk> sources,
+            List<DocumentChunk> cleanedChunks,
+            OriginalSummaryTextCleaner.CleaningStats cleaningStats
+    ) {
+        public OriginalSummary(DocumentNode summaryNode, String content, List<DocumentChunk> sources) {
+            this(summaryNode, content, sources, sources, OriginalSummaryTextCleaner.CleaningStats.empty(content));
+        }
+
+        public OriginalSummary {
+            sources = sources == null ? List.of() : List.copyOf(sources);
+            cleanedChunks = cleanedChunks == null ? List.of() : List.copyOf(cleanedChunks);
+        }
     }
 
     private record ChapterNumber(String raw, String normalized) {

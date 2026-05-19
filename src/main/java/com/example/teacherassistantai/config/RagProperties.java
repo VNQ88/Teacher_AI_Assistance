@@ -116,7 +116,7 @@ public class RagProperties {
             @Min(1)
             private int timeoutSeconds = 120;
 
-            private boolean pauseAllOn429 = true;
+            private boolean pauseAllOn429 = false;
         }
     }
 
@@ -149,6 +149,10 @@ public class RagProperties {
 
         private ReviewQuestionComposition reviewQuestionComposition = new ReviewQuestionComposition();
 
+        private ReviewQuestionMixedInput reviewQuestionMixedInput = new ReviewQuestionMixedInput();
+
+        private Repair repair = new Repair();
+
         @Min(1)
         private int maxNodeChunks = 120;
 
@@ -171,6 +175,9 @@ public class RagProperties {
 
         @Min(1)
         private int representativeSectionChunks = 3;
+
+        @Min(1)
+        private int maxDirectOriginalSummaryChars = 2_000;
 
         @Min(1)
         private int parentSummaryMaxChildChars = 3_000;
@@ -225,6 +232,36 @@ public class RagProperties {
 
             @Min(1)
             private int maxMissingQueuePerRequest = 10;
+        }
+
+        @Data
+        public static class ReviewQuestionMixedInput {
+            private boolean enabled = true;
+
+            private double summaryTargetRatio = 0.5;
+
+            @Min(1)
+            private int maxChildSummaryChars = 2_000;
+
+            @Min(1)
+            private int maxFallbackChunksPerChild = 3;
+
+            @Min(1)
+            private int maxRepresentativeChunksPerChild = 3;
+
+            @Min(1)
+            private int maxTotalContextChars = 48_000;
+
+            private boolean requireSourceMode = true;
+        }
+
+        @Data
+        public static class Repair {
+            @Min(1)
+            private int maxRawResponseChars = 12_000;
+
+            @Min(1)
+            private int maxAttempts = 2;
         }
     }
 }

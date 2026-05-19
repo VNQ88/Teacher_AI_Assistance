@@ -42,6 +42,7 @@ public class QuizAgent {
         return switch (nodeType) {
             case "part" -> fromComposition(compositionService.composeForPart(node));
             case "document", "subject" -> fromComposition(compositionService.composeForDocument(node));
+            case "chapter" -> executeNodeLevel(node);
             case "summary", "review_questions" -> AgentResult.message(
                     "Không thể tạo bộ câu hỏi trực tiếp cho node hỗ trợ này. Hãy chọn phần, chương hoặc mục nội dung.");
             default -> executeNodeLevel(node);
@@ -82,7 +83,7 @@ public class QuizAgent {
             QuizGenerationStrategy.QuizInputType inputType =
                     strategy.determine(node, scope.chunks().size());
 
-            QuizArtifactOutcome outcome = enrichmentService.generateAndSaveQuizArtifact(node, inputType);
+            QuizArtifactOutcome outcome = enrichmentService.generateAndSaveQuizArtifactOnDemand(node, inputType);
 
             if (outcome == QuizArtifactOutcome.COMPLETED) {
                 Optional<DocumentNodeArtifact> generated = fetchCompletedQuiz(node.getId());

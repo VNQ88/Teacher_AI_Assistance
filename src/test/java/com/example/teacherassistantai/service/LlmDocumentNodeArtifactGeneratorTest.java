@@ -246,7 +246,8 @@ class LlmDocumentNodeArtifactGeneratorTest {
         return new LlmDocumentNodeArtifactGenerator(
                 aiChatGateway,
                 new DocumentEnrichmentPromptBuilder(new RagProperties()),
-                new DocumentEnrichmentArtifactValidationService(new ObjectMapper())
+                new DocumentEnrichmentArtifactValidationService(new ObjectMapper()),
+                new RagProperties()
         );
     }
 

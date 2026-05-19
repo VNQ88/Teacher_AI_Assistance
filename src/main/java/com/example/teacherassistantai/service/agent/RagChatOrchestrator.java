@@ -64,9 +64,10 @@ public class RagChatOrchestrator {
                 .build();
         chatMessageRepository.save(userMessage);
 
-        if (resolveProcessingDocument(session) != null) {
+        Document nonReadyDocument = resolveNonReadyDocument(session);
+        if (nonReadyDocument != null) {
             ChatMessage notice = saveAssistantMessage(session,
-                    "Tài liệu đang được xử lý (khoảng 10-20 phút). Bạn sẽ có thể hỏi đáp sau khi tài liệu sẵn sàng.",
+                    notReadyMessage(nonReadyDocument),
                     List.of(), startedAt, 0, AgentType.KNOWLEDGE_CHATBOT);
             saveAgentLog(session, request.getQuestion(), notice, notice.getContent());
             return toResponse(notice, null, null);
@@ -142,14 +143,21 @@ public class RagChatOrchestrator {
                 .toList();
     }
 
-    private Document resolveProcessingDocument(ChatSession session) {
+    private Document resolveNonReadyDocument(ChatSession session) {
         if (session.getSubject() == null) return null;
         Long subjectId = session.getSubject().getId();
         var readyPage = documentRepository.findByFilters(subjectId, DocumentStatus.READY, PageRequest.of(0, 1));
         if (readyPage != null && readyPage.hasContent()) return null;
-        var sumPage = documentRepository.findByFilters(subjectId, DocumentStatus.SUMMARISING, PageRequest.of(0, 1));
-        if (sumPage == null || !sumPage.hasContent()) return null;
-        return sumPage.getContent().stream().findFirst().orElse(null);
+        var documentPage = documentRepository.findByFilters(subjectId, null, PageRequest.of(0, 1));
+        if (documentPage == null || !documentPage.hasContent()) return null;
+        return documentPage.getContent().stream().findFirst().orElse(null);
+    }
+
+    private String notReadyMessage(Document document) {
+        if (document.getStatus() == DocumentStatus.FAILED) {
+            return "Tài liệu chưa sẵn sàng do lỗi xử lý. Bạn sẽ có thể hỏi đáp sau khi tài liệu được xử lý lại thành công.";
+        }
+        return "Tài liệu đang được xử lý (khoảng 10-20 phút). Bạn sẽ có thể hỏi đáp sau khi tài liệu sẵn sàng.";
     }
 
     private List<ChatMessage> loadHistory(Long sessionId, String question, int maxMessages) {

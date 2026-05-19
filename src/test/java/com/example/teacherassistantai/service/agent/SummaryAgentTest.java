@@ -9,6 +9,8 @@ import com.example.teacherassistantai.entity.DocumentNodeArtifact;
 import com.example.teacherassistantai.integration.ai.AiChatGateway;
 import com.example.teacherassistantai.repository.DocumentNodeArtifactRepository;
 import com.example.teacherassistantai.repository.DocumentRepository;
+import com.example.teacherassistantai.service.DocumentEnrichmentService;
+import com.example.teacherassistantai.service.DocumentNodeScopeService;
 import com.example.teacherassistantai.service.DocumentOutlineSummaryRenderer;
 import com.example.teacherassistantai.service.OriginalSummaryNodeService;
 import com.example.teacherassistantai.service.RagArtifactChatHandlerService;
@@ -34,6 +36,8 @@ class SummaryAgentTest {
     private RagArtifactChatHandlerService handlerService;
     private OriginalSummaryNodeService originalSummaryNodeService;
     private DocumentOutlineSummaryRenderer outlineSummaryRenderer;
+    private DocumentEnrichmentService documentEnrichmentService;
+    private RagProperties ragProperties;
     private SummaryAgent summaryAgent;
 
     @BeforeEach
@@ -42,26 +46,59 @@ class SummaryAgentTest {
         handlerService = mock(RagArtifactChatHandlerService.class);
         originalSummaryNodeService = mock(OriginalSummaryNodeService.class);
         outlineSummaryRenderer = mock(DocumentOutlineSummaryRenderer.class);
+        documentEnrichmentService = mock(DocumentEnrichmentService.class);
+        ragProperties = new RagProperties();
         summaryAgent = new SummaryAgent(
                 artifactRepository,
                 mock(DocumentRepository.class),
                 handlerService,
                 mock(VectorRetrievalService.class),
+                mock(DocumentNodeScopeService.class),
                 mock(AiChatGateway.class),
                 mock(RedisTemplate.class),
-                new RagProperties(),
+                ragProperties,
                 mock(PlatformTransactionManager.class),
                 originalSummaryNodeService,
-                outlineSummaryRenderer
+                outlineSummaryRenderer,
+                documentEnrichmentService
         );
     }
 
     @Test
-    void execute_chapterUsesOriginalSummaryNodeBeforeArtifact() {
+    void execute_chapterPrefersCompletedArtifactBeforeOriginalSummaryNode() {
+        DocumentNode chapter = node(10L, "chapter", "Chương I", "Chương I");
+        DocumentNode summaryNode = node(11L, "summary", "TÓM TẮT CHƯƠNG I", "TÓM TẮT CHƯƠNG I");
+        DocumentChunk source = chunk(100L);
+        DocumentNodeArtifact artifact = DocumentNodeArtifact.builder()
+                .documentNode(chapter)
+                .artifactType(DocumentNodeArtifactType.SUMMARY)
+                .contentJsonb(Map.of("summary", "Tóm tắt artifact"))
+                .build();
+        when(outlineSummaryRenderer.render(chapter)).thenReturn(Optional.empty());
+        when(artifactRepository.findLatestCompletedSummaryByNodeId(10L)).thenReturn(Optional.of(artifact));
+        when(handlerService.renderSummary(artifact.getContentJsonb(), chapter)).thenReturn("Tóm tắt artifact");
+        when(handlerService.sourceChunksFromCitations(artifact.getContentJsonb())).thenReturn(List.of(source));
+        when(originalSummaryNodeService.findForChapter(chapter))
+                .thenReturn(Optional.of(new OriginalSummaryNodeService.OriginalSummary(
+                        summaryNode,
+                        "Nội dung tóm tắt gốc của chương.",
+                        List.of(source)
+                )));
+
+        AgentResult result = summaryAgent.execute(state(chapter));
+
+        assertThat(result.answer()).isEqualTo("Tóm tắt artifact");
+        assertThat(result.sources()).containsExactly(source);
+        verify(originalSummaryNodeService, never()).findForChapter(chapter);
+    }
+
+    @Test
+    void execute_chapterUsesOriginalSummaryWhenArtifactMissingAndContentIsShort() {
         DocumentNode chapter = node(10L, "chapter", "Chương I", "Chương I");
         DocumentNode summaryNode = node(11L, "summary", "TÓM TẮT CHƯƠNG I", "TÓM TẮT CHƯƠNG I");
         DocumentChunk source = chunk(100L);
         when(outlineSummaryRenderer.render(chapter)).thenReturn(Optional.empty());
+        when(artifactRepository.findLatestCompletedSummaryByNodeId(10L)).thenReturn(Optional.empty());
         when(originalSummaryNodeService.findForChapter(chapter))
                 .thenReturn(Optional.of(new OriginalSummaryNodeService.OriginalSummary(
                         summaryNode,
@@ -73,7 +110,30 @@ class SummaryAgentTest {
 
         assertThat(result.answer()).contains("Nội dung tóm tắt gốc của chương.");
         assertThat(result.sources()).containsExactly(source);
-        verify(artifactRepository, never()).findLatestCompletedSummaryByNodeId(10L);
+    }
+
+    @Test
+    void execute_chapterQueuesNormalizationWhenOriginalSummaryIsTooLong() {
+        DocumentNode chapter = node(10L, "chapter", "Chương I", "Chương I");
+        DocumentNode summaryNode = node(11L, "summary", "TÓM TẮT CHƯƠNG I", "TÓM TẮT CHƯƠNG I");
+        ragProperties.getEnrichment().setMaxDirectOriginalSummaryChars(20);
+        when(outlineSummaryRenderer.render(chapter)).thenReturn(Optional.empty());
+        when(artifactRepository.findLatestCompletedSummaryByNodeId(10L)).thenReturn(Optional.empty());
+        when(originalSummaryNodeService.findForChapter(chapter))
+                .thenReturn(Optional.of(new OriginalSummaryNodeService.OriginalSummary(
+                        summaryNode,
+                        "Nội dung tóm tắt gốc của chương rất dài.",
+                        List.of(chunk(100L))
+                )));
+
+        AgentResult result = summaryAgent.execute(state(chapter));
+
+        assertThat(result.answer()).contains("đang được chuẩn hóa");
+        verify(documentEnrichmentService).enqueueNodeEnrichment(
+                10L,
+                false,
+                List.of(DocumentNodeArtifactType.SUMMARY)
+        );
     }
 
     @Test

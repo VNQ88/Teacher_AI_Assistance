@@ -11,8 +11,6 @@ public class ChatSessionResponse {
     private Long id;
     private Long subjectId;
     private String subjectName;
-    private Long classroomId;
-    private String classroomName;
     private String title;
     private Boolean active;
     private LocalDateTime createdAt;

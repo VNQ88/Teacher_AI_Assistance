@@ -12,6 +12,8 @@ import com.example.teacherassistantai.integration.ai.AiChatGateway;
 import com.example.teacherassistantai.integration.ai.AiWorkload;
 import com.example.teacherassistantai.repository.DocumentNodeArtifactRepository;
 import com.example.teacherassistantai.repository.DocumentRepository;
+import com.example.teacherassistantai.service.DocumentEnrichmentService;
+import com.example.teacherassistantai.service.DocumentNodeScopeService;
 import com.example.teacherassistantai.service.DocumentOutlineSummaryRenderer;
 import com.example.teacherassistantai.service.OriginalSummaryNodeService;
 import com.example.teacherassistantai.service.RagArtifactChatHandlerService;
@@ -46,25 +48,20 @@ public class SummaryAgent {
     private final DocumentRepository documentRepository;
     private final RagArtifactChatHandlerService handlerService;
     private final VectorRetrievalService retrievalService;
+    private final DocumentNodeScopeService nodeScopeService;
     private final AiChatGateway aiChatGateway;
     private final RedisTemplate<String, String> redisTemplate;
     private final RagProperties ragProperties;
     private final PlatformTransactionManager transactionManager;
     private final OriginalSummaryNodeService originalSummaryNodeService;
     private final DocumentOutlineSummaryRenderer outlineSummaryRenderer;
+    private final DocumentEnrichmentService documentEnrichmentService;
 
     public AgentResult execute(RagChatState state) {
         DocumentNode node = state.getResolvedNode();
         Optional<String> outlineSummary = outlineSummaryRenderer.render(node);
         if (outlineSummary.isPresent()) {
             return AgentResult.hit(outlineSummary.get(), List.of());
-        }
-        if ("chapter".equals(node.getNodeType())) {
-            Optional<OriginalSummaryNodeService.OriginalSummary> originalSummary =
-                    originalSummaryNodeService.findForChapter(node);
-            if (originalSummary.isPresent()) {
-                return AgentResult.hit(renderOriginalSummary(node, originalSummary.get()), originalSummary.get().sources());
-            }
         }
 
         Optional<DocumentNodeArtifact> artifact = fetchCompletedSummary(node.getId());
@@ -76,8 +73,52 @@ public class SummaryAgent {
             return AgentResult.hit(answer, sources);
         }
 
+        if ("chapter".equals(node.getNodeType())) {
+            Optional<OriginalSummaryNodeService.OriginalSummary> originalSummary =
+                    originalSummaryNodeService.findForChapter(node);
+            if (originalSummary.isPresent()) {
+                return fromOriginalSummary(node, originalSummary.get());
+            }
+        }
+
         log.warn("SummaryAgent: no completed artifact for nodeId={}, using RAG fallback", node.getId());
         return ragFallbackSummary(state, node);
+    }
+
+    private AgentResult fromOriginalSummary(DocumentNode chapterNode,
+                                            OriginalSummaryNodeService.OriginalSummary originalSummary) {
+        int maxDirectChars = ragProperties.getEnrichment().getMaxDirectOriginalSummaryChars();
+        String content = originalSummary.content();
+        if (content != null && content.length() <= maxDirectChars) {
+            return AgentResult.hit(renderOriginalSummary(chapterNode, originalSummary), originalSummary.sources());
+        }
+        enqueueSummaryNormalization(chapterNode);
+        return AgentResult.message(
+                "Tóm tắt chương này đang được chuẩn hóa. Vui lòng hỏi lại sau ít phút.");
+    }
+
+    private void enqueueSummaryNormalization(DocumentNode chapterNode) {
+        if (chapterNode == null || chapterNode.getId() == null) {
+            return;
+        }
+        String lockKey = "summary-original-normalize:" + chapterNode.getId();
+        boolean shouldEnqueue = true;
+        try {
+            var ops = redisTemplate.opsForValue();
+            shouldEnqueue = ops == null
+                    || Boolean.TRUE.equals(ops.setIfAbsent(lockKey, "1", Duration.ofMinutes(5)));
+        } catch (Exception ex) {
+            log.warn("SummaryAgent: could not acquire original summary normalization lock for nodeId={}",
+                    chapterNode.getId(), ex);
+        }
+        if (!shouldEnqueue) {
+            return;
+        }
+        documentEnrichmentService.enqueueNodeEnrichment(
+                chapterNode.getId(),
+                false,
+                List.of(DocumentNodeArtifactType.SUMMARY)
+        );
     }
 
     private String renderOriginalSummary(DocumentNode chapterNode, OriginalSummaryNodeService.OriginalSummary originalSummary) {
@@ -102,8 +143,10 @@ public class SummaryAgent {
         }
 
         try {
-            List<DocumentChunk> chunks = retrievalService.retrieve(
-                    state.getSession(), state.getQuestion(), RAG_TOP_K);
+            List<DocumentChunk> chunks = scopedChunks(node);
+            if (chunks.isEmpty()) {
+                chunks = retrievalService.retrieve(state.getSession(), state.getQuestion(), RAG_TOP_K);
+            }
 
             if (chunks.isEmpty()) {
                 return AgentResult.message(
@@ -183,6 +226,21 @@ public class SummaryAgent {
         Long documentId = node.getDocument().getId();
         return documentRepository.findById(documentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + documentId));
+    }
+
+    private List<DocumentChunk> scopedChunks(DocumentNode node) {
+        if (node == null || node.getId() == null) {
+            return List.of();
+        }
+        try {
+            return nodeScopeService.getScope(node.getId()).chunks()
+                    .stream()
+                    .limit(RAG_TOP_K)
+                    .toList();
+        } catch (Exception ex) {
+            log.warn("SummaryAgent: could not load scoped chunks for fallback nodeId={}", node.getId(), ex);
+            return List.of();
+        }
     }
 
     private String buildSummarizationPrompt(DocumentNode node, List<DocumentChunk> chunks) {

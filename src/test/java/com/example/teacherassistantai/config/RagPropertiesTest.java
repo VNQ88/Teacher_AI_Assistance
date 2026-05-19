@@ -23,6 +23,12 @@ class RagPropertiesTest {
             assertThat(properties.getAi().getEmbeddingModel()).isEqualTo("qwen3-embedding-0.6b");
             assertThat(properties.getAi().getEnrichment().getSummaryModel()).isEqualTo("openai-gpt-5-mini");
             assertThat(properties.getAi().getEnrichment().getReviewQuestionModel()).isEqualTo("openai-gpt-oss-120b");
+            assertThat(properties.getEnrichment().getMaxDirectOriginalSummaryChars()).isEqualTo(2_000);
+            assertThat(properties.getEnrichment().getReviewQuestionMixedInput().isEnabled()).isTrue();
+            assertThat(properties.getEnrichment().getReviewQuestionMixedInput().getSummaryTargetRatio()).isEqualTo(0.5);
+            assertThat(properties.getEnrichment().getReviewQuestionMixedInput().getMaxChildSummaryChars()).isEqualTo(2_000);
+            assertThat(properties.getEnrichment().getRepair().getMaxRawResponseChars()).isEqualTo(12_000);
+            assertThat(properties.getEnrichment().getRepair().getMaxAttempts()).isEqualTo(2);
             assertThat(properties.getEnrichment().getReviewQuestionComposition().getMaxQuestionsPerChapterInPart()).isEqualTo(5);
             assertThat(properties.getEnrichment().getReviewQuestionComposition().getMaxQuestionsPerChapterInDocument()).isEqualTo(3);
         });
@@ -41,6 +47,12 @@ class RagPropertiesTest {
                         "application.rag.ai.enrichment.api-key=test-key",
                         "application.rag.ai.enrichment.summary-model=test-summary",
                         "application.rag.ai.enrichment.review-question-model=test-question",
+                        "application.rag.enrichment.max-direct-original-summary-chars=1500",
+                        "application.rag.enrichment.review-question-mixed-input.enabled=false",
+                        "application.rag.enrichment.review-question-mixed-input.summary-target-ratio=0.4",
+                        "application.rag.enrichment.review-question-mixed-input.max-child-summary-chars=1800",
+                        "application.rag.enrichment.repair.max-raw-response-chars=8000",
+                        "application.rag.enrichment.repair.max-attempts=3",
                         "application.rag.enrichment.review-question-composition.max-questions-per-chapter-in-part=7",
                         "application.rag.enrichment.review-question-composition.max-total-questions-in-document=25"
                 )
@@ -56,6 +68,12 @@ class RagPropertiesTest {
                     assertThat(properties.getAi().getEnrichment().getApiKey()).isEqualTo("test-key");
                     assertThat(properties.getAi().getEnrichment().getSummaryModel()).isEqualTo("test-summary");
                     assertThat(properties.getAi().getEnrichment().getReviewQuestionModel()).isEqualTo("test-question");
+                    assertThat(properties.getEnrichment().getMaxDirectOriginalSummaryChars()).isEqualTo(1500);
+                    assertThat(properties.getEnrichment().getReviewQuestionMixedInput().isEnabled()).isFalse();
+                    assertThat(properties.getEnrichment().getReviewQuestionMixedInput().getSummaryTargetRatio()).isEqualTo(0.4);
+                    assertThat(properties.getEnrichment().getReviewQuestionMixedInput().getMaxChildSummaryChars()).isEqualTo(1800);
+                    assertThat(properties.getEnrichment().getRepair().getMaxRawResponseChars()).isEqualTo(8000);
+                    assertThat(properties.getEnrichment().getRepair().getMaxAttempts()).isEqualTo(3);
                     assertThat(properties.getEnrichment().getReviewQuestionComposition().getMaxQuestionsPerChapterInPart()).isEqualTo(7);
                     assertThat(properties.getEnrichment().getReviewQuestionComposition().getMaxTotalQuestionsInDocument()).isEqualTo(25);
                 });

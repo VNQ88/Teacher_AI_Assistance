@@ -10,13 +10,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Tài liệu học tập được upload lên hệ thống.
- * Gắn với Subject (bắt buộc) và tùy chọn gắn thêm Classroom cụ thể.
- *
- * Luồng: Upload → chunk text → tạo embedding → lưu DocumentChunk → status = READY
- * RAG agent sẽ filter theo subject_id khi tìm kiếm để tránh nhầm lẫn giữa các môn.
- */
 @Getter
 @Setter
 @Builder
@@ -60,15 +53,6 @@ public class Document extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subject_id", nullable = false)
     Subject subject;
-
-    /**
-     * Lớp học cụ thể (nullable).
-     * Nếu null → tài liệu dùng chung cho toàn môn học.
-     * Nếu có → tài liệu chỉ dành riêng cho lớp đó.
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "classroom_id")
-    Classroom classroom;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "uploaded_by", nullable = false)

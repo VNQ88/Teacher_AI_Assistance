@@ -5,7 +5,6 @@ import com.example.teacherassistantai.common.enumerate.DocumentEnrichmentStatus;
 import com.example.teacherassistantai.common.response.PageResponse;
 import com.example.teacherassistantai.config.DocumentIngestionProps;
 import com.example.teacherassistantai.dto.response.DocumentResponse;
-import com.example.teacherassistantai.entity.Classroom;
 import com.example.teacherassistantai.entity.Document;
 import com.example.teacherassistantai.entity.Role;
 import com.example.teacherassistantai.entity.Subject;
@@ -15,7 +14,6 @@ import com.example.teacherassistantai.exception.InvalidDataException;
 import com.example.teacherassistantai.exception.ResourceNotFoundException;
 import com.example.teacherassistantai.exception.StorageOperationException;
 import com.example.teacherassistantai.integration.minio.MinioChannel;
-import com.example.teacherassistantai.repository.ClassroomRepository;
 import com.example.teacherassistantai.repository.DocumentChunkRepository;
 import com.example.teacherassistantai.repository.DocumentRepository;
 import com.example.teacherassistantai.repository.SubjectRepository;
@@ -29,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,7 +43,6 @@ public class DocumentService {
 
     private final DocumentRepository documentRepository;
     private final SubjectRepository subjectRepository;
-    private final ClassroomRepository classroomRepository;
     private final UserRepository userRepository;
     private final DocumentChunkRepository documentChunkRepository;
     private final MinioChannel minioChannel;
@@ -56,22 +52,12 @@ public class DocumentService {
     @Transactional
     public DocumentResponse uploadDocument(MultipartFile file,
                                            Long subjectId,
-                                           @Nullable  Long classroomId,
                                            String title,
                                            String description) {
         validateUploadRequest(file);
 
         Subject subject = subjectRepository.findById(subjectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Subject not found with id: " + subjectId));
-
-        Classroom classroom = null;
-        if (classroomId != null) {
-            classroom = classroomRepository.findById(classroomId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Classroom not found with id: " + classroomId));
-            if (!classroom.getSubject().getId().equals(subjectId)) {
-                throw new InvalidDataException("Classroom does not belong to provided subject");
-            }
-        }
 
         User currentUser = getCurrentUser();
         String extension = getExtension(file.getOriginalFilename());
@@ -98,7 +84,6 @@ public class DocumentService {
                 .fileType(normalizedType)
                 .fileSizeBytes(file.getSize())
                 .subject(subject)
-                .classroom(classroom)
                 .uploadedBy(currentUser)
                 .status(DocumentStatus.UPLOADED)
                 .build();
@@ -278,8 +263,6 @@ public class DocumentService {
                 .description(document.getDescription())
                 .subjectId(document.getSubject().getId())
                 .subjectName(document.getSubject().getName())
-                .classroomId(document.getClassroom() != null ? document.getClassroom().getId() : null)
-                .classroomName(document.getClassroom() != null ? document.getClassroom().getName() : null)
                 .fileType(document.getFileType())
                 .fileSizeBytes(document.getFileSizeBytes())
                 .originalObjectKey(document.getOriginalObjectKey())

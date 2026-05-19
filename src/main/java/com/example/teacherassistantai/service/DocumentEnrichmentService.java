@@ -10,6 +10,7 @@ import com.example.teacherassistantai.entity.DocumentChunk;
 import com.example.teacherassistantai.entity.DocumentNode;
 import com.example.teacherassistantai.entity.DocumentNodeArtifact;
 import com.example.teacherassistantai.exception.BackgroundRateLimitedException;
+import com.example.teacherassistantai.exception.BackgroundTransientAiException;
 import com.example.teacherassistantai.exception.ResourceNotFoundException;
 import com.example.teacherassistantai.integration.ai.AiModelRoutingService;
 import com.example.teacherassistantai.repository.DocumentChunkRepository;
@@ -52,10 +53,9 @@ public class DocumentEnrichmentService {
     private static final Set<String> ENRICHABLE_NODE_TYPES = Set.of("part", "chapter", "section", "subsection", "subsection_level2");
     private static final Set<String> NON_CONTENT_REVIEW_QUESTION_NODE_TYPES = Set.of("document", "summary", "review_questions");
     private static final List<String> SUMMARY_NODE_ORDER = List.of("subsection_level2", "subsection", "section", "chapter", "part");
+    private static final int READY_CHAPTER_SUMMARY_PERCENT = 75;
     private static final String PHASE_4_GENERATOR_MISSING =
             "Artifact generation is not available until Phase 4 prompt/LLM generator is implemented";
-    private static final String REVIEW_QUESTION_DEFERRED_FOR_SUMMARY_BACKLOG =
-            "Review question enrichment deferred because summary backlog exists";
 
     private final DocumentRepository documentRepository;
     private final DocumentNodeRepository documentNodeRepository;
@@ -67,9 +67,9 @@ public class DocumentEnrichmentService {
     private final TransactionTemplate transactionTemplate;
     private final RedisTemplate<String, String> redisTemplate;
     private final com.example.teacherassistantai.service.quiz.HierarchicalQuizEnrichmentService quizEnrichmentService;
-    private final DocumentEnrichmentBacklogService backlogService;
     private final ReviewQuestionCountResolver reviewQuestionCountResolver;
     private final AiModelRoutingService aiModelRoutingService;
+    private final OriginalSummaryNodeService originalSummaryNodeService;
 
     @Async("documentEnrichmentExecutor")
     public void enqueueDocumentEnrichment(Long documentId) {
@@ -137,14 +137,6 @@ public class DocumentEnrichmentService {
         List<DocumentNodeArtifactType> nonSummaryArtifactTypes = artifactTypes.stream()
                 .filter(artifactType -> artifactType != DocumentNodeArtifactType.SUMMARY)
                 .toList();
-        if (nonSummaryArtifactTypes.contains(DocumentNodeArtifactType.REVIEW_QUESTION_SET)
-                && backlogService.hasSummaryBacklog(documentId)) {
-            log.info("Defer REVIEW_QUESTION_SET enrichment because summary backlog exists: documentId={}", documentId);
-            outcomes.add(ArtifactOutcome.generatedSkipped(REVIEW_QUESTION_DEFERRED_FOR_SUMMARY_BACKLOG));
-            nonSummaryArtifactTypes = nonSummaryArtifactTypes.stream()
-                    .filter(artifactType -> artifactType != DocumentNodeArtifactType.REVIEW_QUESTION_SET)
-                    .toList();
-        }
         boolean stopNonSummaryBatch = false;
         for (DocumentNode node : nodes) {
             if (stopNonSummaryBatch) {
@@ -441,13 +433,20 @@ public class DocumentEnrichmentService {
                     input.fallbackRawChunks()
             );
             DocumentNodeArtifactGenerationResult result = generator.generateSummary(context);
+            Map<String, Object> completedContent = completedSummaryContent(result.contentJsonb(), input);
             upsertArtifact(existing, document, node, DocumentNodeArtifactType.SUMMARY, promptVersion, model, sourceHash,
-                    DocumentNodeArtifactStatus.COMPLETED, result.contentJsonb(), null, result.tokenCount());
+                    DocumentNodeArtifactStatus.COMPLETED, completedContent, null, result.tokenCount());
             return ArtifactOutcome.generatedCompleted();
         } catch (BackgroundRateLimitedException ex) {
             log.info("Artifact RATE_LIMITED nodeId={} until={}", node.getId(), ex.getPausedUntil());
             upsertArtifact(existing, document, node, DocumentNodeArtifactType.SUMMARY, promptVersion, model, sourceHash,
                     DocumentNodeArtifactStatus.RATE_LIMITED, rateLimitContent(node, DocumentNodeArtifactType.SUMMARY, sourceHash, ex), ex.getMessage(), null);
+            return ArtifactOutcome.generatedRateLimited();
+        } catch (BackgroundTransientAiException ex) {
+            log.info("Artifact retryable transient AI error nodeId={} artifactType={} errorType={}",
+                    node.getId(), DocumentNodeArtifactType.SUMMARY, ex.getErrorType());
+            upsertArtifact(existing, document, node, DocumentNodeArtifactType.SUMMARY, promptVersion, model, sourceHash,
+                    DocumentNodeArtifactStatus.RATE_LIMITED, transientContent(node, DocumentNodeArtifactType.SUMMARY, sourceHash, ex), ex.getMessage(), null);
             return ArtifactOutcome.generatedRateLimited();
         } catch (Exception ex) {
             log.warn("Document summary artifact generation failed: documentId={}, nodeId={}, summaryMode={}",
@@ -463,10 +462,49 @@ public class DocumentEnrichmentService {
             case "subsection_level2" -> chunksSummaryInput(document, node, SummaryMode.SUBSECTION_LEVEL2_FROM_CHUNKS);
             case "subsection" -> subsectionSummaryInput(document, node);
             case "section" -> sectionSummaryInput(document, node);
-            case "chapter" -> parentSummaryInput(document, node, "section", SummaryMode.CHAPTER_FROM_SECTIONS, SummaryMode.CHAPTER_FALLBACK);
+            case "chapter" -> chapterSummaryInput(document, node);
             case "part" -> parentSummaryInput(document, node, "chapter", SummaryMode.PART_FROM_CHAPTERS, SummaryMode.PART_FALLBACK);
             default -> chunksSummaryInput(document, node, SummaryMode.CHAPTER_FALLBACK);
         };
+    }
+
+    private SummaryInput chapterSummaryInput(Document document, DocumentNode node) {
+        Optional<OriginalSummaryNodeService.OriginalSummary> originalSummary = Optional.empty();
+        if (originalSummaryNodeService != null) {
+            Optional<OriginalSummaryNodeService.OriginalSummary> resolved =
+                    originalSummaryNodeService.findForChapter(node);
+            originalSummary = resolved == null ? Optional.empty() : resolved;
+        }
+        if (originalSummary.isPresent()) {
+            SummaryInput input = originalSummaryInput(originalSummary.get());
+            if (input != null) {
+                return input;
+            }
+        }
+        return parentSummaryInput(document, node, "section", SummaryMode.CHAPTER_FROM_SECTIONS, SummaryMode.CHAPTER_FALLBACK);
+    }
+
+    private SummaryInput originalSummaryInput(OriginalSummaryNodeService.OriginalSummary originalSummary) {
+        List<DocumentChunk> cleanedChunks = originalSummary.cleanedChunks();
+        if (cleanedChunks.isEmpty()) {
+            return null;
+        }
+        SummaryCoverage coverage = SummaryCoverage.chunksOnly(cleanedChunks.size(), cleanedChunks.size());
+        Map<String, Object> metadata = new LinkedHashMap<>();
+        metadata.put("sourceMode", "ORIGINAL_SUMMARY_NODE");
+        metadata.put("originalSummaryNodeId", originalSummary.summaryNode().getId());
+        metadata.put("cleanedOriginalSummaryChars", originalSummary.content().length());
+        metadata.put("generatedVia", "original_summary_llm");
+        metadata.put("cleaningStats", cleaningStatsMetadata(originalSummary.cleaningStats()));
+        return new SummaryInput(
+                SummaryMode.CHAPTER_FROM_ORIGINAL_SUMMARY,
+                cleanedChunks,
+                List.of(),
+                coverage,
+                null,
+                Map.of(),
+                metadata
+        );
     }
 
     private SummaryInput subsectionSummaryInput(Document document, DocumentNode node) {
@@ -665,6 +703,27 @@ public class DocumentEnrichmentService {
         );
     }
 
+    private Map<String, Object> completedSummaryContent(Map<String, Object> content, SummaryInput input) {
+        Map<String, Object> completed = new LinkedHashMap<>(content == null ? Map.of() : content);
+        if (!input.sourceMetadata().isEmpty()) {
+            completed.putAll(input.sourceMetadata());
+        }
+        return completed;
+    }
+
+    private Map<String, Object> cleaningStatsMetadata(OriginalSummaryTextCleaner.CleaningStats stats) {
+        if (stats == null) {
+            return Map.of();
+        }
+        Map<String, Object> metadata = new LinkedHashMap<>();
+        metadata.put("originalChars", stats.originalChars());
+        metadata.put("cleanedChars", stats.cleanedChars());
+        metadata.put("removedBreadcrumbCount", stats.removedBreadcrumbCount());
+        metadata.put("removedHeadingCount", stats.removedHeadingCount());
+        metadata.put("removedOverlapCount", stats.removedOverlapCount());
+        return metadata;
+    }
+
     private List<DocumentChunk> representativeDirectChunks(Document document, DocumentNode node) {
         return directChunks(document, node).stream()
                 .limit(ragProperties.getEnrichment().getRepresentativeSectionChunks())
@@ -697,11 +756,12 @@ public class DocumentEnrichmentService {
                     document.getId(), documentNodeId, node.getNodeType());
             return ArtifactOutcome.generatedSkipped(reason);
         }
-        if (artifactType == DocumentNodeArtifactType.REVIEW_QUESTION_SET
-                && backlogService.hasSummaryBacklog(document.getId())) {
-            log.info("Defer REVIEW_QUESTION_SET enrichment because summary backlog exists: documentId={}, nodeId={}",
-                    document.getId(), documentNodeId);
-            return ArtifactOutcome.generatedSkipped(REVIEW_QUESTION_DEFERRED_FOR_SUMMARY_BACKLOG);
+        if (artifactType == DocumentNodeArtifactType.REVIEW_QUESTION_SET) {
+            return quizOutcome(quizEnrichmentService.generateAndSaveQuizArtifact(
+                    node,
+                    com.example.teacherassistantai.service.quiz.QuizGenerationStrategy.QuizInputType.CHILD_SUMMARIES,
+                    forceRegenerate
+            ));
         }
         String sourceHash = scope.sourceHash();
         String promptVersion = ragProperties.getEnrichment().getPromptVersion();
@@ -752,6 +812,12 @@ public class DocumentEnrichmentService {
             upsertArtifact(existing, document, node, artifactType, promptVersion, model, sourceHash,
                     DocumentNodeArtifactStatus.RATE_LIMITED, rateLimitContent(node, artifactType, sourceHash, ex), ex.getMessage(), null);
             return ArtifactOutcome.generatedRateLimited();
+        } catch (BackgroundTransientAiException ex) {
+            log.info("Artifact retryable transient AI error nodeId={} artifactType={} errorType={}",
+                    documentNodeId, artifactType, ex.getErrorType());
+            upsertArtifact(existing, document, node, artifactType, promptVersion, model, sourceHash,
+                    DocumentNodeArtifactStatus.RATE_LIMITED, transientContent(node, artifactType, sourceHash, ex), ex.getMessage(), null);
+            return ArtifactOutcome.generatedRateLimited();
         } catch (Exception ex) {
             log.warn("Document enrichment artifact generation failed: documentId={}, nodeId={}, artifactType={}",
                     document.getId(), documentNodeId, artifactType, ex);
@@ -768,6 +834,15 @@ public class DocumentEnrichmentService {
         Long documentId = node.getDocument().getId();
         return documentRepository.findById(documentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + documentId));
+    }
+
+    private ArtifactOutcome quizOutcome(com.example.teacherassistantai.service.quiz.HierarchicalQuizEnrichmentService.QuizArtifactOutcome outcome) {
+        return switch (outcome) {
+            case COMPLETED -> ArtifactOutcome.generatedCompleted();
+            case RATE_LIMITED -> ArtifactOutcome.generatedRateLimited();
+            case SKIPPED -> ArtifactOutcome.generatedSkipped("Review question enrichment skipped because no usable context was available");
+            case FAILED -> ArtifactOutcome.generatedFailed();
+        };
     }
 
     private List<DocumentChunk> limitedChunks(List<DocumentChunk> chunks) {
@@ -829,6 +904,9 @@ public class DocumentEnrichmentService {
         update(digest, "usedDirectChunkCount", coverage.usedDirectChunkCount());
         update(digest, "complete", coverage.complete());
         update(digest, "fallbackChildCount", coverage.fallbackChildCount());
+        for (Map.Entry<String, Object> entry : input.sourceMetadata().entrySet()) {
+            update(digest, "sourceMetadata." + entry.getKey(), entry.getValue());
+        }
         return HexFormat.of().formatHex(digest.digest());
     }
 
@@ -942,8 +1020,16 @@ public class DocumentEnrichmentService {
                                                String sourceHash,
                                                Exception ex) {
         Map<String, Object> content = baseContent(node, artifactType, sourceHash);
+        if (isInvalidJsonFailure(ex)) {
+            content.put("errorType", "INVALID_JSON");
+        }
         content.put("error", ex.getMessage());
         return content;
+    }
+
+    private boolean isInvalidJsonFailure(Exception ex) {
+        String message = ex == null ? null : ex.getMessage();
+        return message != null && message.toLowerCase(java.util.Locale.ROOT).contains("json");
     }
 
     private Map<String, Object> rateLimitContent(DocumentNode node,
@@ -953,6 +1039,17 @@ public class DocumentEnrichmentService {
         Map<String, Object> content = baseContent(node, artifactType, sourceHash);
         content.put("errorType", "RATE_LIMIT");
         content.put("retryAfter", ex.getPausedUntil() != null ? ex.getPausedUntil().toString() : null);
+        return content;
+    }
+
+    private Map<String, Object> transientContent(DocumentNode node,
+                                                 DocumentNodeArtifactType artifactType,
+                                                 String sourceHash,
+                                                 BackgroundTransientAiException ex) {
+        Map<String, Object> content = baseContent(node, artifactType, sourceHash);
+        content.put("errorType", ex.getErrorType() == null ? "TRANSIENT_AI_ERROR" : ex.getErrorType());
+        content.put("retryAfter", ex.getRetryAfter() == null ? null : ex.getRetryAfter().toString());
+        content.put("error", ex.getMessage());
         return content;
     }
 
@@ -1003,25 +1100,67 @@ public class DocumentEnrichmentService {
             Document document = documentRepository.findById(documentId)
                     .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + documentId));
             ArtifactSummary summary = ArtifactSummary.from(outcomes);
+            ChapterSummaryReadiness readiness = chapterSummaryReadiness(documentId);
             document.setEnrichmentCompletedAt(LocalDateTime.now());
             if (summary.total() == 0 || summary.skipped() == summary.total()) {
                 document.setEnrichmentStatus(DocumentEnrichmentStatus.SKIPPED);
                 document.setEnrichmentError(summary.primarySkippedReason());
-            } else if (summary.failed() == 0 && summary.completed() > 0) {
+            } else if (readiness.ready() && readiness.allCompleted() && summary.failed() == 0) {
                 document.setStatus(DocumentStatus.READY);
                 document.setEnrichmentStatus(DocumentEnrichmentStatus.ENRICHED);
                 document.setEnrichmentError(null);
-            } else if (summary.failed() == summary.total()) {
-                document.setStatus(DocumentStatus.FAILED);
-                document.setEnrichmentStatus(DocumentEnrichmentStatus.FAILED);
-                document.setEnrichmentError("All enrichment artifacts failed");
-            } else {
+            } else if (readiness.ready()) {
                 document.setStatus(DocumentStatus.READY);
                 document.setEnrichmentStatus(DocumentEnrichmentStatus.PARTIAL_FAILED);
-                document.setEnrichmentError("Some enrichment artifacts failed or were skipped");
+                document.setEnrichmentError("Chapter summary readiness reached %d/%d; remaining artifacts will continue in background"
+                        .formatted(readiness.completedChapters(), readiness.totalChapters()));
+            } else {
+                if (document.getStatus() != DocumentStatus.FAILED) {
+                    document.setStatus(DocumentStatus.SUMMARISING);
+                }
+                document.setEnrichmentStatus(DocumentEnrichmentStatus.PARTIAL_FAILED);
+                document.setEnrichmentError("Chapter summary readiness is %d/%d; document requires at least %d%% completed chapter summaries"
+                        .formatted(readiness.completedChapters(), readiness.totalChapters(), READY_CHAPTER_SUMMARY_PERCENT));
             }
             documentRepository.save(document);
         });
+    }
+
+    private ChapterSummaryReadiness chapterSummaryReadiness(Long documentId) {
+        List<DocumentNode> chapters = documentNodeRepository.findByDocumentIdAndNodeTypeOrderByOrderIndexAsc(
+                documentId,
+                "chapter"
+        );
+        if (chapters == null || chapters.isEmpty()) {
+            return new ChapterSummaryReadiness(0, 0, true);
+        }
+
+        List<Long> chapterIds = chapters.stream()
+                .map(DocumentNode::getId)
+                .filter(java.util.Objects::nonNull)
+                .toList();
+        if (chapterIds.isEmpty()) {
+            return new ChapterSummaryReadiness(0, chapters.size(), false);
+        }
+
+        List<DocumentNodeArtifact> completedArtifacts = artifactRepository
+                .findByNodeIdsAndArtifactTypeAndStatusOrderByNodeOrderAndUpdatedAt(
+                        chapterIds,
+                        DocumentNodeArtifactType.SUMMARY,
+                        DocumentNodeArtifactStatus.COMPLETED
+                );
+        Set<Long> completedChapterIds = (completedArtifacts == null ? List.<DocumentNodeArtifact>of() : completedArtifacts)
+                .stream()
+                .map(DocumentNodeArtifact::getDocumentNode)
+                .filter(java.util.Objects::nonNull)
+                .map(DocumentNode::getId)
+                .filter(chapterIds::contains)
+                .collect(java.util.stream.Collectors.toSet());
+
+        int completed = completedChapterIds.size();
+        int total = chapterIds.size();
+        boolean ready = completed * 100 >= total * READY_CHAPTER_SUMMARY_PERCENT;
+        return new ChapterSummaryReadiness(completed, total, ready);
     }
 
     private boolean isEnrichableDocumentStatus(DocumentStatus status) {
@@ -1081,18 +1220,26 @@ public class DocumentEnrichmentService {
         }
     }
 
+    private record ChapterSummaryReadiness(int completedChapters, int totalChapters, boolean ready) {
+        boolean allCompleted() {
+            return totalChapters == 0 || completedChapters >= totalChapters;
+        }
+    }
+
     private record SummaryInput(
             SummaryMode summaryMode,
             List<DocumentChunk> directChunks,
             List<ChildSummary> childSummaries,
             SummaryCoverage coverage,
             String dependencyError,
-            Map<Long, List<DocumentChunk>> fallbackRawChunks
+            Map<Long, List<DocumentChunk>> fallbackRawChunks,
+            Map<String, Object> sourceMetadata
     ) {
         private SummaryInput {
             directChunks = directChunks == null ? List.of() : directChunks;
             childSummaries = childSummaries == null ? List.of() : childSummaries;
             fallbackRawChunks = fallbackRawChunks == null ? Map.of() : fallbackRawChunks;
+            sourceMetadata = sourceMetadata == null ? Map.of() : sourceMetadata;
         }
 
         SummaryInput(SummaryMode summaryMode,
@@ -1100,7 +1247,16 @@ public class DocumentEnrichmentService {
                      List<ChildSummary> childSummaries,
                      SummaryCoverage coverage,
                      String dependencyError) {
-            this(summaryMode, directChunks, childSummaries, coverage, dependencyError, Map.of());
+            this(summaryMode, directChunks, childSummaries, coverage, dependencyError, Map.of(), Map.of());
+        }
+
+        SummaryInput(SummaryMode summaryMode,
+                     List<DocumentChunk> directChunks,
+                     List<ChildSummary> childSummaries,
+                     SummaryCoverage coverage,
+                     String dependencyError,
+                     Map<Long, List<DocumentChunk>> fallbackRawChunks) {
+            this(summaryMode, directChunks, childSummaries, coverage, dependencyError, fallbackRawChunks, Map.of());
         }
     }
 

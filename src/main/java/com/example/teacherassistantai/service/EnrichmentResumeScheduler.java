@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +26,10 @@ public class EnrichmentResumeScheduler {
     private final DocumentEnrichmentService enrichmentService;
     private final DigitalOceanAiRateLimiter rateLimiter;
     private final RagProperties ragProperties;
-    private final DocumentEnrichmentBacklogService backlogService;
     private final AiModelRoutingService aiModelRoutingService;
 
     @Scheduled(fixedDelay = 120_000)
+    @Transactional(readOnly = true)
     public void resumeRateLimitedArtifacts() {
         RagProperties.Ai.RateLimit cfg = ragProperties.getAi().getRateLimit();
         if (!cfg.isEnabled()) return;
@@ -64,12 +65,6 @@ public class EnrichmentResumeScheduler {
             }
             if (reviewBatchSize >= ragProperties.getEnrichment().getReviewQuestionResumeBatchSize()) {
                 break;
-            }
-            Long documentId = artifact.getDocumentNode().getDocument().getId();
-            if (backlogService.hasSummaryBacklog(documentId)) {
-                log.debug("Background resume: defer REVIEW_QUESTION_SET nodeId={} because summary backlog exists",
-                        artifact.getDocumentNode().getId());
-                continue;
             }
             batch.add(artifact);
             reviewBatchSize++;

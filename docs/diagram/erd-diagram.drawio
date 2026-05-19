@@ -1,0 +1,194 @@
+<mxfile host="drawio-plugin" modified="2026-05-18T09:39:54.175Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" version="22.1.22" etag="kmDZaSHRSXMtEgsLiioa" type="embed">
+  <diagram id="teacher-assistant-ai-erd" name="ERD Tổng quan">
+    <mxGraphModel dx="2520" dy="531" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="1180" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="users" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;users&lt;/b&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;PK id&lt;br style=&quot;font-size: 12px;&quot;&gt;created_at&lt;br style=&quot;font-size: 12px;&quot;&gt;updated_at&lt;br style=&quot;font-size: 12px;&quot;&gt;avatar&lt;br style=&quot;font-size: 12px;&quot;&gt;UQ email&lt;br style=&quot;font-size: 12px;&quot;&gt;enabled&lt;br style=&quot;font-size: 12px;&quot;&gt;full_name&lt;br style=&quot;font-size: 12px;&quot;&gt;password" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=5;fontSize=12;fillColor=#FFFFFF;strokeColor=#64748B;fontColor=#0F172A;" parent="1" vertex="1">
+          <mxGeometry x="40" y="100" width="150" height="175" as="geometry" />
+        </mxCell>
+        <mxCell id="role" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;role&lt;/b&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;PK id&lt;br style=&quot;font-size: 12px;&quot;&gt;created_at&lt;br style=&quot;font-size: 12px;&quot;&gt;updated_at&lt;br style=&quot;font-size: 12px;&quot;&gt;UQ name" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=5;fontSize=12;fillColor=#FFFFFF;strokeColor=#64748B;fontColor=#0F172A;" parent="1" vertex="1">
+          <mxGeometry x="40" y="330" width="135" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="users_roles" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;users_roles&lt;/b&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;PK users_id + roles_id&lt;br style=&quot;font-size: 12px;&quot;&gt;FK users_id&lt;br style=&quot;font-size: 12px;&quot;&gt;FK roles_id" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=5;fontSize=12;fillColor=#F8FAFC;strokeColor=#475569;fontColor=#0F172A;" parent="1" vertex="1">
+          <mxGeometry x="215" y="330" width="150" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="subjects" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;subjects&lt;/b&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;PK id&lt;br style=&quot;font-size: 12px;&quot;&gt;created_at&lt;br style=&quot;font-size: 12px;&quot;&gt;updated_at&lt;br style=&quot;font-size: 12px;&quot;&gt;active&lt;br style=&quot;font-size: 12px;&quot;&gt;UQ code&lt;br style=&quot;font-size: 12px;&quot;&gt;description&lt;br style=&quot;font-size: 12px;&quot;&gt;UQ name&lt;br style=&quot;font-size: 12px;&quot;&gt;subject_type&lt;br style=&quot;font-size: 12px;&quot;&gt;owner_id" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=5;fontSize=12;fillColor=#FFFFFF;strokeColor=#22C55E;fontColor=#0F172A;" parent="1" vertex="1">
+          <mxGeometry x="270" y="100" width="160" height="195" as="geometry" />
+        </mxCell>
+        <mxCell id="documents" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;documents&lt;/b&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;PK id&lt;br style=&quot;font-size: 12px;&quot;&gt;created_at&lt;br style=&quot;font-size: 12px;&quot;&gt;updated_at&lt;br style=&quot;font-size: 12px;&quot;&gt;description&lt;br style=&quot;font-size: 12px;&quot;&gt;file_size_bytes&lt;br style=&quot;font-size: 12px;&quot;&gt;file_type&lt;br style=&quot;font-size: 12px;&quot;&gt;processing_error&lt;br style=&quot;font-size: 12px;&quot;&gt;status&lt;br style=&quot;font-size: 12px;&quot;&gt;enrichment_status&lt;br style=&quot;font-size: 12px;&quot;&gt;enrichment_started_at&lt;br style=&quot;font-size: 12px;&quot;&gt;enrichment_completed_at&lt;br style=&quot;font-size: 12px;&quot;&gt;enrichment_error&lt;br style=&quot;font-size: 12px;&quot;&gt;enrichment_retry_count&lt;br style=&quot;font-size: 12px;&quot;&gt;title&lt;br style=&quot;font-size: 12px;&quot;&gt;FK subject_id&lt;br style=&quot;font-size: 12px;&quot;&gt;FK uploaded_by&lt;br style=&quot;font-size: 12px;&quot;&gt;UQ original_object_key&lt;br style=&quot;font-size: 12px;&quot;&gt;UQ markdown_object_key&lt;br style=&quot;font-size: 12px;&quot;&gt;UQ hierarchy_object_key&lt;br style=&quot;font-size: 12px;&quot;&gt;UQ chunks_object_key" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=5;fontSize=12;fillColor=#FFFFFF;strokeColor=#22C55E;fontColor=#0F172A;" parent="1" vertex="1">
+          <mxGeometry x="270" y="500" width="185" height="350" as="geometry" />
+        </mxCell>
+        <mxCell id="agent_logs" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;agent_logs&lt;/b&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;PK id&lt;br style=&quot;font-size: 12px;&quot;&gt;created_at&lt;br style=&quot;font-size: 12px;&quot;&gt;updated_at&lt;br style=&quot;font-size: 12px;&quot;&gt;agent_type&lt;br style=&quot;font-size: 12px;&quot;&gt;error_message&lt;br style=&quot;font-size: 12px;&quot;&gt;input_summary&lt;br style=&quot;font-size: 12px;&quot;&gt;output_summary&lt;br style=&quot;font-size: 12px;&quot;&gt;processing_time_ms&lt;br style=&quot;font-size: 12px;&quot;&gt;related_entity_id&lt;br style=&quot;font-size: 12px;&quot;&gt;related_entity_type&lt;br style=&quot;font-size: 12px;&quot;&gt;success&lt;br style=&quot;font-size: 12px;&quot;&gt;tokens_used&lt;br style=&quot;font-size: 12px;&quot;&gt;FK subject_id&lt;br style=&quot;font-size: 12px;&quot;&gt;FK triggered_by" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=5;fontSize=12;fillColor=#FFFFFF;strokeColor=#F97316;fontColor=#0F172A;" parent="1" vertex="1">
+          <mxGeometry x="40" y="600" width="185" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="document_nodes" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;document_nodes&lt;/b&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;PK id&lt;br style=&quot;font-size: 12px;&quot;&gt;created_at&lt;br style=&quot;font-size: 12px;&quot;&gt;updated_at&lt;br style=&quot;font-size: 12px;&quot;&gt;FK document_id&lt;br style=&quot;font-size: 12px;&quot;&gt;FK parent_id&lt;br style=&quot;font-size: 12px;&quot;&gt;subject_id&lt;br style=&quot;font-size: 12px;&quot;&gt;UQ document_id + node_key&lt;br style=&quot;font-size: 12px;&quot;&gt;node_type&lt;br style=&quot;font-size: 12px;&quot;&gt;level&lt;br style=&quot;font-size: 12px;&quot;&gt;title&lt;br style=&quot;font-size: 12px;&quot;&gt;section_path&lt;br style=&quot;font-size: 12px;&quot;&gt;order_index&lt;br style=&quot;font-size: 12px;&quot;&gt;page_from&lt;br style=&quot;font-size: 12px;&quot;&gt;page_to&lt;br style=&quot;font-size: 12px;&quot;&gt;content&lt;br style=&quot;font-size: 12px;&quot;&gt;metadata_jsonb" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=5;fontSize=12;fillColor=#FFFFFF;strokeColor=#22C55E;fontColor=#0F172A;" parent="1" vertex="1">
+          <mxGeometry x="575" y="150" width="190" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="document_chunks" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;document_chunks&lt;/b&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;PK id&lt;br style=&quot;font-size: 12px;&quot;&gt;created_at&lt;br style=&quot;font-size: 12px;&quot;&gt;updated_at&lt;br style=&quot;font-size: 12px;&quot;&gt;chunk_index&lt;br style=&quot;font-size: 12px;&quot;&gt;content&lt;br style=&quot;font-size: 12px;&quot;&gt;subject_id&lt;br style=&quot;font-size: 12px;&quot;&gt;FK document_id&lt;br style=&quot;font-size: 12px;&quot;&gt;embedding vector(1024)&lt;br style=&quot;font-size: 12px;&quot;&gt;chunk_type&lt;br style=&quot;font-size: 12px;&quot;&gt;token_count&lt;br style=&quot;font-size: 12px;&quot;&gt;metadata_jsonb&lt;br style=&quot;font-size: 12px;&quot;&gt;FK node_id&lt;br style=&quot;font-size: 12px;&quot;&gt;FK parent_node_id&lt;br style=&quot;font-size: 12px;&quot;&gt;section_path&lt;br style=&quot;font-size: 12px;&quot;&gt;page_from&lt;br style=&quot;font-size: 12px;&quot;&gt;page_to&lt;br style=&quot;font-size: 12px;&quot;&gt;source_order" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=5;fontSize=12;fillColor=#FFFFFF;strokeColor=#22C55E;fontColor=#0F172A;" parent="1" vertex="1">
+          <mxGeometry x="575" y="620" width="195" height="310" as="geometry" />
+        </mxCell>
+        <mxCell id="document_node_artifacts" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;document_node_artifacts&lt;/b&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;PK id&lt;br style=&quot;font-size: 12px;&quot;&gt;created_at&lt;br style=&quot;font-size: 12px;&quot;&gt;updated_at&lt;br style=&quot;font-size: 12px;&quot;&gt;FK document_id&lt;br style=&quot;font-size: 12px;&quot;&gt;FK document_node_id&lt;br style=&quot;font-size: 12px;&quot;&gt;artifact_type&lt;br style=&quot;font-size: 12px;&quot;&gt;status&lt;br style=&quot;font-size: 12px;&quot;&gt;prompt_version&lt;br style=&quot;font-size: 12px;&quot;&gt;model&lt;br style=&quot;font-size: 12px;&quot;&gt;source_hash&lt;br style=&quot;font-size: 12px;&quot;&gt;content_jsonb&lt;br style=&quot;font-size: 12px;&quot;&gt;error_message&lt;br style=&quot;font-size: 12px;&quot;&gt;token_count&lt;br style=&quot;font-size: 12px;&quot;&gt;UQ node + type + version + model + hash" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=5;fontSize=12;fillColor=#FFFFFF;strokeColor=#22C55E;fontColor=#0F172A;" parent="1" vertex="1">
+          <mxGeometry x="850" y="420" width="220" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="chat_sessions" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;chat_sessions&lt;/b&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;PK id&lt;br style=&quot;font-size: 12px;&quot;&gt;created_at&lt;br style=&quot;font-size: 12px;&quot;&gt;updated_at&lt;br style=&quot;font-size: 12px;&quot;&gt;active&lt;br style=&quot;font-size: 12px;&quot;&gt;session_type&lt;br style=&quot;font-size: 12px;&quot;&gt;title&lt;br style=&quot;font-size: 12px;&quot;&gt;FK subject_id&lt;br style=&quot;font-size: 12px;&quot;&gt;FK user_id" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=5;fontSize=12;fillColor=#FFFFFF;strokeColor=#3B82F6;fontColor=#0F172A;" parent="1" vertex="1">
+          <mxGeometry x="940" y="100" width="170" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="chat_messages" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;chat_messages&lt;/b&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;PK id&lt;br style=&quot;font-size: 12px;&quot;&gt;created_at&lt;br style=&quot;font-size: 12px;&quot;&gt;updated_at&lt;br style=&quot;font-size: 12px;&quot;&gt;agent_type&lt;br style=&quot;font-size: 12px;&quot;&gt;content&lt;br style=&quot;font-size: 12px;&quot;&gt;response_time_ms&lt;br style=&quot;font-size: 12px;&quot;&gt;role&lt;br style=&quot;font-size: 12px;&quot;&gt;tokens_used&lt;br style=&quot;font-size: 12px;&quot;&gt;FK session_id" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=5;fontSize=12;fillColor=#FFFFFF;strokeColor=#3B82F6;fontColor=#0F172A;" parent="1" vertex="1">
+          <mxGeometry x="1110" y="380" width="170" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="message_source_chunks" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;message_source_chunks&lt;/b&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;FK message_id&lt;br style=&quot;font-size: 12px;&quot;&gt;FK chunk_id" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=5;fontSize=12;fillColor=#EFF6FF;strokeColor=#2563EB;fontColor=#0F172A;" parent="1" vertex="1">
+          <mxGeometry x="1110" y="670" width="170" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="e-user-user-role" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;exitX=1;exitY=0.72;entryX=0;entryY=0.25;strokeColor=#475569;fontSize=12;fontColor=#334155;" parent="1" source="users" target="users_roles" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="200" y="226" />
+              <mxPoint x="200" y="355" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-role-user-role" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;exitX=1;exitY=0.5;entryX=0;entryY=0.75;strokeColor=#475569;fontSize=12;fontColor=#334155;" parent="1" source="role" target="users_roles" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-user-subject-owner" value="owner_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;dashPattern=6 4;endArrow=open;exitX=1;exitY=0.2;entryX=0;entryY=0.25;strokeColor=#94A3B8;fontSize=12;fontColor=#64748B;" parent="1" source="users" target="subjects" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-subject-documents" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;entryX=0.55;entryY=0;strokeColor=#16A34A;fontSize=12;fontColor=#166534;exitX=0.64;exitY=1.002;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="subjects" target="documents" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="370" y="300" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="372" y="300" />
+              <mxPoint x="372" y="295" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-user-documents" value="tải lên" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;exitX=0;exitY=1;entryX=0;entryY=0.45;strokeColor=#475569;fontSize=12;fontColor=#334155;" parent="1" source="users" target="documents" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="20" y="275" />
+              <mxPoint x="20" y="540" />
+              <mxPoint x="250" y="540" />
+              <mxPoint x="250" y="635" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-documents-nodes" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;exitX=1;exitY=0.18;entryX=0;entryY=0.55;strokeColor=#16A34A;fontSize=12;fontColor=#166534;" parent="1" source="documents" target="document_nodes" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="520" y="563" />
+              <mxPoint x="520" y="315" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-node-parent" value="parent_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERzeroToOne;startFill=0;endArrow=ERmany;endFill=0;exitX=1;exitY=0.2;entryX=1;entryY=0.78;strokeColor=#16A34A;fontSize=12;fontColor=#166534;" parent="1" source="document_nodes" target="document_nodes" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="795" y="210" />
+              <mxPoint x="795" y="384" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-documents-chunks" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;exitX=1;exitY=0.68;entryX=0;entryY=0.45;strokeColor=#16A34A;fontSize=12;fontColor=#166534;" parent="1" source="documents" target="document_chunks" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="455" y="738" />
+              <mxPoint x="520" y="738" />
+              <mxPoint x="575" y="737" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-node-chunks" value="node_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERzeroToOne;startFill=0;endArrow=ERzeroToMany;endFill=0;exitX=0.35;exitY=1;entryX=0.35;entryY=0;strokeColor=#16A34A;fontSize=12;fontColor=#166534;" parent="1" source="document_nodes" target="document_chunks" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="642" y="540" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-parent-node-chunks" value="parent_node_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERzeroToOne;startFill=0;endArrow=ERzeroToMany;endFill=0;exitX=0.7;exitY=1;entryX=0.7;entryY=0;strokeColor=#16A34A;fontSize=12;fontColor=#166534;" parent="1" source="document_nodes" target="document_chunks" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="712" y="570" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-node-artifacts" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;exitX=1;exitY=0.62;strokeColor=#16A34A;fontSize=12;fontColor=#166534;" parent="1" source="document_nodes" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="815" y="336" />
+              <mxPoint x="815" y="480" />
+            </Array>
+            <mxPoint x="850" y="480" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-documents-artifacts" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;strokeColor=#16A34A;fontSize=12;fontColor=#166534;" parent="1" source="documents" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="520" y="840" />
+              <mxPoint x="520" y="950" />
+              <mxPoint x="815" y="950" />
+              <mxPoint x="815" y="590" />
+            </Array>
+            <mxPoint x="850" y="590" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-user-chat-sessions" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;exitX=0.5;exitY=0;entryX=0.3;entryY=0;strokeColor=#2563EB;fontSize=12;fontColor=#1D4ED8;" parent="1" source="users" target="chat_sessions" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="115" y="75" />
+              <mxPoint x="991" y="75" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-subject-chat-sessions" value="0..N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERzeroToOne;startFill=0;endArrow=ERzeroToMany;endFill=0;exitX=1;exitY=0.35;entryX=0;entryY=0.35;strokeColor=#2563EB;fontSize=12;fontColor=#1D4ED8;" parent="1" source="subjects" target="chat_sessions" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="505" y="168" />
+              <mxPoint x="505" y="85" />
+              <mxPoint x="900" y="85" />
+              <mxPoint x="900" y="160" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-chat-session-message" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#2563EB;fontSize=12;fontColor=#1D4ED8;" parent="1" source="chat_sessions" target="chat_messages" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-message-source" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#2563EB;fontSize=12;fontColor=#1D4ED8;" parent="1" source="chat_messages" target="message_source_chunks" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-chunk-source" value="1:N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;exitX=1;exitY=0.55;strokeColor=#2563EB;fontSize=12;fontColor=#1D4ED8;" parent="1" source="document_chunks" target="message_source_chunks" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1090" y="793" />
+              <mxPoint x="1090" y="710" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-user-logs" value="triggered_by" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;entryX=0.35;entryY=0;strokeColor=#F97316;fontSize=12;fontColor=#9A3412;" parent="1" target="agent_logs" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="40" y="260" />
+              <mxPoint x="20" y="260" />
+              <mxPoint x="20" y="570" />
+              <mxPoint x="105" y="570" />
+            </Array>
+            <mxPoint x="40" y="260" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-subject-logs" value="subject_id" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERone;startFill=0;endArrow=ERmany;endFill=0;exitX=1;exitY=0.9;entryX=1;entryY=0.2;strokeColor=#F97316;fontSize=12;fontColor=#9A3412;" parent="1" source="subjects" target="agent_logs" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="505" y="275" />
+              <mxPoint x="505" y="880" />
+              <mxPoint x="240" y="880" />
+              <mxPoint x="240" y="650" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="documents" target="documents">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -7,10 +7,10 @@ import com.example.teacherassistantai.entity.Document;
 import com.example.teacherassistantai.entity.DocumentChunk;
 import com.example.teacherassistantai.entity.DocumentNode;
 import com.example.teacherassistantai.entity.DocumentNodeArtifact;
+import com.example.teacherassistantai.integration.ai.AiWorkload;
 import com.example.teacherassistantai.integration.ai.DigitalOceanAiRateLimiter;
 import com.example.teacherassistantai.repository.DocumentNodeArtifactRepository;
 import com.example.teacherassistantai.repository.DocumentNodeRepository;
-import com.example.teacherassistantai.service.DocumentEnrichmentBacklogService;
 import com.example.teacherassistantai.service.InternalCitationSanitizer;
 import com.example.teacherassistantai.service.RagArtifactChatHandlerService;
 import org.junit.jupiter.api.Test;
@@ -38,8 +38,7 @@ class ReviewQuestionCompositionServiceTest {
         when(fixture.nodeRepository.findByParentIdAndNodeTypeOrderByOrderIndexAsc(10L, "chapter"))
                 .thenReturn(List.of(ch1, ch2));
         whenCompletedArtifacts(fixture, ch1, ch2);
-        when(fixture.backlogService.hasSummaryBacklog(1L)).thenReturn(false);
-        when(fixture.rateLimiter.isBackgroundPaused()).thenReturn(false);
+        when(fixture.rateLimiter.isPaused(AiWorkload.ENRICH_REVIEW_QUESTION)).thenReturn(false);
         when(fixture.handlerService.sourceChunksFromCitations(any())).thenReturn(List.of(source));
 
         ReviewQuestionCompositionService.ReviewQuestionCompositionResult result =
@@ -65,8 +64,7 @@ class ReviewQuestionCompositionServiceTest {
         when(fixture.artifactRepository.findByNodeIdsAndArtifactTypeAndStatusOrderByNodeOrderAndUpdatedAt(
                 any(), any(), any()
         )).thenReturn(List.of(artifact(ch1, 2)));
-        when(fixture.backlogService.hasSummaryBacklog(1L)).thenReturn(false);
-        when(fixture.rateLimiter.isBackgroundPaused()).thenReturn(false);
+        when(fixture.rateLimiter.isPaused(AiWorkload.ENRICH_REVIEW_QUESTION)).thenReturn(false);
         when(fixture.handlerService.sourceChunksFromCitations(any())).thenReturn(List.of());
 
         ReviewQuestionCompositionService.ReviewQuestionCompositionResult result =
@@ -92,8 +90,7 @@ class ReviewQuestionCompositionServiceTest {
         when(fixture.artifactRepository.findByNodeIdsAndArtifactTypeAndStatusOrderByNodeOrderAndUpdatedAt(
                 any(), any(), any()
         )).thenReturn(List.of());
-        when(fixture.backlogService.hasSummaryBacklog(1L)).thenReturn(false);
-        when(fixture.rateLimiter.isBackgroundPaused()).thenReturn(false);
+        when(fixture.rateLimiter.isPaused(AiWorkload.ENRICH_REVIEW_QUESTION)).thenReturn(false);
 
         ReviewQuestionCompositionService.ReviewQuestionCompositionResult result =
                 service.composeForPart(fixture.part);
@@ -121,8 +118,7 @@ class ReviewQuestionCompositionServiceTest {
         when(fixture.nodeRepository.findByParentIdAndNodeTypeOrderByOrderIndexAsc(20L, "chapter"))
                 .thenReturn(List.of(ch2));
         whenCompletedArtifacts(fixture, ch1, ch2);
-        when(fixture.backlogService.hasSummaryBacklog(1L)).thenReturn(false);
-        when(fixture.rateLimiter.isBackgroundPaused()).thenReturn(false);
+        when(fixture.rateLimiter.isPaused(AiWorkload.ENRICH_REVIEW_QUESTION)).thenReturn(false);
         when(fixture.handlerService.sourceChunksFromCitations(any())).thenReturn(List.of());
 
         ReviewQuestionCompositionService.ReviewQuestionCompositionResult result =
@@ -148,8 +144,7 @@ class ReviewQuestionCompositionServiceTest {
         when(fixture.artifactRepository.findByNodeIdsAndArtifactTypeAndStatusOrderByNodeOrderAndUpdatedAt(
                 any(), any(), any()
         )).thenReturn(List.of(artifact(ch1, 25)));
-        when(fixture.backlogService.hasSummaryBacklog(1L)).thenReturn(false);
-        when(fixture.rateLimiter.isBackgroundPaused()).thenReturn(false);
+        when(fixture.rateLimiter.isPaused(AiWorkload.ENRICH_REVIEW_QUESTION)).thenReturn(false);
         when(fixture.handlerService.sourceChunksFromCitations(any())).thenReturn(List.of());
 
         ReviewQuestionCompositionService.ReviewQuestionCompositionResult result =
@@ -160,7 +155,7 @@ class ReviewQuestionCompositionServiceTest {
     }
 
     @Test
-    void composeForPart_summaryBacklogBlocksMissingQueue() {
+    void composeForPart_summaryBacklogDoesNotBlockMissingQueue() {
         Fixture fixture = fixture();
         DocumentNode ch1 = chapter(101L, "Chương 1");
         ReviewQuestionCompositionService service = service(fixture);
@@ -170,14 +165,13 @@ class ReviewQuestionCompositionServiceTest {
         when(fixture.artifactRepository.findByNodeIdsAndArtifactTypeAndStatusOrderByNodeOrderAndUpdatedAt(
                 any(), any(), any()
         )).thenReturn(List.of());
-        when(fixture.backlogService.hasSummaryBacklog(1L)).thenReturn(true);
-        when(fixture.rateLimiter.isBackgroundPaused()).thenReturn(false);
+        when(fixture.rateLimiter.isPaused(AiWorkload.ENRICH_REVIEW_QUESTION)).thenReturn(false);
 
         ReviewQuestionCompositionService.ReviewQuestionCompositionResult result =
                 service.composeForPart(fixture.part);
 
-        assertThat(result.answer()).contains("summary sẵn sàng");
-        verify(fixture.enrichmentService, never()).enqueueChapterQuizGeneration(any());
+        assertThat(result.answer()).contains("đang được tạo theo từng chương");
+        verify(fixture.enrichmentService).enqueueChapterQuizGeneration(101L);
     }
 
     @Test
@@ -191,8 +185,7 @@ class ReviewQuestionCompositionServiceTest {
         when(fixture.artifactRepository.findByNodeIdsAndArtifactTypeAndStatusOrderByNodeOrderAndUpdatedAt(
                 any(), any(), any()
         )).thenReturn(List.of());
-        when(fixture.backlogService.hasSummaryBacklog(1L)).thenReturn(false);
-        when(fixture.rateLimiter.isBackgroundPaused()).thenReturn(true);
+        when(fixture.rateLimiter.isPaused(AiWorkload.ENRICH_REVIEW_QUESTION)).thenReturn(true);
 
         ReviewQuestionCompositionService.ReviewQuestionCompositionResult result =
                 service.composeForPart(fixture.part);
@@ -201,12 +194,56 @@ class ReviewQuestionCompositionServiceTest {
         verify(fixture.enrichmentService, never()).enqueueChapterQuizGeneration(any());
     }
 
+    @Test
+    void composeForChapter_completedArtifactRendersImmediately() {
+        Fixture fixture = fixture();
+        DocumentNode ch1 = chapter(101L, "Chương 1");
+        ReviewQuestionCompositionService service = service(fixture);
+        DocumentNodeArtifact artifact = artifact(ch1, 2);
+
+        when(fixture.artifactRepository.findLatestByNodeTypeAndStatus(
+                101L,
+                DocumentNodeArtifactType.REVIEW_QUESTION_SET,
+                DocumentNodeArtifactStatus.COMPLETED
+        )).thenReturn(List.of(artifact));
+        when(fixture.handlerService.renderQuestions(artifact.getContentJsonb(), ch1)).thenReturn("Bộ câu hỏi Chương 1");
+        when(fixture.handlerService.sourceChunksFromCitations(artifact.getContentJsonb())).thenReturn(List.of());
+
+        ReviewQuestionCompositionService.ReviewQuestionCompositionResult result =
+                service.composeForChapter(ch1);
+
+        assertThat(result.hasAnyCompletedChapter()).isTrue();
+        assertThat(result.answer()).isEqualTo("Bộ câu hỏi Chương 1");
+        verify(fixture.enrichmentService, never()).enqueueChapterQuizGeneration(any());
+    }
+
+    @Test
+    void composeForChapter_missingArtifactQueuesAndReturnsWaitMessage() {
+        Fixture fixture = fixture();
+        DocumentNode ch1 = chapter(101L, "Chương 1");
+        ReviewQuestionCompositionService service = service(fixture);
+
+        when(fixture.artifactRepository.findLatestByNodeTypeAndStatus(
+                101L,
+                DocumentNodeArtifactType.REVIEW_QUESTION_SET,
+                DocumentNodeArtifactStatus.COMPLETED
+        )).thenReturn(List.of());
+        when(fixture.rateLimiter.isPaused(AiWorkload.ENRICH_REVIEW_QUESTION)).thenReturn(false);
+
+        ReviewQuestionCompositionService.ReviewQuestionCompositionResult result =
+                service.composeForChapter(ch1);
+
+        assertThat(result.hasAnyCompletedChapter()).isFalse();
+        assertThat(result.answer()).contains("đang được tạo");
+        assertThat(result.queuedChapters()).containsExactly(ch1);
+        verify(fixture.enrichmentService).enqueueChapterQuizGeneration(101L);
+    }
+
     private ReviewQuestionCompositionService service(Fixture fixture) {
         return new ReviewQuestionCompositionService(
                 fixture.nodeRepository,
                 fixture.artifactRepository,
                 fixture.enrichmentService,
-                fixture.backlogService,
                 fixture.rateLimiter,
                 fixture.ragProperties,
                 fixture.handlerService,
@@ -271,7 +308,6 @@ class ReviewQuestionCompositionServiceTest {
                 mock(DocumentNodeRepository.class),
                 mock(DocumentNodeArtifactRepository.class),
                 mock(HierarchicalQuizEnrichmentService.class),
-                mock(DocumentEnrichmentBacklogService.class),
                 mock(DigitalOceanAiRateLimiter.class),
                 new RagProperties(),
                 mock(RagArtifactChatHandlerService.class)
@@ -326,7 +362,6 @@ class ReviewQuestionCompositionServiceTest {
             DocumentNodeRepository nodeRepository,
             DocumentNodeArtifactRepository artifactRepository,
             HierarchicalQuizEnrichmentService enrichmentService,
-            DocumentEnrichmentBacklogService backlogService,
             DigitalOceanAiRateLimiter rateLimiter,
             RagProperties ragProperties,
             RagArtifactChatHandlerService handlerService

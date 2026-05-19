@@ -7,9 +7,12 @@ import com.example.teacherassistantai.entity.Document;
 import com.example.teacherassistantai.entity.DocumentChunk;
 import com.example.teacherassistantai.entity.DocumentNode;
 import com.example.teacherassistantai.entity.DocumentNodeArtifact;
+import com.example.teacherassistantai.exception.AiRateLimitedException;
 import com.example.teacherassistantai.exception.BackgroundRateLimitedException;
+import com.example.teacherassistantai.exception.BackgroundTransientAiException;
 import com.example.teacherassistantai.exception.ResourceNotFoundException;
 import com.example.teacherassistantai.integration.ai.AiModelRoutingService;
+import com.example.teacherassistantai.integration.ai.AiWorkload;
 import com.example.teacherassistantai.integration.ai.DigitalOceanAiRateLimiter;
 import com.example.teacherassistantai.repository.DocumentNodeArtifactRepository;
 import com.example.teacherassistantai.repository.DocumentNodeRepository;
@@ -18,7 +21,6 @@ import com.example.teacherassistantai.service.DocumentEnrichmentBacklogService;
 import com.example.teacherassistantai.service.DocumentNodeArtifactGenerationContext;
 import com.example.teacherassistantai.service.DocumentNodeScopeService;
 import com.example.teacherassistantai.service.LlmDocumentNodeArtifactGenerator;
-import com.example.teacherassistantai.service.ReviewQuestionCountResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -53,15 +55,11 @@ public class HierarchicalQuizEnrichmentService {
     private final TransactionTemplate transactionTemplate;
     private final DigitalOceanAiRateLimiter rateLimiter;
     private final DocumentEnrichmentBacklogService backlogService;
-    private final ReviewQuestionCountResolver reviewQuestionCountResolver;
     private final AiModelRoutingService aiModelRoutingService;
+    private final ReviewQuestionInputResolver inputResolver;
 
     @Async("documentEnrichmentExecutor")
     public void enrichQuizPhase1(Long documentId) {
-        if (backlogService.hasSummaryBacklog(documentId)) {
-            log.info("BG Quiz Phase 1 deferred because summary backlog exists: documentId={}", documentId);
-            return;
-        }
         List<DocumentNode> smallNodes = getSmallNodes(documentId);
         log.info("BG Quiz Phase 1: {} small nodes for documentId={}", smallNodes.size(), documentId);
         enrichBatch(smallNodes, QuizGenerationStrategy.QuizInputType.RAW_CHUNKS);
@@ -79,7 +77,7 @@ public class HierarchicalQuizEnrichmentService {
     }
 
     @Async("documentEnrichmentExecutor")
-    public void enqueueChapterQuizGeneration(Long chapterNodeId) {
+    public void enqueueChapterQuizGeneration(Long chapterNodeId, boolean onDemand) {
         DocumentNode chapter = nodeRepository.findById(chapterNodeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Document node not found with id: " + chapterNodeId));
         if (!"chapter".equalsIgnoreCase(String.valueOf(chapter.getNodeType()))) {
@@ -88,16 +86,36 @@ public class HierarchicalQuizEnrichmentService {
         }
         Long documentId = chapter.getDocument() == null ? null : chapter.getDocument().getId();
         if (documentId != null && backlogService.hasSummaryBacklog(documentId)) {
-            log.info("BG Quiz: chapter enqueue deferred because summary backlog exists: nodeId={}", chapter.getId());
-            return;
+            log.debug("BG Quiz: summary backlog exists but review question enrichment remains independent: nodeId={}",
+                    chapter.getId());
         }
-        if (rateLimiter.isBackgroundPaused()) {
-            log.info("BG Quiz: chapter enqueue deferred because background is paused: nodeId={}", chapter.getId());
+        if (!onDemand && rateLimiter.isPaused(AiWorkload.ENRICH_REVIEW_QUESTION)) {
+            log.info("BG Quiz: chapter enqueue deferred because review question enrichment is paused: nodeId={}", chapter.getId());
             return;
         }
         DocumentNodeScopeService.NodeScope scope = nodeScopeService.getScope(chapter.getId());
         QuizGenerationStrategy.QuizInputType inputType = strategy.determine(chapter, scope.chunks().size());
-        enrichQuizWithLock(chapter, inputType);
+        if (onDemand) {
+            enrichQuizWithLockOnDemand(chapter, inputType);
+        } else {
+            enrichQuizWithLock(chapter, inputType);
+        }
+    }
+
+    private QuizArtifactOutcome enrichQuizWithLockOnDemand(DocumentNode node, QuizGenerationStrategy.QuizInputType inputType) {
+        String lock = "artifact-lock:" + node.getId() + ":REVIEW_QUESTION_SET";
+        if (!Boolean.TRUE.equals(redisTemplate.opsForValue().setIfAbsent(lock, "od", Duration.ofMinutes(5)))) {
+            log.debug("On-demand Quiz: skipping nodeId={} — lock held", node.getId());
+            return QuizArtifactOutcome.SKIPPED;
+        }
+        try {
+            if (artifactCompleted(node.getId())) {
+                return QuizArtifactOutcome.COMPLETED;
+            }
+            return generateAndSaveQuizArtifactInternal(node, inputType, false, true);
+        } finally {
+            redisTemplate.delete(lock);
+        }
     }
 
     private void enrichBatch(List<DocumentNode> nodes, QuizGenerationStrategy.QuizInputType inputType) {
@@ -145,8 +163,8 @@ public class HierarchicalQuizEnrichmentService {
     }
 
     private QuizArtifactOutcome enrichQuizWithLock(DocumentNode node, QuizGenerationStrategy.QuizInputType inputType) {
-        if (rateLimiter.isBackgroundPaused()) {
-            log.info("BG Quiz: background paused, stopping before lock acquire for nodeId={}", node.getId());
+        if (rateLimiter.isPaused(AiWorkload.ENRICH_REVIEW_QUESTION)) {
+            log.info("BG Quiz: review question enrichment paused, stopping before lock acquire for nodeId={}", node.getId());
             return QuizArtifactOutcome.RATE_LIMITED;
         }
         String lock = "artifact-lock:" + node.getId() + ":REVIEW_QUESTION_SET";
@@ -160,20 +178,34 @@ public class HierarchicalQuizEnrichmentService {
                 log.debug("BG Quiz: skipping nodeId={} — already COMPLETED", node.getId());
                 return QuizArtifactOutcome.COMPLETED;
             }
-            return generateAndSaveQuizArtifactInternal(node, inputType);
+            return generateAndSaveQuizArtifactInternal(node, inputType, false, false);
         } finally {
             redisTemplate.delete(lock);
         }
     }
 
     public QuizArtifactOutcome generateAndSaveQuizArtifact(DocumentNode node, QuizGenerationStrategy.QuizInputType inputType) {
-        return generateAndSaveQuizArtifactInternal(node, inputType);
+        return generateAndSaveQuizArtifactInternal(node, inputType, false, false);
     }
 
-    private QuizArtifactOutcome generateAndSaveQuizArtifactInternal(DocumentNode node, QuizGenerationStrategy.QuizInputType inputType) {
-        DocumentNodeScopeService.NodeScope scope = nodeScopeService.getScope(node.getId());
+    public QuizArtifactOutcome generateAndSaveQuizArtifact(DocumentNode node,
+                                                           QuizGenerationStrategy.QuizInputType inputType,
+                                                           boolean forceRegenerate) {
+        return generateAndSaveQuizArtifactInternal(node, inputType, forceRegenerate, false);
+    }
+
+    public QuizArtifactOutcome generateAndSaveQuizArtifactOnDemand(DocumentNode node,
+                                                                   QuizGenerationStrategy.QuizInputType inputType) {
+        return generateAndSaveQuizArtifactInternal(node, inputType, false, true);
+    }
+
+    private QuizArtifactOutcome generateAndSaveQuizArtifactInternal(DocumentNode node,
+                                                                    QuizGenerationStrategy.QuizInputType inputType,
+                                                                    boolean forceRegenerate,
+                                                                    boolean isOnDemand) {
+        ReviewQuestionGenerationContext reviewContext = inputResolver.resolve(node);
         Document document = loadDocument(node);
-        String sourceHash = scope.sourceHash();
+        String sourceHash = reviewContext.sourceHash();
         String promptVersion = ragProperties.getEnrichment().getPromptVersion();
         String model = aiModelRoutingService.enrichmentModelFor(DocumentNodeArtifactType.REVIEW_QUESTION_SET);
 
@@ -182,32 +214,38 @@ public class HierarchicalQuizEnrichmentService {
                         node.getId(), DocumentNodeArtifactType.REVIEW_QUESTION_SET,
                         promptVersion, model, sourceHash)
                 .orElse(null);
-        if (existing != null && existing.getStatus() == DocumentNodeArtifactStatus.COMPLETED) {
+        if (!forceRegenerate && existing != null && existing.getStatus() == DocumentNodeArtifactStatus.COMPLETED) {
             return QuizArtifactOutcome.COMPLETED;
         }
 
-        List<DocumentChunk> chunks = selectChunks(node, inputType, scope);
-        if (chunks.isEmpty()) {
-            log.warn("BG Quiz: no chunks for nodeId={}, skipping", node.getId());
+        if (!reviewContext.hasUsableContext()) {
+            log.warn("BG Quiz: no usable review question context for nodeId={}, skipping", node.getId());
             return QuizArtifactOutcome.SKIPPED;
         }
 
         existing = upsert(existing, document, node, promptVersion, model, sourceHash,
                 DocumentNodeArtifactStatus.RUNNING, Map.of(), null, null);
 
+        AiWorkload workloadOverride = isOnDemand ? AiWorkload.ENRICH_REVIEW_QUESTION_ONDEMAND : null;
         try {
-            ReviewQuestionCountResolver.CountRange questionCountRange = reviewQuestionCountResolver.resolve(node.getNodeType());
             DocumentNodeArtifactGenerationContext context = new DocumentNodeArtifactGenerationContext(
-                    document, node, DocumentNodeArtifactType.REVIEW_QUESTION_SET,
-                    chunks, sourceHash, promptVersion, model,
-                    questionCountRange.min(),
-                    questionCountRange.max(),
-                    ragProperties.getEnrichment().getMaxNodeContextChars()
+                    document,
+                    node,
+                    DocumentNodeArtifactType.REVIEW_QUESTION_SET,
+                    reviewContext.allowedCitationChunks(),
+                    sourceHash,
+                    promptVersion,
+                    model,
+                    reviewContext.minQuestionCount(),
+                    reviewContext.maxQuestionCount(),
+                    ragProperties.getEnrichment().getMaxNodeContextChars(),
+                    reviewContext,
+                    workloadOverride
             );
             var result = generator.generate(context);
             upsert(existing, document, node, promptVersion, model, sourceHash,
                     DocumentNodeArtifactStatus.COMPLETED, result.contentJsonb(), null, result.tokenCount());
-            log.info("BG Quiz: COMPLETED nodeId={} inputType={}", node.getId(), inputType);
+            log.info("BG Quiz: COMPLETED nodeId={} inputType={} isOnDemand={}", node.getId(), inputType, isOnDemand);
             return QuizArtifactOutcome.COMPLETED;
         } catch (BackgroundRateLimitedException ex) {
             log.info("Artifact RATE_LIMITED nodeId={} until={}", node.getId(), ex.getPausedUntil());
@@ -217,32 +255,64 @@ public class HierarchicalQuizEnrichmentService {
             upsert(existing, document, node, promptVersion, model, sourceHash,
                     DocumentNodeArtifactStatus.RATE_LIMITED, content, ex.getMessage(), null);
             return QuizArtifactOutcome.RATE_LIMITED;
+        } catch (AiRateLimitedException ex) {
+            log.info("Artifact RATE_LIMITED (ondemand) nodeId={}", node.getId());
+            Map<String, Object> content = new java.util.LinkedHashMap<>();
+            content.put("errorType", "RATE_LIMIT");
+            upsert(existing, document, node, promptVersion, model, sourceHash,
+                    DocumentNodeArtifactStatus.RATE_LIMITED, content, ex.getMessage(), null);
+            return QuizArtifactOutcome.RATE_LIMITED;
+        } catch (BackgroundTransientAiException ex) {
+            log.info("Artifact retryable transient AI error nodeId={} errorType={}", node.getId(), ex.getErrorType());
+            upsert(existing, document, node, promptVersion, model, sourceHash,
+                    DocumentNodeArtifactStatus.RATE_LIMITED, transientContent(ex), ex.getMessage(), null);
+            return QuizArtifactOutcome.RATE_LIMITED;
         } catch (Exception ex) {
+            if (isRedisFactoryStoppedError(ex)) {
+                log.info("BG Quiz: Redis factory stopped during generation, marking RATE_LIMITED for retry: nodeId={}", node.getId());
+                Map<String, Object> content = new java.util.LinkedHashMap<>();
+                content.put("errorType", "REDIS_UNAVAILABLE");
+                content.put("error", ex.getMessage());
+                upsert(existing, document, node, promptVersion, model, sourceHash,
+                        DocumentNodeArtifactStatus.RATE_LIMITED, content, ex.getMessage(), null);
+                return QuizArtifactOutcome.RATE_LIMITED;
+            }
             log.warn("BG Quiz: generation failed for nodeId={}", node.getId(), ex);
             upsert(existing, document, node, promptVersion, model, sourceHash,
-                    DocumentNodeArtifactStatus.FAILED, Map.of("error", String.valueOf(ex.getMessage())),
+                    DocumentNodeArtifactStatus.FAILED, failureContent(ex),
                     ex.getMessage(), null);
             return QuizArtifactOutcome.FAILED;
         }
     }
 
-    private List<DocumentChunk> selectChunks(DocumentNode node,
-                                              QuizGenerationStrategy.QuizInputType inputType,
-                                              DocumentNodeScopeService.NodeScope scope) {
-        if (inputType == QuizGenerationStrategy.QuizInputType.RAW_CHUNKS) {
-            return limitedChunks(scope.chunks());
+    private boolean isRedisFactoryStoppedError(Throwable ex) {
+        Throwable cause = ex;
+        for (int depth = 0; cause != null && depth < 5; depth++) {
+            String msg = cause.getMessage();
+            if (msg != null && msg.contains("STOPPED")) {
+                return true;
+            }
+            cause = cause.getCause();
         }
-        List<DocumentNode> children = nodeRepository.findByParentIdOrderByOrderIndexAsc(node.getId());
-        if (children.isEmpty()) {
-            return limitedChunks(scope.chunks());
+        return false;
+    }
+
+    private Map<String, Object> failureContent(Exception ex) {
+        Map<String, Object> content = new java.util.LinkedHashMap<>();
+        String message = ex == null ? null : ex.getMessage();
+        if (message != null && message.toLowerCase(java.util.Locale.ROOT).contains("json")) {
+            content.put("errorType", "INVALID_JSON");
         }
-        int perChild = Math.max(1, ragProperties.getEnrichment().getRepresentativeSectionChunks());
-        List<DocumentChunk> result = new ArrayList<>();
-        for (DocumentNode child : children) {
-            List<DocumentChunk> childChunks = nodeScopeService.getScope(child.getId()).chunks();
-            result.addAll(childChunks.stream().limit(perChild).toList());
-        }
-        return result.stream().limit(ragProperties.getEnrichment().getMaxNodeChunks()).toList();
+        content.put("error", String.valueOf(message));
+        return content;
+    }
+
+    private Map<String, Object> transientContent(BackgroundTransientAiException ex) {
+        Map<String, Object> content = new java.util.LinkedHashMap<>();
+        content.put("errorType", ex.getErrorType() == null ? "TRANSIENT_AI_ERROR" : ex.getErrorType());
+        content.put("retryAfter", ex.getRetryAfter() == null ? null : ex.getRetryAfter().toString());
+        content.put("message", ex.getMessage());
+        return content;
     }
 
     private DocumentNodeArtifact upsert(DocumentNodeArtifact existing,

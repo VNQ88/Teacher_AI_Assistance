@@ -4,7 +4,9 @@ import com.example.teacherassistantai.common.response.ResponseData;
 import com.example.teacherassistantai.dto.request.RagDebugRetrieveRequest;
 import com.example.teacherassistantai.dto.response.RagDebugRetrieveResponse;
 import com.example.teacherassistantai.entity.ChatSession;
+import com.example.teacherassistantai.exception.InvalidDataException;
 import com.example.teacherassistantai.service.ChatSessionService;
+import com.example.teacherassistantai.service.SubjectService;
 import com.example.teacherassistantai.service.VectorRetrievalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,13 +30,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class RagDebugController {
 
     private final ChatSessionService chatSessionService;
+    private final SubjectService subjectService;
     private final VectorRetrievalService vectorRetrievalService;
 
     @PostMapping("/debug-retrieve")
-    @PreAuthorize("hasAnyAuthority('STUDENT', 'TEACHER', 'ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
     @Operation(summary = "Debug RAG retrieval", description = "Return candidates, parent groups, selected chunks, scores, and prompt context preview")
     public ResponseData<RagDebugRetrieveResponse> debugRetrieve(@RequestBody @Valid RagDebugRetrieveRequest request) {
         ChatSession session = chatSessionService.getOwnedSession(request.getSessionId());
+        if (session.getSubject() == null) {
+            throw new InvalidDataException("Session has no associated subject");
+        }
+        subjectService.validateSubjectOwnershipById(session.getSubject().getId());
         RagDebugRetrieveResponse response = vectorRetrievalService.debugRetrieve(
                 session,
                 request.getQuestion(),

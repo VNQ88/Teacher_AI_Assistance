@@ -4,6 +4,7 @@ package com.example.teacherassistantai.controller;
 import com.example.teacherassistantai.common.response.PageResponse;
 import com.example.teacherassistantai.common.response.ResponseData;
 import com.example.teacherassistantai.dto.request.ChangePasswordRequest;
+import com.example.teacherassistantai.dto.request.CreateUserRequest;
 import com.example.teacherassistantai.dto.request.UpdateUserRequest;
 import com.example.teacherassistantai.dto.response.UserResponse;
 import com.example.teacherassistantai.service.UserService;
@@ -26,6 +27,15 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @Operation(summary = "Create user", description = "Admin creates a new user with a specified role")
+    @PostMapping
+    public ResponseData<?> createUser(@RequestBody @Valid CreateUserRequest request) {
+        log.info("Request create user, email={}, role={}", request.getEmail(), request.getRole());
+        UserResponse user = userService.createUser(request);
+        return new ResponseData<>(HttpStatus.CREATED.value(), "User created successfully", user);
+    }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Get user detail", description = "Send a request via this API to get user information")
@@ -73,7 +83,7 @@ public class UserController {
         return new ResponseData<>(HttpStatus.OK.value(), "Update user role to teacher successful");
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{userId}")
     @Operation(summary = "Update user information", description = "Send a request via this API to update user information")
     public ResponseData<?> updateUser(@PathVariable @Min(1) long userId,

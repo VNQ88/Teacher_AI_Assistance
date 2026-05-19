@@ -10,6 +10,7 @@ import com.example.teacherassistantai.repository.DocumentNodeArtifactRepository;
 import com.example.teacherassistantai.service.DocumentNodeScopeService;
 import com.example.teacherassistantai.service.RagArtifactChatHandlerService;
 import com.example.teacherassistantai.service.quiz.HierarchicalQuizEnrichmentService;
+import com.example.teacherassistantai.service.quiz.HierarchicalQuizEnrichmentService.QuizArtifactOutcome;
 import com.example.teacherassistantai.service.quiz.QuizGenerationStrategy;
 import com.example.teacherassistantai.service.quiz.ReviewQuestionCompositionService;
 import org.junit.jupiter.api.Test;
@@ -124,6 +125,10 @@ class QuizAgentTest {
                 .thenReturn(new DocumentNodeScopeService.NodeScope(fixture.node(), List.of(source), "hash"));
         when(strategy.determine(fixture.node(), 1))
                 .thenReturn(QuizGenerationStrategy.QuizInputType.RAW_CHUNKS);
+        when(enrichmentService.generateAndSaveQuizArtifact(
+                fixture.node(),
+                QuizGenerationStrategy.QuizInputType.RAW_CHUNKS
+        )).thenReturn(QuizArtifactOutcome.COMPLETED);
         when(handlerService.renderQuestions(fixture.content(), fixture.node())).thenReturn("Bộ câu hỏi mới");
         when(handlerService.sourceChunksFromCitations(fixture.content())).thenReturn(List.of(source));
 
@@ -203,6 +208,37 @@ class QuizAgentTest {
     }
 
     @Test
+    void execute_chapterUsesCompositionFlow() {
+        ReviewQuestionCompositionService compositionService = mock(ReviewQuestionCompositionService.class);
+        DocumentNode chapter = node(600L, "chapter", "Chương 1");
+        QuizAgent quizAgent = new QuizAgent(
+                mock(DocumentNodeArtifactRepository.class),
+                mock(RagArtifactChatHandlerService.class),
+                mock(DocumentNodeScopeService.class),
+                mock(QuizGenerationStrategy.class),
+                mock(HierarchicalQuizEnrichmentService.class),
+                mock(RedisTemplate.class),
+                compositionService
+        );
+
+        when(compositionService.composeForChapter(chapter)).thenReturn(
+                new ReviewQuestionCompositionService.ReviewQuestionCompositionResult(
+                        "Bộ câu hỏi Chương 1",
+                        List.of(),
+                        List.of(),
+                        List.of(),
+                        true,
+                        true
+                )
+        );
+
+        AgentResult result = quizAgent.execute(state(chapter));
+
+        assertThat(result.answer()).isEqualTo("Bộ câu hỏi Chương 1");
+        verify(compositionService).composeForChapter(chapter);
+    }
+
+    @Test
     void execute_supportNodesAreRejected() {
         QuizAgent quizAgent = new QuizAgent(
                 mock(DocumentNodeArtifactRepository.class),
@@ -232,7 +268,7 @@ class QuizAgentTest {
                 .title("Giáo trình")
                 .build();
         document.setId(10L);
-        DocumentNode node = node(100L, "chapter", "Chương 1");
+        DocumentNode node = node(100L, "section", "Mục 1");
         node.setDocument(document);
         DocumentNodeArtifact artifact = DocumentNodeArtifact.builder()
                 .documentNode(node)

@@ -49,11 +49,10 @@ public class DocumentController {
     @Operation(summary = "Upload document", description = "Upload PDF/DOCX/TXT document and trigger async processing")
     public ResponseData<DocumentResponse> uploadDocument(@RequestPart("file") MultipartFile file,
                                                          @RequestParam("subjectId") @Min(1) Long subjectId,
-                                                         @RequestParam(value = "classroomId", required = false) @Min(1) Long classroomId,
                                                          @RequestParam(value = "title", required = false) String title,
                                                          @RequestParam(value = "description", required = false) String description) {
-        log.info("Upload document: subjectId={}, classroomId={}, originalName={}", subjectId, classroomId, file.getOriginalFilename());
-        DocumentResponse response = documentService.uploadDocument(file, subjectId, classroomId, title, description);
+        log.info("Upload document: subjectId={}, originalName={}", subjectId, file.getOriginalFilename());
+        DocumentResponse response = documentService.uploadDocument(file, subjectId, title, description);
         return new ResponseData<>(HttpStatus.CREATED.value(), "Document uploaded", response);
     }
 

@@ -4,6 +4,10 @@ import com.example.teacherassistantai.common.enumerate.DocumentNodeArtifactType;
 import com.example.teacherassistantai.entity.DocumentChunk;
 import com.example.teacherassistantai.entity.DocumentNode;
 import com.example.teacherassistantai.exception.InvalidDataException;
+import com.example.teacherassistantai.service.quiz.QuizInputMode;
+import com.example.teacherassistantai.service.quiz.ReviewQuestionCoverage;
+import com.example.teacherassistantai.service.quiz.ReviewQuestionGenerationContext;
+import com.example.teacherassistantai.service.quiz.ReviewQuestionSourceMode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -87,6 +91,26 @@ public class DocumentEnrichmentArtifactValidationService {
         return content;
     }
 
+    public Map<String, Object> parseAndValidateReviewQuestions(String rawResponse,
+                                                               ReviewQuestionGenerationContext context) {
+        JsonNode root = normalizeArtifactJson(DocumentNodeArtifactType.REVIEW_QUESTION_SET, readJsonObject(rawResponse));
+        validateReviewQuestions(root, context);
+        Map<String, Object> content = toMap(root);
+        normalizeReviewQuestionCount(DocumentNodeArtifactType.REVIEW_QUESTION_SET, content);
+        content.putIfAbsent("nodeTitle", context.node().getTitle());
+        content.putIfAbsent("sectionPath", context.node().getSectionPath());
+        content.putIfAbsent("nodeType", context.node().getNodeType());
+        content.put("inputMode", context.inputMode().name());
+        content.put("coverage", reviewCoverageMetadata(context.coverage()));
+        content.put("childSummaryRefs", childSummaryRefs(context.childSummaries()));
+        content.put("summaryBasedTargetCount", context.summaryBasedTargetCount());
+        content.put("representativeTargetCount", context.representativeTargetCount());
+        content.put("requestedQuestionMinCount", context.minQuestionCount());
+        content.put("requestedQuestionMaxCount", context.maxQuestionCount());
+        content.put("generated", true);
+        return content;
+    }
+
     private JsonNode normalizeArtifactJson(DocumentNodeArtifactType artifactType, JsonNode root) {
         if (!(root instanceof ObjectNode objectNode)) {
             return root;
@@ -135,7 +159,7 @@ public class DocumentEnrichmentArtifactValidationService {
         }
         String json = extractJsonObject(rawResponse);
         try {
-            JsonNode node = objectMapper.readTree(json);
+            JsonNode node = objectMapper.readTree(escapeRawControlCharsInsideStrings(json));
             if (!node.isObject()) {
                 throw new InvalidDataException("LLM response must be a JSON object");
             }
@@ -156,11 +180,73 @@ public class DocumentEnrichmentArtifactValidationService {
         }
 
         int start = value.indexOf('{');
-        int end = value.lastIndexOf('}');
-        if (start < 0 || end <= start) {
+        if (start < 0) {
             throw new InvalidDataException("LLM response does not contain a JSON object");
         }
-        return value.substring(start, end + 1);
+        boolean inString = false;
+        boolean escaped = false;
+        int depth = 0;
+        for (int i = start; i < value.length(); i++) {
+            char current = value.charAt(i);
+            if (escaped) {
+                escaped = false;
+                continue;
+            }
+            if (current == '\\' && inString) {
+                escaped = true;
+                continue;
+            }
+            if (current == '"') {
+                inString = !inString;
+                continue;
+            }
+            if (inString) {
+                continue;
+            }
+            if (current == '{') {
+                depth++;
+            } else if (current == '}') {
+                depth--;
+                if (depth == 0) {
+                    return value.substring(start, i + 1);
+                }
+            }
+        }
+        throw new InvalidDataException("LLM response does not contain a balanced JSON object");
+    }
+
+    private String escapeRawControlCharsInsideStrings(String json) {
+        StringBuilder output = new StringBuilder(json.length());
+        boolean inString = false;
+        boolean escaped = false;
+        for (int i = 0; i < json.length(); i++) {
+            char current = json.charAt(i);
+            if (escaped) {
+                output.append(current);
+                escaped = false;
+                continue;
+            }
+            if (current == '\\' && inString) {
+                output.append(current);
+                escaped = true;
+                continue;
+            }
+            if (current == '"') {
+                output.append(current);
+                inString = !inString;
+                continue;
+            }
+            if (inString && current == '\n') {
+                output.append("\\n");
+            } else if (inString && current == '\r') {
+                output.append("\\n");
+            } else if (inString && current == '\t') {
+                output.append("\\t");
+            } else {
+                output.append(current);
+            }
+        }
+        return output.toString();
     }
 
     private void validateSummary(JsonNode root,
@@ -195,12 +281,48 @@ public class DocumentEnrichmentArtifactValidationService {
 
         Set<Long> validChunkIds = validChunkIds(scopeChunks);
         for (int i = 0; i < questions.size(); i++) {
-            validateQuestion(questions.get(i), validChunkIds, i + 1);
+            validateQuestion(questions.get(i), validChunkIds, i + 1, false);
         }
     }
 
-    private void validateQuestion(JsonNode question, Set<Long> validChunkIds, int questionNumber) {
+    private void validateReviewQuestions(JsonNode root, ReviewQuestionGenerationContext context) {
+        JsonNode questions = root.path("questions");
+        if (!questions.isArray() || questions.isEmpty()) {
+            throw new InvalidDataException("Review question set must contain questions array");
+        }
+
+        int actualCount = questions.size();
+        if (hasEnoughContext(context) && (actualCount < context.minQuestionCount() || actualCount > context.maxQuestionCount())) {
+            throw new InvalidDataException("Question count must be between %d and %d"
+                    .formatted(context.minQuestionCount(), context.maxQuestionCount()));
+        }
+        if (actualCount > context.maxQuestionCount()) {
+            throw new InvalidDataException("Question count exceeds max " + context.maxQuestionCount());
+        }
+
+        boolean requireSourceMode = context.inputMode() == QuizInputMode.MIXED_CHILD_SUMMARIES_AND_REPRESENTATIVE_CHUNKS;
+        Set<Long> validChunkIds = validChunkIds(context.allowedCitationChunks());
+        for (int i = 0; i < questions.size(); i++) {
+            validateQuestion(questions.get(i), validChunkIds, i + 1, requireSourceMode);
+        }
+    }
+
+    private void validateQuestion(JsonNode question,
+                                  Set<Long> validChunkIds,
+                                  int questionNumber,
+                                  boolean requireSourceMode) {
         String prefix = "Question " + questionNumber + ": ";
+        String sourceMode = optionalText(question, "sourceMode");
+        if (requireSourceMode && !StringUtils.hasText(sourceMode)) {
+            throw new InvalidDataException(prefix + "sourceMode is required");
+        }
+        if (StringUtils.hasText(sourceMode)) {
+            try {
+                ReviewQuestionSourceMode.valueOf(sourceMode.toUpperCase(Locale.ROOT));
+            } catch (IllegalArgumentException ex) {
+                throw new InvalidDataException(prefix + "unsupported sourceMode " + sourceMode, ex);
+            }
+        }
         String type = requireText(question, "type", prefix + "type is required").toUpperCase(Locale.ROOT);
         if (!QUESTION_TYPES.contains(type)) {
             throw new InvalidDataException(prefix + "unsupported type " + type);
@@ -243,6 +365,9 @@ public class DocumentEnrichmentArtifactValidationService {
 
     private void validateCitations(JsonNode citations, Set<Long> validChunkIds, String fieldName) {
         if (!citations.isArray() || citations.isEmpty()) {
+            if (validChunkIds.isEmpty()) {
+                return;
+            }
             throw new InvalidDataException(fieldName + " must contain at least one citation");
         }
         for (JsonNode citation : citations) {
@@ -418,6 +543,48 @@ public class DocumentEnrichmentArtifactValidationService {
             }
         }
         return chars >= ENOUGH_CONTEXT_CHARS;
+    }
+
+    private boolean hasEnoughContext(ReviewQuestionGenerationContext context) {
+        int chars = 0;
+        for (DocumentChunk chunk : context.allowedCitationChunks()) {
+            if (chunk != null && chunk.getContent() != null) {
+                chars += chunk.getContent().length();
+            }
+        }
+        for (ChildSummary childSummary : context.childSummaries()) {
+            if (childSummary != null && childSummary.summary() != null) {
+                chars += childSummary.summary().length();
+            }
+        }
+        return chars >= ENOUGH_CONTEXT_CHARS;
+    }
+
+    private Map<String, Object> reviewCoverageMetadata(ReviewQuestionCoverage coverage) {
+        if (coverage == null) {
+            return Map.of();
+        }
+        Map<String, Object> metadata = new java.util.LinkedHashMap<>();
+        metadata.put("expectedChildCount", coverage.expectedChildCount());
+        metadata.put("usedChildSummaryCount", coverage.usedChildSummaryCount());
+        metadata.put("fallbackChildCount", coverage.fallbackChildCount());
+        metadata.put("representativeChildCount", coverage.representativeChildCount());
+        metadata.put("rawChunkCount", coverage.rawChunkCount());
+        metadata.put("allowedCitationChunkCount", coverage.allowedCitationChunkCount());
+        metadata.put("complete", coverage.complete());
+        return metadata;
+    }
+
+    private List<Map<String, Object>> childSummaryRefs(List<ChildSummary> childSummaries) {
+        return (childSummaries == null ? List.<ChildSummary>of() : childSummaries).stream()
+                .map(summary -> {
+                    Map<String, Object> ref = new java.util.LinkedHashMap<>();
+                    ref.put("nodeId", summary.nodeId());
+                    ref.put("artifactId", summary.artifactId());
+                    ref.put("sourceHash", summary.sourceHash());
+                    return ref;
+                })
+                .toList();
     }
 
     private int safeSize(List<?> values) {
