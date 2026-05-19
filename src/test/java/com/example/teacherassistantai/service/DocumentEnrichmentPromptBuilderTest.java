@@ -154,7 +154,7 @@ class DocumentEnrichmentPromptBuilderTest {
                 "hash"
         );
 
-        String prompt = promptBuilder.buildReviewQuestionPrompt(context);
+        String prompt = promptBuilder.buildReviewQuestionPrompt(fixture.document(), context);
 
         assertThat(prompt).contains("Khoang 12 cau");
         assertThat(prompt).contains("Khoang 13 cau");

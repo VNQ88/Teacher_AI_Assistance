@@ -3,7 +3,7 @@ package com.example.teacherassistantai.service;
 import com.example.teacherassistantai.entity.Role;
 import com.example.teacherassistantai.entity.Subject;
 import com.example.teacherassistantai.entity.User;
-import com.example.teacherassistantai.exception.InvalidDataException;
+import com.example.teacherassistantai.exception.AccessDeniedOperationException;
 import com.example.teacherassistantai.repository.SubjectRepository;
 import com.example.teacherassistantai.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -84,7 +84,7 @@ class SubjectServiceDeleteTest {
         when(userRepository.findByEmail("other@mail.com")).thenReturn(Optional.of(user(8L, "other@mail.com", "TEACHER")));
         when(subjectRepository.findById(subjectId)).thenReturn(Optional.of(subject));
 
-        assertThrows(InvalidDataException.class, () -> subjectService.deleteSubject(subjectId));
+        assertThrows(AccessDeniedOperationException.class, () -> subjectService.deleteSubject(subjectId));
 
         verify(subjectRepository, never()).delete(subject);
     }

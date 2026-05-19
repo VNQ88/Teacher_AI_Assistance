@@ -125,7 +125,7 @@ class QuizAgentTest {
                 .thenReturn(new DocumentNodeScopeService.NodeScope(fixture.node(), List.of(source), "hash"));
         when(strategy.determine(fixture.node(), 1))
                 .thenReturn(QuizGenerationStrategy.QuizInputType.RAW_CHUNKS);
-        when(enrichmentService.generateAndSaveQuizArtifact(
+        when(enrichmentService.generateAndSaveQuizArtifactOnDemand(
                 fixture.node(),
                 QuizGenerationStrategy.QuizInputType.RAW_CHUNKS
         )).thenReturn(QuizArtifactOutcome.COMPLETED);
@@ -136,7 +136,7 @@ class QuizAgentTest {
 
         assertThat(result.answer()).isEqualTo("Bộ câu hỏi mới");
         assertThat(result.sources()).containsExactly(source);
-        verify(enrichmentService).generateAndSaveQuizArtifact(
+        verify(enrichmentService).generateAndSaveQuizArtifactOnDemand(
                 fixture.node(),
                 QuizGenerationStrategy.QuizInputType.RAW_CHUNKS
         );
@@ -208,12 +208,21 @@ class QuizAgentTest {
     }
 
     @Test
-    void execute_chapterUsesCompositionFlow() {
+    void execute_chapterUsesNodeLevelArtifactFlow() {
+        DocumentNodeArtifactRepository artifactRepository = mock(DocumentNodeArtifactRepository.class);
+        RagArtifactChatHandlerService handlerService = mock(RagArtifactChatHandlerService.class);
         ReviewQuestionCompositionService compositionService = mock(ReviewQuestionCompositionService.class);
         DocumentNode chapter = node(600L, "chapter", "Chương 1");
+        Map<String, Object> content = Map.of("questions", List.of(Map.of("question", "Câu hỏi?")));
+        DocumentNodeArtifact artifact = DocumentNodeArtifact.builder()
+                .documentNode(chapter)
+                .artifactType(DocumentNodeArtifactType.REVIEW_QUESTION_SET)
+                .status(DocumentNodeArtifactStatus.COMPLETED)
+                .contentJsonb(content)
+                .build();
         QuizAgent quizAgent = new QuizAgent(
-                mock(DocumentNodeArtifactRepository.class),
-                mock(RagArtifactChatHandlerService.class),
+                artifactRepository,
+                handlerService,
                 mock(DocumentNodeScopeService.class),
                 mock(QuizGenerationStrategy.class),
                 mock(HierarchicalQuizEnrichmentService.class),
@@ -221,21 +230,18 @@ class QuizAgentTest {
                 compositionService
         );
 
-        when(compositionService.composeForChapter(chapter)).thenReturn(
-                new ReviewQuestionCompositionService.ReviewQuestionCompositionResult(
-                        "Bộ câu hỏi Chương 1",
-                        List.of(),
-                        List.of(),
-                        List.of(),
-                        true,
-                        true
-                )
-        );
+        when(artifactRepository.findLatestByNodeTypeAndStatus(
+                600L,
+                DocumentNodeArtifactType.REVIEW_QUESTION_SET,
+                DocumentNodeArtifactStatus.COMPLETED
+        )).thenReturn(List.of(artifact));
+        when(handlerService.renderQuestions(content, chapter)).thenReturn("Bộ câu hỏi Chương 1");
+        when(handlerService.sourceChunksFromCitations(content)).thenReturn(List.of());
 
         AgentResult result = quizAgent.execute(state(chapter));
 
         assertThat(result.answer()).isEqualTo("Bộ câu hỏi Chương 1");
-        verify(compositionService).composeForChapter(chapter);
+        verify(compositionService, never()).composeForChapter(chapter);
     }
 
     @Test

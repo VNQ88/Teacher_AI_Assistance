@@ -23,7 +23,11 @@ class RagPropertiesTest {
             assertThat(properties.getAi().getEmbeddingModel()).isEqualTo("qwen3-embedding-0.6b");
             assertThat(properties.getAi().getEnrichment().getSummaryModel()).isEqualTo("openai-gpt-5-mini");
             assertThat(properties.getAi().getEnrichment().getReviewQuestionModel()).isEqualTo("openai-gpt-oss-120b");
+            assertThat(properties.getAi().getEnrichment().getOnDemandReviewQuestionModel()).isEqualTo("gemma-4-31B-it");
+            assertThat(properties.getAi().getEnrichment().getOnDemandTimeoutSeconds()).isEqualTo(120);
             assertThat(properties.getEnrichment().getMaxDirectOriginalSummaryChars()).isEqualTo(2_000);
+            assertThat(properties.getEnrichment().getMaxConcurrency()).isEqualTo(6);
+            assertThat(properties.getEnrichment().getIntraDocumentConcurrency()).isEqualTo(6);
             assertThat(properties.getEnrichment().getReviewQuestionMixedInput().isEnabled()).isTrue();
             assertThat(properties.getEnrichment().getReviewQuestionMixedInput().getSummaryTargetRatio()).isEqualTo(0.5);
             assertThat(properties.getEnrichment().getReviewQuestionMixedInput().getMaxChildSummaryChars()).isEqualTo(2_000);
@@ -47,6 +51,9 @@ class RagPropertiesTest {
                         "application.rag.ai.enrichment.api-key=test-key",
                         "application.rag.ai.enrichment.summary-model=test-summary",
                         "application.rag.ai.enrichment.review-question-model=test-question",
+                        "application.rag.ai.api-key=rag-key",
+                        "application.rag.ai.enrichment.ondemand-review-question-model=ondemand-test",
+                        "application.rag.ai.enrichment.ondemand-timeout-seconds=90",
                         "application.rag.enrichment.max-direct-original-summary-chars=1500",
                         "application.rag.enrichment.review-question-mixed-input.enabled=false",
                         "application.rag.enrichment.review-question-mixed-input.summary-target-ratio=0.4",
@@ -68,6 +75,9 @@ class RagPropertiesTest {
                     assertThat(properties.getAi().getEnrichment().getApiKey()).isEqualTo("test-key");
                     assertThat(properties.getAi().getEnrichment().getSummaryModel()).isEqualTo("test-summary");
                     assertThat(properties.getAi().getEnrichment().getReviewQuestionModel()).isEqualTo("test-question");
+                    assertThat(properties.getAi().getApiKey()).isEqualTo("rag-key");
+                    assertThat(properties.getAi().getEnrichment().getOnDemandReviewQuestionModel()).isEqualTo("ondemand-test");
+                    assertThat(properties.getAi().getEnrichment().getOnDemandTimeoutSeconds()).isEqualTo(90);
                     assertThat(properties.getEnrichment().getMaxDirectOriginalSummaryChars()).isEqualTo(1500);
                     assertThat(properties.getEnrichment().getReviewQuestionMixedInput().isEnabled()).isFalse();
                     assertThat(properties.getEnrichment().getReviewQuestionMixedInput().getSummaryTargetRatio()).isEqualTo(0.4);

@@ -137,7 +137,6 @@ application:
         chapter:
           min: 12
           max: 30
-      review-question-requests-per-minute: 10
       review-question-resume-batch-size: 10
       review-question-composition:
         max-questions-per-chapter-in-part: 5
@@ -147,8 +146,8 @@ application:
         max-missing-queue-per-request: 10
       max-node-chunks: 120
       max-node-context-chars: 60000
-      max-concurrency: 3
-      intra-document-concurrency: 4
+      max-concurrency: 6
+      intra-document-concurrency: 6
       auto-retry-on-partial-failed: true
       auto-retry-delay-minutes: 35
       auto-retry-max-attempts: 3
@@ -159,6 +158,7 @@ application:
       chapter-summary-max-key-points: 10
     ai:
       base-url: ${DIGITALOCEAN_RAG_BASE_URL:${DIGITALOCEAN_BASE_URL}}
+      api-key: ${DIGITALOCEAN_RAG_MODEL_ACCESS_KEY}
       chat-model: ${DIGITALOCEAN_RAG_CHAT_MODEL:${DIGITALOCEAN_CHAT_MODEL}}
       embedding-model: ${DIGITALOCEAN_EMBEDDING_MODEL}
       timeout-seconds: 80
@@ -167,7 +167,9 @@ application:
         api-key: ${DIGITALOCEAN_ENRICHMENT_MODEL_ACCESS_KEY}
         summary-model: ${DIGITALOCEAN_ENRICH_SUMMARY_MODEL:deepseek-3.2}
         review-question-model: ${DIGITALOCEAN_ENRICH_REVIEW_QUESTION_MODEL:openai-gpt-oss-120b}
+        ondemand-review-question-model: ${DIGITALOCEAN_ONDEMAND_REVIEW_QUESTION_MODEL:gemma-4-31B-it}
         timeout-seconds: 150
+        ondemand-timeout-seconds: 120
         pause-all-on-429: true
       rate-limit:
         enabled: true

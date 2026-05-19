@@ -20,6 +20,8 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -75,7 +77,7 @@ class ReviewQuestionCompositionServiceTest {
         assertThat(result.missingChapters()).containsExactly(ch2);
         assertThat(result.queuedChapters()).containsExactly(ch2);
         assertThat(result.answer()).contains("Các chương sau đang được tạo thêm câu hỏi");
-        verify(fixture.enrichmentService).enqueueChapterQuizGeneration(102L);
+        verify(fixture.enrichmentService).enqueueChapterQuizGeneration(102L, true);
     }
 
     @Test
@@ -97,8 +99,8 @@ class ReviewQuestionCompositionServiceTest {
 
         assertThat(result.hasAnyCompletedChapter()).isFalse();
         assertThat(result.answer()).contains("đang được tạo theo từng chương");
-        verify(fixture.enrichmentService).enqueueChapterQuizGeneration(101L);
-        verify(fixture.enrichmentService).enqueueChapterQuizGeneration(102L);
+        verify(fixture.enrichmentService).enqueueChapterQuizGeneration(101L, true);
+        verify(fixture.enrichmentService).enqueueChapterQuizGeneration(102L, true);
     }
 
     @Test
@@ -171,11 +173,11 @@ class ReviewQuestionCompositionServiceTest {
                 service.composeForPart(fixture.part);
 
         assertThat(result.answer()).contains("đang được tạo theo từng chương");
-        verify(fixture.enrichmentService).enqueueChapterQuizGeneration(101L);
+        verify(fixture.enrichmentService).enqueueChapterQuizGeneration(101L, true);
     }
 
     @Test
-    void composeForPart_ratePauseBlocksMissingQueue() {
+    void composeForPart_ratePauseStillQueuesMissingChapterOnDemand() {
         Fixture fixture = fixture();
         DocumentNode ch1 = chapter(101L, "Chương 1");
         ReviewQuestionCompositionService service = service(fixture);
@@ -191,7 +193,8 @@ class ReviewQuestionCompositionServiceTest {
                 service.composeForPart(fixture.part);
 
         assertThat(result.answer()).contains("tạm dừng do giới hạn AI");
-        verify(fixture.enrichmentService, never()).enqueueChapterQuizGeneration(any());
+        assertThat(result.queuedChapters()).containsExactly(ch1);
+        verify(fixture.enrichmentService).enqueueChapterQuizGeneration(101L, true);
     }
 
     @Test
@@ -214,7 +217,7 @@ class ReviewQuestionCompositionServiceTest {
 
         assertThat(result.hasAnyCompletedChapter()).isTrue();
         assertThat(result.answer()).isEqualTo("Bộ câu hỏi Chương 1");
-        verify(fixture.enrichmentService, never()).enqueueChapterQuizGeneration(any());
+        verify(fixture.enrichmentService, never()).enqueueChapterQuizGeneration(anyLong(), anyBoolean());
     }
 
     @Test
@@ -236,7 +239,7 @@ class ReviewQuestionCompositionServiceTest {
         assertThat(result.hasAnyCompletedChapter()).isFalse();
         assertThat(result.answer()).contains("đang được tạo");
         assertThat(result.queuedChapters()).containsExactly(ch1);
-        verify(fixture.enrichmentService).enqueueChapterQuizGeneration(101L);
+        verify(fixture.enrichmentService).enqueueChapterQuizGeneration(101L, true);
     }
 
     private ReviewQuestionCompositionService service(Fixture fixture) {

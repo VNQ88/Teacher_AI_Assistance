@@ -62,14 +62,25 @@ public class HierarchicalQuizEnrichmentService {
     public void enrichQuizPhase1(Long documentId) {
         List<DocumentNode> smallNodes = getSmallNodes(documentId);
         log.info("BG Quiz Phase 1: {} small nodes for documentId={}", smallNodes.size(), documentId);
-        enrichBatch(smallNodes, QuizGenerationStrategy.QuizInputType.RAW_CHUNKS);
+        if (enrichBatch(smallNodes, QuizGenerationStrategy.QuizInputType.RAW_CHUNKS)) {
+            log.info("BG Quiz: skipping phases 2/3 because phase 1 reached rate limit: documentId={}", documentId);
+            return;
+        }
+        enrichQuizPhase2And3Internal(documentId);
     }
 
     @Async("documentEnrichmentExecutor")
     public void enrichQuizPhase2And3(Long documentId) {
+        enrichQuizPhase2And3Internal(documentId);
+    }
+
+    private void enrichQuizPhase2And3Internal(Long documentId) {
         List<DocumentNode> largeNodes = getLargeNonChapterNodes(documentId);
         log.info("BG Quiz Phase 2: {} large non-chapter nodes for documentId={}", largeNodes.size(), documentId);
-        enrichBatch(largeNodes, QuizGenerationStrategy.QuizInputType.CHILD_SUMMARIES);
+        if (enrichBatch(largeNodes, QuizGenerationStrategy.QuizInputType.CHILD_SUMMARIES)) {
+            log.info("BG Quiz: skipping phase 3 because phase 2 reached rate limit: documentId={}", documentId);
+            return;
+        }
 
         List<DocumentNode> chapters = getChapterNodes(documentId);
         log.info("BG Quiz Phase 3: {} chapter nodes for documentId={}", chapters.size(), documentId);
@@ -118,8 +129,8 @@ public class HierarchicalQuizEnrichmentService {
         }
     }
 
-    private void enrichBatch(List<DocumentNode> nodes, QuizGenerationStrategy.QuizInputType inputType) {
-        if (nodes.isEmpty()) return;
+    private boolean enrichBatch(List<DocumentNode> nodes, QuizGenerationStrategy.QuizInputType inputType) {
+        if (nodes.isEmpty()) return false;
         int concurrency = ragProperties.getEnrichment().getMaxConcurrency();
         Semaphore semaphore = new Semaphore(concurrency);
         AtomicBoolean stopBatch = new AtomicBoolean(false);
@@ -160,6 +171,7 @@ public class HierarchicalQuizEnrichmentService {
                 Thread.currentThread().interrupt();
             }
         }
+        return stopBatch.get();
     }
 
     private QuizArtifactOutcome enrichQuizWithLock(DocumentNode node, QuizGenerationStrategy.QuizInputType inputType) {
@@ -207,7 +219,7 @@ public class HierarchicalQuizEnrichmentService {
         Document document = loadDocument(node);
         String sourceHash = reviewContext.sourceHash();
         String promptVersion = ragProperties.getEnrichment().getPromptVersion();
-        String model = aiModelRoutingService.enrichmentModelFor(DocumentNodeArtifactType.REVIEW_QUESTION_SET);
+        String model = aiModelRoutingService.reviewQuestionModelFor(isOnDemand);
 
         DocumentNodeArtifact existing = artifactRepository
                 .findByDocumentNodeIdAndArtifactTypeAndPromptVersionAndModelAndSourceHash(

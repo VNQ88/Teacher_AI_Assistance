@@ -16,8 +16,16 @@ public class AiModelRoutingService {
 
     public AiModelRoute route(AiWorkload workload) {
         if (workload == AiWorkload.ENRICH_REVIEW_QUESTION_ONDEMAND) {
-            // Uses enrichment client (120s timeout) but stores RAG_CHAT workload so rate limiter uses 180/min bucket.
-            return enrichmentRoute(AiWorkload.RAG_CHAT, ragProperties.getAi().getEnrichment().getReviewQuestionModel());
+            // On-demand: RAG account/key, dedicated on-demand model, RAG_CHAT bucket (180/min), raw HTTP client for explicit model + timeout.
+            RagProperties.Ai ai = ragProperties.getAi();
+            return new AiModelRoute(
+                    AiWorkload.RAG_CHAT,
+                    ACCOUNT_RAG,
+                    ai.getBaseUrl(),
+                    ai.getApiKey(),
+                    ai.getEnrichment().getOnDemandReviewQuestionModel(),
+                    true
+            );
         }
         AiWorkload normalized = workload == null ? AiWorkload.RAG_CHAT : workload.normalized();
         RagProperties.Ai ai = ragProperties.getAi();
@@ -53,6 +61,11 @@ public class AiModelRoutingService {
             return ragProperties.getAi().getEnrichment().getReviewQuestionModel();
         }
         return ragProperties.getAi().getChatModel();
+    }
+
+    public String reviewQuestionModelFor(boolean isOnDemand) {
+        RagProperties.Ai.EnrichmentAi enrichment = ragProperties.getAi().getEnrichment();
+        return isOnDemand ? enrichment.getOnDemandReviewQuestionModel() : enrichment.getReviewQuestionModel();
     }
 
     private AiModelRoute enrichmentRoute(AiWorkload workload, String model) {

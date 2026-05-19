@@ -49,6 +49,8 @@ public class RagProperties {
         @NotBlank
         private String baseUrl = "https://inference.do-ai.run";
 
+        private String apiKey = "";
+
         @NotBlank
         private String chatModel = "openai-gpt-oss-120b";
 
@@ -113,8 +115,14 @@ public class RagProperties {
             @NotBlank
             private String reviewQuestionModel = "openai-gpt-oss-120b";
 
+            @NotBlank
+            private String onDemandReviewQuestionModel = "gemma-4-31B-it";
+
             @Min(1)
             private int timeoutSeconds = 120;
+
+            @Min(1)
+            private int onDemandTimeoutSeconds = 120;
 
             private boolean pauseAllOn429 = false;
         }
@@ -142,9 +150,6 @@ public class RagProperties {
         private Map<String, ReviewQuestionCountRange> reviewQuestionCounts = defaultReviewQuestionCounts();
 
         @Min(1)
-        private int reviewQuestionRequestsPerMinute = 10;
-
-        @Min(1)
         private int reviewQuestionResumeBatchSize = 10;
 
         private ReviewQuestionComposition reviewQuestionComposition = new ReviewQuestionComposition();
@@ -160,10 +165,10 @@ public class RagProperties {
         private int maxNodeContextChars = 60_000;
 
         @Min(1)
-        private int maxConcurrency = 3;
+        private int maxConcurrency = 6;
 
         @Min(1)
-        private int intraDocumentConcurrency = 4;
+        private int intraDocumentConcurrency = 6;
 
         private boolean autoRetryOnPartialFailed = true;
 

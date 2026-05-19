@@ -38,12 +38,14 @@ public class DigitalOceanEnrichmentChatClient {
     }
 
     public AiChatCompletion complete(String prompt, Double temperature, AiModelRoute route) {
-        RagProperties.Ai.EnrichmentAi enrichment = ragProperties.getAi().getEnrichment();
-        if (!StringUtils.hasText(enrichment.getApiKey())) {
-            throw new InvalidDataException("DigitalOcean enrichment API key is not configured");
+        if (!StringUtils.hasText(route.apiKey())) {
+            throw new InvalidDataException("API key is not configured for route: accountAlias=" + route.accountAlias());
         }
-
-        RestClient restClient = restClient(route.baseUrl(), enrichment.getApiKey(), enrichment.getTimeoutSeconds());
+        RagProperties.Ai.EnrichmentAi enrichment = ragProperties.getAi().getEnrichment();
+        int timeoutSeconds = AiModelRoutingService.ACCOUNT_RAG.equals(route.accountAlias())
+                ? enrichment.getOnDemandTimeoutSeconds()
+                : enrichment.getTimeoutSeconds();
+        RestClient restClient = restClient(route.baseUrl(), route.apiKey(), timeoutSeconds);
         Map<String, Object> body = Map.of(
                 "model", route.model(),
                 "messages", List.of(Map.of("role", "user", "content", prompt)),

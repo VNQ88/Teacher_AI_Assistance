@@ -18,7 +18,6 @@ public class DigitalOceanAiRateLimiter {
     private static final String ENRICHMENT_ALL_MODELS = "__ALL__";
     private static final String PREFIX_TOTAL_MIN = "ai:rl:total:min:";
     private static final String PREFIX_TOTAL_HOUR = "ai:rl:total:hour:";
-    private static final String PREFIX_REVIEW_QUESTION_MIN = "ai:rl:req:min:ENRICH_REVIEW_QUESTION:";
 
     private final RedisTemplate<String, String> redisTemplate;
     private final RagProperties ragProperties;
@@ -48,9 +47,6 @@ public class DigitalOceanAiRateLimiter {
         if (normalized.enrichment()) {
             checkEnrichmentNotPaused(normalized, accountAlias, model);
             checkTokenSnapshotThreshold(normalized, accountAlias, model, cfg);
-            if (normalized == AiWorkload.ENRICH_REVIEW_QUESTION) {
-                checkReviewQuestionRequestCap(cfg);
-            }
             log.debug("AI limiter acquire workload={} accountAlias={} model={}", normalized, accountAlias, model);
             return;
         }
@@ -158,19 +154,6 @@ public class DigitalOceanAiRateLimiter {
                     snapshot.remainingTokensPerMinute(), snapshot.remainingTokensPerDay());
             throw new BackgroundRateLimitedException(until);
         });
-    }
-
-    private void checkReviewQuestionRequestCap(RagProperties.Ai.RateLimit cfg) {
-        int cap = ragProperties.getEnrichment().getReviewQuestionRequestsPerMinute();
-        String key = PREFIX_REVIEW_QUESTION_MIN + epochMinute();
-        long current = parseLong(redisTemplate.opsForValue().get(key));
-        if (current >= cap) {
-            long waitMs = msUntilNextMinute();
-            log.info("AI limiter review question minute wait waitMs={}", waitMs);
-            sleep(waitMs);
-            key = PREFIX_REVIEW_QUESTION_MIN + epochMinute();
-        }
-        incr(key, 90);
     }
 
     private void pause(AiWorkload workload, String accountAlias, String model, Instant until) {

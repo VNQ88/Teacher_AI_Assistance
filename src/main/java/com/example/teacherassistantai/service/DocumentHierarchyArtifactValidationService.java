@@ -4,7 +4,6 @@ import com.example.teacherassistantai.entity.Document;
 import com.example.teacherassistantai.exception.InvalidDataException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -14,7 +13,6 @@ import java.util.List;
 import java.util.Locale;
 
 @Service
-@Slf4j
 public class DocumentHierarchyArtifactValidationService {
 
     private static final int LONG_HEADING_THRESHOLD = 180;
@@ -43,10 +41,6 @@ public class DocumentHierarchyArtifactValidationService {
         validateGeneratedChunks(document, artifacts.chunks(), warnings);
 
         ValidationReport report = new ValidationReport(errors.size(), warnings.size(), List.copyOf(errors), List.copyOf(warnings));
-        if (!warnings.isEmpty()) {
-            log.warn("Document hierarchy artifact validation warnings: documentId={}, warningCount={}, warnings={}",
-                    document.getId(), warnings.size(), warnings);
-        }
         if (!errors.isEmpty()) {
             throw new InvalidDataException("Invalid hierarchy artifacts for document id=%s: %s"
                     .formatted(document.getId(), String.join("; ", errors)));
