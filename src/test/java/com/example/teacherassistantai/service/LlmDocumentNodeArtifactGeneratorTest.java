@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -195,6 +196,62 @@ class LlmDocumentNodeArtifactGeneratorTest {
 
         assertThat(calls).hasValue(1);
         assertThat(result.tokenCount()).isEqualTo(30);
+    }
+
+    @Test
+    void generateSummary_documentModeUsesDocumentPrompt() {
+        LlmDocumentNodeArtifactGenerator generator = generator(new AiChatGateway() {
+            @Override
+            public String generateAnswer(String prompt, Double temperature, AiWorkload workload) {
+                throw new AssertionError("generate should be used");
+            }
+
+            @Override
+            public AiChatCompletion generate(String prompt, Double temperature, AiWorkload workload) {
+                assertThat(workload).isEqualTo(AiWorkload.ENRICH_SUMMARY);
+                assertThat(prompt).contains("Tao summary document/mon hoc");
+                assertThat(prompt).contains("Khong chi liet ke part/chapter");
+                assertThat(prompt).contains("summaryMode bat buoc: DOCUMENT_FROM_CHAPTERS");
+                return new AiChatCompletion("""
+                        {
+                          "summaryMode": "DOCUMENT_FROM_CHAPTERS",
+                          "summary": "Tóm tắt toàn bộ tài liệu.",
+                          "keyPoints": ["Ý chính tài liệu"],
+                          "citations": []
+                        }
+                        """, null, null, "summary-model", workload);
+            }
+        });
+        Fixture fixture = fixture();
+        DocumentNode documentRoot = DocumentNode.builder()
+                .document(fixture.document())
+                .nodeType("document")
+                .title("Giáo trình")
+                .sectionPath("Giáo trình")
+                .build();
+        documentRoot.setId(99L);
+
+        DocumentNodeArtifactGenerationResult result = generator.generateSummary(new SummaryGenerationContext(
+                fixture.document(),
+                documentRoot,
+                SummaryMode.DOCUMENT_FROM_CHAPTERS,
+                List.of(),
+                List.of(new ChildSummary(
+                        101L,
+                        "chapter",
+                        "Chương 1",
+                        "Chương 1",
+                        901L,
+                        "hash-1",
+                        "Tóm tắt chương 1.",
+                        List.of(Map.of("chunkId", 200L))
+                )),
+                new SummaryCoverage(1, 1, List.of(), 0, 0, true)
+        ));
+
+        assertThat(result.contentJsonb()).containsEntry("summaryMode", SummaryMode.DOCUMENT_FROM_CHAPTERS.name());
+        assertThat(result.contentJsonb()).containsEntry("summary", "Tóm tắt toàn bộ tài liệu.");
+        assertThat(result.contentJsonb()).containsEntry("nodeType", "document");
     }
 
     @Test

@@ -50,9 +50,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Slf4j
 public class DocumentEnrichmentService {
 
-    private static final Set<String> ENRICHABLE_NODE_TYPES = Set.of("part", "chapter", "section", "subsection", "subsection_level2");
+    private static final Set<String> ENRICHABLE_NODE_TYPES = Set.of("document", "part", "chapter", "section", "subsection", "subsection_level2");
     private static final Set<String> NON_CONTENT_REVIEW_QUESTION_NODE_TYPES = Set.of("document", "summary", "review_questions");
-    private static final List<String> SUMMARY_NODE_ORDER = List.of("subsection_level2", "subsection", "section", "chapter", "part");
+    private static final List<String> SUMMARY_NODE_ORDER = List.of("subsection_level2", "subsection", "section", "chapter", "part", "document");
     private static final String PHASE_4_GENERATOR_MISSING =
             "Artifact generation is not available until Phase 4 prompt/LLM generator is implemented";
 
@@ -468,8 +468,19 @@ public class DocumentEnrichmentService {
             case "section" -> sectionSummaryInput(document, node);
             case "chapter" -> chapterSummaryInput(document, node);
             case "part" -> parentSummaryInput(document, node, "chapter", SummaryMode.PART_FROM_CHAPTERS, SummaryMode.PART_FALLBACK);
+            case "document" -> documentSummaryInput(document, node);
             default -> chunksSummaryInput(document, node, SummaryMode.CHAPTER_FALLBACK);
         };
+    }
+
+    private SummaryInput documentSummaryInput(Document document, DocumentNode node) {
+        if (!directChildrenOfType(node, "part").isEmpty()) {
+            return parentSummaryInput(document, node, "part", SummaryMode.DOCUMENT_FROM_PARTS, SummaryMode.DOCUMENT_FALLBACK);
+        }
+        if (!directChildrenOfType(node, "chapter").isEmpty()) {
+            return parentSummaryInput(document, node, "chapter", SummaryMode.DOCUMENT_FROM_CHAPTERS, SummaryMode.DOCUMENT_FALLBACK);
+        }
+        return chunksSummaryInput(document, node, SummaryMode.DOCUMENT_FALLBACK);
     }
 
     private SummaryInput chapterSummaryInput(Document document, DocumentNode node) {

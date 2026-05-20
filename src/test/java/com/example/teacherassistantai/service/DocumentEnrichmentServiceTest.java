@@ -651,6 +651,124 @@ class DocumentEnrichmentServiceTest {
     }
 
     @Test
+    void enrichNode_documentSummary_prefersPartSummariesWhenPartsExist() {
+        Fixture fixture = fixture();
+        DocumentNode documentRoot = node(fixture.document(), 240L, "document", "Giáo trình", null);
+        DocumentNode part = node(fixture.document(), 241L, "part", "Phần I", documentRoot);
+        DocumentNode chapter = node(fixture.document(), 242L, "chapter", "Chương trực tiếp", documentRoot);
+        List<SummaryGenerationContext> contexts = new ArrayList<>();
+        DocumentEnrichmentService service = service(List.of(summaryContextGenerator(contexts)));
+        mockDocument(fixture.document());
+        when(documentNodeRepository.findById(documentRoot.getId())).thenReturn(Optional.of(documentRoot));
+        when(documentNodeRepository.findByParentIdOrderByOrderIndexAsc(documentRoot.getId()))
+                .thenReturn(List.of(part, chapter));
+        when(artifactRepository.findLatestCompletedSummaryByNodeId(
+                part.getId(),
+                ragProperties.getEnrichment().getPromptVersion(),
+                ragProperties.getAi().getChatModel()
+        )).thenReturn(Optional.of(completedSummaryArtifact(fixture.document(), part, "Tóm tắt phần")));
+        when(artifactRepository.findByDocumentNodeIdAndArtifactTypeAndPromptVersionAndModelAndSourceHash(
+                anyLong(), any(), any(), any(), any()))
+                .thenReturn(Optional.empty());
+        when(artifactRepository.save(any(DocumentNodeArtifact.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        service.enrichNode(documentRoot.getId(), false, List.of(DocumentNodeArtifactType.SUMMARY));
+
+        assertThat(contexts).hasSize(1);
+        assertThat(contexts.getFirst().summaryMode()).isEqualTo(SummaryMode.DOCUMENT_FROM_PARTS);
+        assertThat(contexts.getFirst().childSummaries()).hasSize(1);
+        assertThat(contexts.getFirst().childSummaries().getFirst().nodeId()).isEqualTo(part.getId());
+        verify(artifactRepository, never()).findLatestCompletedSummaryByNodeId(
+                eq(chapter.getId()),
+                anyString(),
+                anyString()
+        );
+    }
+
+    @Test
+    void enrichNode_documentSummary_usesChapterSummariesWhenNoPartsExist() {
+        Fixture fixture = fixture();
+        DocumentNode documentRoot = node(fixture.document(), 250L, "document", "Giáo trình", null);
+        DocumentNode chapterOne = node(fixture.document(), 251L, "chapter", "Chương 1", documentRoot);
+        DocumentNode chapterTwo = node(fixture.document(), 252L, "chapter", "Chương 2", documentRoot);
+        List<SummaryGenerationContext> contexts = new ArrayList<>();
+        DocumentEnrichmentService service = service(List.of(summaryContextGenerator(contexts)));
+        mockDocument(fixture.document());
+        when(documentNodeRepository.findById(documentRoot.getId())).thenReturn(Optional.of(documentRoot));
+        when(documentNodeRepository.findByParentIdOrderByOrderIndexAsc(documentRoot.getId()))
+                .thenReturn(List.of(chapterOne, chapterTwo));
+        when(artifactRepository.findLatestCompletedSummaryByNodeId(
+                chapterOne.getId(),
+                ragProperties.getEnrichment().getPromptVersion(),
+                ragProperties.getAi().getChatModel()
+        )).thenReturn(Optional.of(completedSummaryArtifact(fixture.document(), chapterOne, "Tóm tắt chương 1")));
+        when(artifactRepository.findLatestCompletedSummaryByNodeId(
+                chapterTwo.getId(),
+                ragProperties.getEnrichment().getPromptVersion(),
+                ragProperties.getAi().getChatModel()
+        )).thenReturn(Optional.of(completedSummaryArtifact(fixture.document(), chapterTwo, "Tóm tắt chương 2")));
+        when(artifactRepository.findByDocumentNodeIdAndArtifactTypeAndPromptVersionAndModelAndSourceHash(
+                anyLong(), any(), any(), any(), any()))
+                .thenReturn(Optional.empty());
+        when(artifactRepository.save(any(DocumentNodeArtifact.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        service.enrichNode(documentRoot.getId(), false, List.of(DocumentNodeArtifactType.SUMMARY));
+
+        assertThat(contexts).hasSize(1);
+        assertThat(contexts.getFirst().summaryMode()).isEqualTo(SummaryMode.DOCUMENT_FROM_CHAPTERS);
+        assertThat(contexts.getFirst().childSummaries())
+                .extracting(ChildSummary::nodeId)
+                .containsExactly(chapterOne.getId(), chapterTwo.getId());
+    }
+
+    @Test
+    void enrichNode_documentSummary_usesFallbackRawChunksWhenChapterSummaryIsMissing() {
+        Fixture fixture = fixture();
+        DocumentNode documentRoot = node(fixture.document(), 260L, "document", "Giáo trình", null);
+        DocumentNode chapterOne = node(fixture.document(), 261L, "chapter", "Chương 1", documentRoot);
+        DocumentNode chapterTwo = node(fixture.document(), 262L, "chapter", "Chương 2", documentRoot);
+        DocumentChunk fallbackChunk = chunk(fixture.document(), chapterTwo, 263L, "Nội dung fallback chương 2");
+        List<SummaryGenerationContext> contexts = new ArrayList<>();
+        DocumentEnrichmentService service = service(List.of(summaryContextGenerator(contexts)));
+        mockDocument(fixture.document());
+        when(documentNodeRepository.findById(documentRoot.getId())).thenReturn(Optional.of(documentRoot));
+        when(documentNodeRepository.findByParentIdOrderByOrderIndexAsc(documentRoot.getId()))
+                .thenReturn(List.of(chapterOne, chapterTwo));
+        when(artifactRepository.findLatestCompletedSummaryByNodeId(
+                chapterOne.getId(),
+                ragProperties.getEnrichment().getPromptVersion(),
+                ragProperties.getAi().getChatModel()
+        )).thenReturn(Optional.of(completedSummaryArtifact(fixture.document(), chapterOne, "Tóm tắt chương 1")));
+        when(artifactRepository.findLatestCompletedSummaryByNodeId(
+                chapterTwo.getId(),
+                ragProperties.getEnrichment().getPromptVersion(),
+                ragProperties.getAi().getChatModel()
+        )).thenReturn(Optional.empty());
+        when(documentChunkRepository.findByDocumentIdAndNodeIdOrderBySourceOrderAsc(
+                fixture.document().getId(),
+                chapterTwo.getId()
+        )).thenReturn(List.of(fallbackChunk));
+        when(artifactRepository.findByDocumentNodeIdAndArtifactTypeAndPromptVersionAndModelAndSourceHash(
+                anyLong(), any(), any(), any(), any()))
+                .thenReturn(Optional.empty());
+        when(artifactRepository.save(any(DocumentNodeArtifact.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        service.enrichNode(documentRoot.getId(), false, List.of(DocumentNodeArtifactType.SUMMARY));
+
+        SummaryGenerationContext context = contexts.getFirst();
+        assertThat(context.summaryMode()).isEqualTo(SummaryMode.DOCUMENT_FROM_CHAPTERS);
+        assertThat(context.childSummaries()).hasSize(1);
+        assertThat(context.fallbackRawChunks()).containsKey(chapterTwo.getId());
+        assertThat(context.fallbackRawChunks().get(chapterTwo.getId())).containsExactly(fallbackChunk);
+        assertThat(context.coverage().expectedChildCount()).isEqualTo(2);
+        assertThat(context.coverage().usedChildCount()).isEqualTo(1);
+        assertThat(context.coverage().fallbackChildCount()).isEqualTo(1);
+    }
+
+    @Test
     void enrichNode_chapterSummary_fallsBackToSubsectionSummariesWhenNoSections() {
         Fixture fixture = fixture();
         DocumentNode chapter = node(fixture.document(), 230L, "chapter", "Chương 1", null);

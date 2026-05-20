@@ -141,6 +141,27 @@ public class DocumentEnrichmentPromptBuilder {
         return prompt.toString();
     }
 
+    public String buildDocumentSummaryPrompt(SummaryGenerationContext context) {
+        StringBuilder prompt = basePrompt(context.document(), context.node());
+        prompt.append("Nhiem vu: Tao summary document/mon hoc theo huong bottom-up.\n");
+        prompt.append("Yeu cau rieng:\n");
+        prompt.append("- Viet bang tieng Viet.\n");
+        prompt.append("- Tong hop toan bo tai lieu/mon hoc tu child summaries duoc cung cap; voi part/chapter thieu summary, tu rut y chinh tu raw chunks fallback.\n");
+        prompt.append("- Khong chi liet ke part/chapter; phai neu duoc mach noi dung, chu de trung tam, cac giai doan hoac nhom y lon cua tai lieu.\n");
+        prompt.append("- Truong 'summary' phai gom 2-3 doan, moi doan 4-6 cau, bao quat toan bo tai lieu.\n");
+        prompt.append("- Output gom 8-12 keyPoints, moi keyPoint mo ta mot y lon co noi dung cu the.\n");
+        prompt.append("- Neu input co nhieu chapter, phan anh du cac chapter o muc khai quat; khong bo sot child summary nao va khong bo sot muc fallback nao.\n");
+        prompt.append("- Khong them kien thuc ngoai input.\n");
+        prompt.append("- Backend se tu them metadata node, coverage va child summary refs; khong can sinh cac field do.\n");
+        prompt.append("- Chi tra ve mot JSON object hop le, khong boc trong markdown/code fence.\n\n");
+        appendSummarySchema(prompt, context, "2-3 doan tong quan, moi doan 4-6 cau + 8-12 y chinh");
+        appendSummaryInputMetadata(prompt, context);
+        appendChildSummaries(prompt, context.childSummaries());
+        appendFallbackRawChunks(prompt, context.fallbackRawChunks());
+        appendContext(prompt, context.directChunks());
+        return prompt.toString();
+    }
+
     public String buildReviewQuestionPrompt(Document document,
                                             DocumentNode node,
                                             List<DocumentChunk> chunks,

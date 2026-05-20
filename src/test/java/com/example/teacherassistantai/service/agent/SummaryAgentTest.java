@@ -187,6 +187,27 @@ class SummaryAgentTest {
         verify(outlineSummaryRenderer, never()).render(part);
     }
 
+    @Test
+    void execute_documentPrefersCompletedArtifactBeforeOutlineSummary() {
+        DocumentNode document = node(40L, "document", "Giáo trình", "Giáo trình");
+        DocumentChunk source = chunk(100L);
+        DocumentNodeArtifact artifact = DocumentNodeArtifact.builder()
+                .documentNode(document)
+                .artifactType(DocumentNodeArtifactType.SUMMARY)
+                .contentJsonb(Map.of("summary", "Tóm tắt nội dung thật của tài liệu."))
+                .build();
+        when(artifactRepository.findLatestCompletedSummaryByNodeId(40L)).thenReturn(Optional.of(artifact));
+        when(handlerService.renderSummary(artifact.getContentJsonb(), document))
+                .thenReturn("Tóm tắt Giáo trình:\n\nTóm tắt nội dung thật của tài liệu.");
+        when(handlerService.sourceChunksFromCitations(artifact.getContentJsonb())).thenReturn(List.of(source));
+
+        AgentResult result = summaryAgent.execute(state(document));
+
+        assertThat(result.answer()).contains("Tóm tắt nội dung thật của tài liệu.");
+        assertThat(result.sources()).containsExactly(source);
+        verify(outlineSummaryRenderer, never()).render(document);
+    }
+
     private RagChatState state(DocumentNode node) {
         return RagChatState.builder()
                 .resolvedNode(node)

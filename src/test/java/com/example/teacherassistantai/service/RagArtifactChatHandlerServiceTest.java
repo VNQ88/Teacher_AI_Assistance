@@ -116,6 +116,59 @@ class RagArtifactChatHandlerServiceTest {
     }
 
     @Test
+    void handle_rendersDocumentSummaryWithKeyPointsAndChildSummaries() {
+        RagScopeResolverService scopeResolverService = mock(RagScopeResolverService.class);
+        DocumentNodeArtifactRepository artifactRepository = mock(DocumentNodeArtifactRepository.class);
+        DocumentChunkRepository chunkRepository = mock(DocumentChunkRepository.class);
+        DocumentEnrichmentService documentEnrichmentService = mock(DocumentEnrichmentService.class);
+        RagArtifactChatHandlerService handlerService = new RagArtifactChatHandlerService(
+                scopeResolverService,
+                artifactRepository,
+                chunkRepository,
+                documentEnrichmentService,
+                new InternalCitationSanitizer()
+        );
+        DocumentNode node = documentNode();
+        DocumentNodeArtifact artifact = DocumentNodeArtifact.builder()
+                .documentNode(node)
+                .artifactType(DocumentNodeArtifactType.SUMMARY)
+                .status(DocumentNodeArtifactStatus.COMPLETED)
+                .contentJsonb(Map.of(
+                        "summaryMode", "DOCUMENT_FROM_CHAPTERS",
+                        "summary", "Tổng quan toàn bộ tài liệu.",
+                        "keyPoints", List.of("Ý chính tài liệu A", "Ý chính tài liệu B"),
+                        "childSummaries", List.of(
+                                Map.of(
+                                        "title", "Chương 1",
+                                        "summary", "Nội dung khái quát của chương 1."
+                                ),
+                                Map.of(
+                                        "title", "Chương 2",
+                                        "summary", "Nội dung khái quát của chương 2."
+                                )
+                        ),
+                        "citations", List.of()
+                ))
+                .build();
+
+        when(scopeResolverService.resolve(any(), eq("Tóm tắt nội dung môn học"))).thenReturn(Optional.of(node));
+        when(artifactRepository.findLatestByNodeTypeAndStatus(400L, DocumentNodeArtifactType.SUMMARY, DocumentNodeArtifactStatus.COMPLETED))
+                .thenReturn(List.of(artifact));
+
+        RagArtifactChatHandlerService.ArtifactChatResult result =
+                handlerService.handle(new ChatSession(), "Tóm tắt nội dung môn học", RagChatIntent.SECTION_SUMMARY);
+
+        assertThat(result.artifactHit()).isTrue();
+        assertThat(result.answer()).contains("Tóm tắt Giáo trình");
+        assertThat(result.answer()).contains("Tổng quan toàn bộ tài liệu.");
+        assertThat(result.answer()).contains("Các ý chính:");
+        assertThat(result.answer()).contains("Ý chính tài liệu A");
+        assertThat(result.answer()).contains("Các nội dung chính:");
+        assertThat(result.answer()).contains("Chương 1: Nội dung khái quát của chương 1.");
+        assertThat(result.answer()).contains("Chương 2: Nội dung khái quát của chương 2.");
+    }
+
+    @Test
     void handle_returnsClearFallbackWhenArtifactIsMissing() {
         RagScopeResolverService scopeResolverService = mock(RagScopeResolverService.class);
         DocumentNodeArtifactRepository artifactRepository = mock(DocumentNodeArtifactRepository.class);
@@ -230,6 +283,22 @@ class RagArtifactChatHandlerServiceTest {
                 .orderIndex(1)
                 .build();
         node.setId(300L);
+        return node;
+    }
+
+    private DocumentNode documentNode() {
+        Document document = Document.builder()
+                .title("Giáo trình")
+                .build();
+        document.setId(10L);
+        DocumentNode node = DocumentNode.builder()
+                .document(document)
+                .nodeType("document")
+                .title("Giáo trình")
+                .sectionPath("Giáo trình")
+                .orderIndex(1)
+                .build();
+        node.setId(400L);
         return node;
     }
 

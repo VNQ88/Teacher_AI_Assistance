@@ -75,6 +75,8 @@ public class LlmDocumentNodeArtifactGenerator implements DocumentNodeArtifactGen
                     : promptBuilder.buildPartSummaryPrompt(context);
             case SECTION_FROM_SUBSECTIONS_AND_DIRECT_CHUNKS -> promptBuilder.buildSectionSummaryPrompt(context);
             case CHAPTER_FROM_SECTIONS -> promptBuilder.buildParentSummaryPrompt(context);
+            case DOCUMENT_FROM_PARTS, DOCUMENT_FROM_CHAPTERS, DOCUMENT_FALLBACK ->
+                    promptBuilder.buildDocumentSummaryPrompt(context);
             case PART_FROM_CHAPTERS -> promptBuilder.buildPartSummaryPrompt(context);
         };
         warnIfLargePrompt(prompt, context.node().getId(), context.node().getNodeType(), context.summaryMode().name());

@@ -122,7 +122,7 @@ public class RagArtifactChatHandlerService {
     @SuppressWarnings("unchecked")
     private void appendChildSummaryParagraphs(StringBuilder answer, Map<String, Object> content) {
         String summaryMode = asString(content.get("summaryMode"));
-        if (!"PART_FROM_CHAPTERS".equals(summaryMode) && !"PART_FALLBACK".equals(summaryMode)) {
+        if (!rendersChildSummaryParagraphs(summaryMode)) {
             return;
         }
         Object rawChildSummaries = content.get("childSummaries");
@@ -146,6 +146,14 @@ public class RagArtifactChatHandlerService {
             }
             answer.append(citationSanitizer.sanitize(childContent));
         }
+    }
+
+    private boolean rendersChildSummaryParagraphs(String summaryMode) {
+        return "PART_FROM_CHAPTERS".equals(summaryMode)
+                || "PART_FALLBACK".equals(summaryMode)
+                || "DOCUMENT_FROM_PARTS".equals(summaryMode)
+                || "DOCUMENT_FROM_CHAPTERS".equals(summaryMode)
+                || "DOCUMENT_FALLBACK".equals(summaryMode);
     }
 
     @SuppressWarnings("unchecked")

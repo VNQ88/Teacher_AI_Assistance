@@ -103,6 +103,67 @@ class DocumentEnrichmentPromptBuilderTest {
     }
 
     @Test
+    void buildDocumentSummaryPrompt_requiresLongerOverviewKeyPointsAndBestEffortInputs() {
+        Fixture fixture = fixture();
+        DocumentNode documentRoot = DocumentNode.builder()
+                .document(fixture.document())
+                .nodeType("document")
+                .title("Giáo trình")
+                .sectionPath("Giáo trình")
+                .build();
+        documentRoot.setId(99L);
+        Map<Long, List<DocumentChunk>> fallbackRawChunks = new LinkedHashMap<>();
+        fallbackRawChunks.put(103L, List.of(fixture.chunk()));
+        SummaryGenerationContext context = new SummaryGenerationContext(
+                fixture.document(),
+                documentRoot,
+                SummaryMode.DOCUMENT_FROM_CHAPTERS,
+                List.of(),
+                List.of(
+                        new ChildSummary(
+                                101L,
+                                "chapter",
+                                "Chương 1",
+                                "Chương 1",
+                                901L,
+                                "hash-1",
+                                "Tóm tắt chương 1.",
+                                List.of(Map.of("chunkId", 200L))
+                        ),
+                        new ChildSummary(
+                                102L,
+                                "chapter",
+                                "Chương 2",
+                                "Chương 2",
+                                902L,
+                                "hash-2",
+                                "Tóm tắt chương 2.",
+                                List.of()
+                        )
+                ),
+                new SummaryCoverage(3, 2, List.of(), 0, 0, true, 1),
+                fallbackRawChunks
+        );
+
+        String prompt = promptBuilder.buildDocumentSummaryPrompt(context);
+
+        assertThat(prompt).contains("Tao summary document/mon hoc");
+        assertThat(prompt).contains("Khong chi liet ke part/chapter");
+        assertThat(prompt).contains("2-3 doan");
+        assertThat(prompt).contains("moi doan 4-6 cau");
+        assertThat(prompt).contains("8-12 keyPoints");
+        assertThat(prompt).contains("summaryMode bat buoc: DOCUMENT_FROM_CHAPTERS");
+        assertThat(prompt).contains("expectedChildCount: 3");
+        assertThat(prompt).contains("fallbackChildCount: 1");
+        assertThat(prompt).contains("<<<CHILD_SUMMARIES>>>");
+        assertThat(prompt).contains("Tóm tắt chương 1.");
+        assertThat(prompt).contains("Tóm tắt chương 2.");
+        assertThat(prompt).contains("<<<FALLBACK_CHUNKS>>>");
+        assertThat(prompt).contains("childNodeId: 103");
+        assertThat(prompt).contains("Nội dung học tập quan trọng");
+    }
+
+    @Test
     void buildReviewQuestionPrompt_includesQuestionTypesAndCountBounds() {
         Fixture fixture = fixture();
 
