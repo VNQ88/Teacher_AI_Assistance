@@ -59,11 +59,6 @@ public class SummaryAgent {
 
     public AgentResult execute(RagChatState state) {
         DocumentNode node = state.getResolvedNode();
-        Optional<String> outlineSummary = outlineSummaryRenderer.render(node);
-        if (outlineSummary.isPresent()) {
-            return AgentResult.hit(outlineSummary.get(), List.of());
-        }
-
         Optional<DocumentNodeArtifact> artifact = fetchCompletedSummary(node.getId());
 
         if (artifact.isPresent()) {
@@ -71,6 +66,11 @@ public class SummaryAgent {
             String answer = handlerService.renderSummary(content, node);
             List<DocumentChunk> sources = handlerService.sourceChunksFromCitations(content);
             return AgentResult.hit(answer, sources);
+        }
+
+        Optional<String> outlineSummary = outlineSummaryRenderer.render(node);
+        if (outlineSummary.isPresent()) {
+            return AgentResult.hit(outlineSummary.get(), List.of());
         }
 
         if ("chapter".equals(node.getNodeType())) {

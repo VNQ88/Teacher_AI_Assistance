@@ -158,12 +158,33 @@ class SummaryAgentTest {
     @Test
     void execute_partReturnsOutlineSummary() {
         DocumentNode part = node(30L, "part", "Phần I", "Phần I");
+        when(artifactRepository.findLatestCompletedSummaryByNodeId(30L)).thenReturn(Optional.empty());
         when(outlineSummaryRenderer.render(part)).thenReturn(Optional.of("Tóm tắt tổng quan Phần I"));
 
         AgentResult result = summaryAgent.execute(state(part));
 
         assertThat(result.answer()).contains("Tóm tắt tổng quan Phần I");
-        verify(artifactRepository, never()).findLatestCompletedSummaryByNodeId(30L);
+    }
+
+    @Test
+    void execute_partPrefersCompletedArtifactBeforeOutlineSummary() {
+        DocumentNode part = node(30L, "part", "Phần I", "Phần I");
+        DocumentChunk source = chunk(100L);
+        DocumentNodeArtifact artifact = DocumentNodeArtifact.builder()
+                .documentNode(part)
+                .artifactType(DocumentNodeArtifactType.SUMMARY)
+                .contentJsonb(Map.of("summary", "Tóm tắt nội dung thật của phần."))
+                .build();
+        when(artifactRepository.findLatestCompletedSummaryByNodeId(30L)).thenReturn(Optional.of(artifact));
+        when(handlerService.renderSummary(artifact.getContentJsonb(), part))
+                .thenReturn("Tóm tắt Phần I:\n\nTóm tắt nội dung thật của phần.");
+        when(handlerService.sourceChunksFromCitations(artifact.getContentJsonb())).thenReturn(List.of(source));
+
+        AgentResult result = summaryAgent.execute(state(part));
+
+        assertThat(result.answer()).contains("Tóm tắt nội dung thật của phần.");
+        assertThat(result.sources()).containsExactly(source);
+        verify(outlineSummaryRenderer, never()).render(part);
     }
 
     private RagChatState state(DocumentNode node) {

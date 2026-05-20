@@ -16,6 +16,9 @@ import java.util.List;
 public class RagChatState {
     // Input
     private final String question;
+    private final String originalQuestion;
+    private final String effectiveQuestion;
+    private final boolean followUp;
     private final ChatSession session;
     private final Integer requestedTopK;
     private final Double requestedTemperature;
@@ -23,6 +26,7 @@ public class RagChatState {
     private final RagChatIntent intent;
     // RAG path
     private final List<ChatMessage> history;
+    private final List<DocumentChunk> anchoredSourceChunks;
     private final List<DocumentChunk> retrievedChunks;
     private final int topK;
     private final int retryCount;

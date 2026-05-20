@@ -51,6 +51,7 @@ class RagChatServiceSourceTrackingTest {
                 agentLogRepository,
                 ragProperties,
                 mock(RagIntentRouterService.class),
+                new RagFollowUpResolverService(chatMessageRepository),
                 mock(DocumentRepository.class),
                 factualQaAgent,
                 mock(DocumentScopeAgent.class),
@@ -85,7 +86,7 @@ class RagChatServiceSourceTrackingTest {
 
         assertThat(response.getContent()).doesNotContain("chunk 99");
         assertThat(response.getContent()).contains("**Nguồn tham khảo:**");
-        assertThat(response.getContent()).contains("Giao trinh Triet hoc, Chuong 1 > I. Khai niem (trang 12-13)");
+        assertThat(response.getContent()).contains("Giao trinh Triet hoc (trang 12-13)");
         assertThat(response.getSources()).containsExactly("Giao trinh Triet hoc");
         assertThat(response.getSourceDetails()).hasSize(1);
         assertThat(response.getSourceDetails().getFirst().getSourceIndex()).isEqualTo(1);
@@ -96,7 +97,7 @@ class RagChatServiceSourceTrackingTest {
         assertThat(response.getSourceDetails().getFirst().getPageFrom()).isEqualTo(12);
         assertThat(response.getSourceDetails().getFirst().getPageTo()).isEqualTo(13);
         assertThat(response.getSourceDetails().getFirst().getSourceLabel())
-                .isEqualTo("Giao trinh Triet hoc, Chuong 1 > I. Khai niem (trang 12-13)");
+                .isEqualTo("Giao trinh Triet hoc (trang 12-13)");
         assertThat(response.getSourceDetails().getFirst().getPageRange()).isEqualTo("trang 12-13");
         assertThat(response.getSourceDetails().getFirst().getChunkType()).isEqualTo("TEXT");
         assertThat(response.getSourceDetails().getFirst().getCharStart()).isEqualTo(100);
@@ -114,6 +115,7 @@ class RagChatServiceSourceTrackingTest {
                 mock(AgentLogRepository.class),
                 new RagProperties(),
                 mock(RagIntentRouterService.class),
+                new RagFollowUpResolverService(chatMessageRepository),
                 mock(DocumentRepository.class),
                 mock(FactualQaAgent.class),
                 mock(DocumentScopeAgent.class),

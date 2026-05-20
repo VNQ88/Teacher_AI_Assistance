@@ -154,6 +154,38 @@ class RagScopeResolverServiceTest {
     }
 
     @Test
+    void resolveDetailed_wholeDocumentVariantsResolveDocumentRootWithoutLlmFallback() {
+        DocumentNodeRepository repository = mock(DocumentNodeRepository.class);
+        LlmScopeDisambiguationService llm = mock(LlmScopeDisambiguationService.class);
+        RagScopeResolverService resolverService = new RagScopeResolverService(repository, llm);
+        ChatSession session = session();
+        DocumentNode documentRoot = node(10L, "document", "Giáo trình Triết học", "Giáo trình Triết học", 0);
+        DocumentNode chapterOne = node(101L, "chapter", "Chương 1", "Chương 1", 1);
+
+        when(repository.findBySubjectIdAndNodeTypeInOrderByOrderIndexAsc(eq(7L), any()))
+                .thenReturn(List.of(documentRoot, chapterOne));
+
+        for (String question : List.of(
+                "Tóm tắt nội dung môn học",
+                "Tổng quan môn học",
+                "Khái quát toàn bộ tài liệu",
+                "Môn học này nói về gì?",
+                "Cho tôi tóm tắt nội dung chính của môn học",
+                "Tổng hợp ý chính giáo trình"
+        )) {
+            ScopeResolution resolved = resolverService.resolveDetailed(session, question);
+
+            assertThat(resolved.status())
+                    .as(question)
+                    .isEqualTo(ScopeResolution.Status.RESOLVED);
+            assertThat(resolved.node())
+                    .as(question)
+                    .isEqualTo(documentRoot);
+        }
+        verifyNoInteractions(llm);
+    }
+
+    @Test
     void resolveDetailed_ambiguousLexicalCanUseLlmBoundedFallback() {
         DocumentNodeRepository repository = mock(DocumentNodeRepository.class);
         LlmScopeDisambiguationService llm = mock(LlmScopeDisambiguationService.class);

@@ -19,6 +19,7 @@ import com.example.teacherassistantai.repository.DocumentRepository;
 import com.example.teacherassistantai.service.ChatSessionService;
 import com.example.teacherassistantai.service.InternalCitationSanitizer;
 import com.example.teacherassistantai.service.RagChatIntent;
+import com.example.teacherassistantai.service.RagFollowUpResolverService;
 import com.example.teacherassistantai.service.RagIntentRouterService;
 import com.example.teacherassistantai.service.ScopeResolution;
 import com.example.teacherassistantai.service.SourceAttributionFormatter;
@@ -45,6 +46,7 @@ public class RagChatOrchestrator {
     private final AgentLogRepository agentLogRepository;
     private final RagProperties ragProperties;
     private final RagIntentRouterService intentRouterService;
+    private final RagFollowUpResolverService followUpResolverService;
     private final DocumentRepository documentRepository;
     private final FactualQaAgent factualQaAgent;
     private final DocumentScopeAgent documentScopeAgent;
@@ -73,19 +75,27 @@ public class RagChatOrchestrator {
             return toResponse(notice, null, null);
         }
 
-        RagChatIntent intent = intentRouterService.route(request.getQuestion());
+        RagFollowUpResolverService.FollowUpResolution followUpResolution =
+                followUpResolverService.resolve(session, userMessage, request.getQuestion());
+        String effectiveQuestion = followUpResolution.effectiveQuestion();
+
+        RagChatIntent intent = intentRouterService.route(effectiveQuestion);
 
         AgentResult result;
         AgentType agentType;
 
         if (intent == RagChatIntent.SECTION_SUMMARY) {
             ScopeResolution resolution =
-                    documentScopeAgent.resolveDetailed(session, request.getQuestion());
+                    documentScopeAgent.resolveDetailed(session, effectiveQuestion);
             if (resolution.status() != ScopeResolution.Status.RESOLVED) {
                 result = documentScopeAgent.unresolved(resolution);
             } else {
                 RagChatState state = RagChatState.builder()
-                        .question(request.getQuestion())
+                        .question(effectiveQuestion)
+                        .originalQuestion(request.getQuestion())
+                        .effectiveQuestion(effectiveQuestion)
+                        .followUp(followUpResolution.followUp())
+                        .anchoredSourceChunks(followUpResolution.previousSourceChunks())
                         .session(session)
                         .intent(intent)
                         .resolvedNode(resolution.node())
@@ -95,12 +105,16 @@ public class RagChatOrchestrator {
             }
             agentType = AgentType.KNOWLEDGE_CHATBOT;
         } else if (intent == RagChatIntent.REVIEW_QUESTION_GENERATION) {
-            ScopeResolution resolution = documentScopeAgent.resolveDetailed(session, request.getQuestion());
+            ScopeResolution resolution = documentScopeAgent.resolveDetailed(session, effectiveQuestion);
             if (resolution.status() != ScopeResolution.Status.RESOLVED) {
                 result = documentScopeAgent.unresolved(resolution);
             } else {
                 RagChatState state = RagChatState.builder()
-                        .question(request.getQuestion())
+                        .question(effectiveQuestion)
+                        .originalQuestion(request.getQuestion())
+                        .effectiveQuestion(effectiveQuestion)
+                        .followUp(followUpResolution.followUp())
+                        .anchoredSourceChunks(followUpResolution.previousSourceChunks())
                         .session(session)
                         .intent(intent)
                         .resolvedNode(resolution.node())
@@ -111,10 +125,14 @@ public class RagChatOrchestrator {
             agentType = AgentType.QUIZ_GENERATOR;
         } else {
             List<ChatMessage> history = loadHistory(
-                    session.getId(), request.getQuestion(), ragProperties.getMaxHistoryMessages());
+                    session.getId(), effectiveQuestion, ragProperties.getMaxHistoryMessages());
             int topK = request.getTopK() != null ? request.getTopK() : ragProperties.getTopK();
             RagChatState state = RagChatState.builder()
-                    .question(request.getQuestion())
+                    .question(effectiveQuestion)
+                    .originalQuestion(request.getQuestion())
+                    .effectiveQuestion(effectiveQuestion)
+                    .followUp(followUpResolution.followUp())
+                    .anchoredSourceChunks(followUpResolution.previousSourceChunks())
                     .session(session)
                     .history(history)
                     .topK(topK)

@@ -47,6 +47,7 @@ class RagChatServiceArtifactIntentTest {
                 mock(AgentLogRepository.class),
                 new RagProperties(),
                 intentRouterService,
+                new RagFollowUpResolverService(chatMessageRepository),
                 mock(DocumentRepository.class),
                 factualQaAgent,
                 documentScopeAgent,

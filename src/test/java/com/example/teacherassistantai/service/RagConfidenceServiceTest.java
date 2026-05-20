@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RagConfidenceServiceTest {
 
@@ -20,7 +19,7 @@ class RagConfidenceServiceTest {
     }
 
     @Test
-    void score_shouldIncreaseWhenAnswerContainsEvidenceCitations() {
+    void score_shouldNotDependOnLegacyChunkCitations() {
         DocumentChunk chunk = DocumentChunk.builder()
                 .content("Phan 2 noi ve dong tu bat quy tac")
                 .build();
@@ -38,11 +37,11 @@ class RagConfidenceServiceTest {
                 "Phan 2 noi ve dong tu bat quy tac [Chunk 88]"
         );
 
-        assertTrue(withCitation > withoutCitation);
+        assertEquals(withoutCitation, withCitation);
     }
 
     @Test
-    void score_shouldIncreaseWhenAnswerContainsSourceIndexCitation() {
+    void score_shouldNotDependOnSourceIndexCitations() {
         DocumentChunk chunk = DocumentChunk.builder()
                 .content("Vat chat la pham tru triet hoc dung de chi thuc tai khach quan")
                 .build();
@@ -60,6 +59,6 @@ class RagConfidenceServiceTest {
                 "Vat chat la pham tru triet hoc dung de chi thuc tai khach quan [Source 1, pages 12-13]"
         );
 
-        assertTrue(withCitation > withoutCitation);
+        assertEquals(withoutCitation, withCitation);
     }
 }

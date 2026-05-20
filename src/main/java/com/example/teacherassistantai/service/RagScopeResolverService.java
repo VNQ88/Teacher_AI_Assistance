@@ -28,6 +28,45 @@ public class RagScopeResolverService {
     private static final Set<String> SECTION_TYPES = Set.of("section", "subsection", "subsection_level2");
     private static final Set<String> SUBSECTION_TYPES = Set.of("subsection", "subsection_level2");
     private static final Set<String> DOCUMENT_TYPES = Set.of("document");
+    private static final List<String> WHOLE_DOCUMENT_PHRASES = List.of(
+            "tom tat mon hoc",
+            "tom tat noi dung mon hoc",
+            "tom tat toan bo",
+            "tom tat tai lieu",
+            "tom tat noi dung tai lieu",
+            "tom tat ca tai lieu",
+            "tom tat giao trinh",
+            "tom tat noi dung giao trinh",
+            "tong quan mon hoc",
+            "tong quan tai lieu",
+            "tong quan giao trinh",
+            "khai quat mon hoc",
+            "khai quat tai lieu",
+            "khai quat giao trinh",
+            "noi dung mon hoc",
+            "noi dung tai lieu",
+            "noi dung giao trinh",
+            "mon hoc nay noi ve gi",
+            "tai lieu nay noi ve gi",
+            "giao trinh nay noi ve gi",
+            "cau hoi on tap toan bo",
+            "cau hoi on tap mon hoc",
+            "cau hoi on tap tai lieu",
+            "cau hoi on tap giao trinh",
+            "bo cau hoi toan bo mon hoc",
+            "bo cau hoi toan bo tai lieu",
+            "bo cau hoi toan bo giao trinh",
+            "de cuong on tap toan bo",
+            "de cuong on tap mon hoc",
+            "de cuong on tap tai lieu",
+            "de cuong on tap giao trinh",
+            "de cuong mon hoc"
+    );
+    private static final Pattern WHOLE_DOCUMENT_PATTERN = Pattern.compile("""
+            \\b(tom\\s+tat|tong\\s+quan|khai\\s+quat|tong\\s+hop\\s+y\\s+chinh|noi\\s+dung\\s+chinh|y\\s+chinh)\\b
+            .*
+            \\b(mon\\s+hoc|tai\\s+lieu|giao\\s+trinh|toan\\s+bo)\\b
+            """, Pattern.CASE_INSENSITIVE | Pattern.COMMENTS);
     private static final Pattern EXPLICIT_SCOPE_PATTERN = Pattern.compile("""
             \\b(tieu\\s+muc|subsection|phan|part|chuong|chapter|muc|section)\\s+([ivxlcdm]+|\\d+(?:\\.\\d+)*)
             """, Pattern.CASE_INSENSITIVE | Pattern.COMMENTS);
@@ -156,23 +195,17 @@ public class RagScopeResolverService {
     }
 
     private boolean isWholeDocumentRequest(String normalizedQuestion) {
-        return containsPhrase(normalizedQuestion, "tom tat mon hoc")
-                || containsPhrase(normalizedQuestion, "tom tat toan bo")
-                || containsPhrase(normalizedQuestion, "tom tat tai lieu")
-                || containsPhrase(normalizedQuestion, "tom tat ca tai lieu")
-                || containsPhrase(normalizedQuestion, "tom tat giao trinh")
-                || containsPhrase(normalizedQuestion, "cau hoi on tap toan bo")
-                || containsPhrase(normalizedQuestion, "cau hoi on tap mon hoc")
-                || containsPhrase(normalizedQuestion, "cau hoi on tap tai lieu")
-                || containsPhrase(normalizedQuestion, "cau hoi on tap giao trinh")
-                || containsPhrase(normalizedQuestion, "bo cau hoi toan bo mon hoc")
-                || containsPhrase(normalizedQuestion, "bo cau hoi toan bo tai lieu")
-                || containsPhrase(normalizedQuestion, "bo cau hoi toan bo giao trinh")
-                || containsPhrase(normalizedQuestion, "de cuong on tap toan bo")
-                || containsPhrase(normalizedQuestion, "de cuong on tap mon hoc")
-                || containsPhrase(normalizedQuestion, "de cuong on tap tai lieu")
-                || containsPhrase(normalizedQuestion, "de cuong on tap giao trinh")
-                || containsPhrase(normalizedQuestion, "de cuong mon hoc");
+        return containsAnyPhrase(normalizedQuestion, WHOLE_DOCUMENT_PHRASES)
+                || WHOLE_DOCUMENT_PATTERN.matcher(normalizedQuestion).find();
+    }
+
+    private boolean containsAnyPhrase(String text, List<String> phrases) {
+        for (String phrase : phrases) {
+            if (containsPhrase(text, phrase)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private ScopeHint extractScopeHint(String normalizedQuestion) {
@@ -263,7 +296,10 @@ public class RagScopeResolverService {
         String value = normalizedQuestion;
         for (String stopPhrase : List.of(
                 "tom tat", "tao bo cau hoi", "bo cau hoi", "cau hoi on tap",
-                "hay", "giup toi", "cho toi", "ve", "noi dung", "phan noi dung"
+                "hay", "giup toi", "cho toi", "ve", "noi dung", "phan noi dung",
+                "noi dung mon hoc", "noi dung tai lieu", "noi dung giao trinh",
+                "mon hoc nay", "tai lieu nay", "giao trinh nay",
+                "tong quan", "khai quat", "y chinh", "noi dung chinh"
         )) {
             value = value.replace(" " + stopPhrase + " ", " ");
         }

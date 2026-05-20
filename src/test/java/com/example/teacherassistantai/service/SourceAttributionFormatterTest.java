@@ -31,19 +31,33 @@ class SourceAttributionFormatterTest {
     }
 
     @Test
-    void format_includesSectionPathWhenReasonable() {
+    void format_omitsSectionPath() {
         assertThat(formatter.format(chunk("Giáo trình", "Chương 1 > I. Khái niệm", 12, 13)))
-                .isEqualTo("Giáo trình, Chương 1 > I. Khái niệm (trang 12-13)");
+                .isEqualTo("Giáo trình (trang 12-13)");
     }
 
     @Test
-    void formatSources_dedupesSameDocumentPageAndSection() {
+    void formatSources_dedupesSameDocumentAndPage() {
         DocumentChunk first = chunk("Giáo trình", "Chương 1", 3, 4);
-        DocumentChunk duplicate = chunk("Giáo trình", " Chương   1 ", 3, 4);
+        DocumentChunk duplicate = chunk("Giáo trình", "Chương 2", 3, 4);
         duplicate.setId(99L);
 
         assertThat(formatter.formatSources(List.of(first, duplicate)))
-                .containsExactly("Giáo trình, Chương 1 (trang 3-4)");
+                .containsExactly("Giáo trình (trang 3-4)");
+    }
+
+    @Test
+    void formatSources_limitsToThreeLabels() {
+        assertThat(formatter.formatSources(List.of(
+                chunk("Giáo trình", "Chương 1", 1, 2),
+                chunk("Giáo trình", "Chương 2", 3, 4),
+                chunk("Giáo trình", "Chương 3", 5, 6),
+                chunk("Giáo trình", "Chương 4", 7, 8)
+        ))).containsExactly(
+                "Giáo trình (trang 1-2)",
+                "Giáo trình (trang 3-4)",
+                "Giáo trình (trang 5-6)"
+        );
     }
 
     private DocumentChunk chunk(String title, String sectionPath, Integer pageFrom, Integer pageTo) {

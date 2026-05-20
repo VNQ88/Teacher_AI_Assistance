@@ -13,7 +13,7 @@ import java.util.Map;
 @Component
 public class SourceAttributionFormatter {
 
-    private static final int MAX_SECTION_PATH_LENGTH = 180;
+    private static final int MAX_SOURCE_LABELS = 3;
 
     public List<String> formatSources(List<DocumentChunk> chunks) {
         if (chunks == null || chunks.isEmpty()) {
@@ -25,6 +25,9 @@ public class SourceAttributionFormatter {
                 continue;
             }
             labelsByKey.putIfAbsent(dedupeKey(chunk), format(chunk));
+            if (labelsByKey.size() >= MAX_SOURCE_LABELS) {
+                break;
+            }
         }
         return new ArrayList<>(labelsByKey.values());
     }
@@ -35,13 +38,9 @@ public class SourceAttributionFormatter {
         }
 
         String title = documentTitle(chunk);
-        String sectionPath = compactSectionPath(chunk.getSectionPath());
         String pageRange = pageRange(chunk);
 
         StringBuilder label = new StringBuilder(title);
-        if (!sectionPath.isBlank()) {
-            label.append(", ").append(sectionPath);
-        }
         if (!pageRange.isBlank()) {
             label.append(" (").append(pageRange).append(")");
         }
@@ -72,9 +71,7 @@ public class SourceAttributionFormatter {
         String documentKey = document == null || document.getId() == null
                 ? normalize(documentTitle(chunk))
                 : String.valueOf(document.getId());
-        return documentKey
-                + "|" + normalize(chunk.getSectionPath())
-                + "|" + pageKey(chunk);
+        return documentKey + "|" + pageKey(chunk);
     }
 
     private String pageKey(DocumentChunk chunk) {
@@ -94,14 +91,6 @@ public class SourceAttributionFormatter {
             return "Nguồn tài liệu";
         }
         return document.getTitle().trim();
-    }
-
-    private String compactSectionPath(String sectionPath) {
-        if (sectionPath == null || sectionPath.isBlank()) {
-            return "";
-        }
-        String normalized = sectionPath.replaceAll("\\s+", " ").trim();
-        return normalized.length() <= MAX_SECTION_PATH_LENGTH ? normalized : "";
     }
 
     private String normalize(String value) {
