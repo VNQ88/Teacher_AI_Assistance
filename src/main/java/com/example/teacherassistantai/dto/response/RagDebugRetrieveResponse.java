@@ -10,6 +10,8 @@ import java.util.Map;
 @Builder
 public class RagDebugRetrieveResponse {
     private String query;
+    private String retrievalMode;
+    private Long scopedNodeId;
     private String intentType;
     private Integer sectionNumber;
     private Integer candidateCount;

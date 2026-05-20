@@ -87,6 +87,34 @@ public interface DocumentChunkRepository extends JpaRepository<DocumentChunk, Lo
                                               @Param("sectionNumber") Integer sectionNumber);
 
     @Query(value = """
+            WITH RECURSIVE node_tree AS (
+                SELECT id
+                FROM document_nodes
+                WHERE id = :rootNodeId
+                UNION ALL
+                SELECT child.id
+                FROM document_nodes child
+                JOIN node_tree parent ON child.parent_id = parent.id
+            )
+            SELECT dc.*
+            FROM document_chunks dc
+            WHERE dc.node_id IN (SELECT id FROM node_tree)
+              AND dc.subject_id = :subjectId
+              AND dc.embedding IS NOT NULL
+              AND upper(COALESCE(dc.chunk_type, 'TEXT')) <> 'CITATION'
+              AND dc.metadata_jsonb IS NOT NULL
+              AND (dc.metadata_jsonb ->> 'charCount') ~ '^[0-9]+$'
+              AND ((dc.metadata_jsonb ->> 'charCount')::int) >= :minCharCount
+            ORDER BY dc.embedding <=> CAST(:queryEmbedding AS vector)
+            LIMIT :candidateTopK
+            """, nativeQuery = true)
+    List<DocumentChunk> searchByNodeSubtreeVector(@Param("subjectId") Long subjectId,
+                                                  @Param("rootNodeId") Long rootNodeId,
+                                                  @Param("queryEmbedding") String queryEmbedding,
+                                                  @Param("minCharCount") int minCharCount,
+                                                  @Param("candidateTopK") int candidateTopK);
+
+    @Query(value = """
             UPDATE document_chunks
             SET embedding = CAST(:embedding AS vector)
             WHERE id = :chunkId

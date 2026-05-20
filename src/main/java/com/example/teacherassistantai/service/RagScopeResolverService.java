@@ -52,7 +52,30 @@ public class RagScopeResolverService {
         return resolveDetailed(session, question).resolvedNode();
     }
 
+    public boolean hasExplicitScopeHint(String question) {
+        if (question == null || question.isBlank()) {
+            return false;
+        }
+        return EXPLICIT_SCOPE_PATTERN.matcher(normalize(question).trim()).find();
+    }
+
     public ScopeResolution resolveDetailed(ChatSession session, String question) {
+        ScopeResolution deterministic = resolveDeterministicOnly(session, question);
+        if (deterministic.status() == ScopeResolution.Status.RESOLVED) {
+            return deterministic;
+        }
+        if (deterministic.status() == ScopeResolution.Status.AMBIGUOUS
+                && llmScopeDisambiguationService != null
+                && !deterministic.candidates().isEmpty()) {
+            Optional<ScopeResolution> llmResolution = llmScopeDisambiguationService.resolve(question, deterministic.candidates());
+            if (llmResolution.isPresent()) {
+                return llmResolution.get();
+            }
+        }
+        return deterministic;
+    }
+
+    public ScopeResolution resolveDeterministicOnly(ChatSession session, String question) {
         if (session == null || session.getSubject() == null || session.getSubject().getId() == null) {
             return ScopeResolution.notFound("missing_subject");
         }
@@ -69,19 +92,7 @@ public class RagScopeResolverService {
             return ScopeResolution.notFound("no_scope_candidates");
         }
 
-        ScopeResolution deterministic = resolveDeterministic(normalizedQuestion, scopeRequest, candidates);
-        if (deterministic.status() == ScopeResolution.Status.RESOLVED) {
-            return deterministic;
-        }
-        if (deterministic.status() == ScopeResolution.Status.AMBIGUOUS
-                && llmScopeDisambiguationService != null
-                && !deterministic.candidates().isEmpty()) {
-            Optional<ScopeResolution> llmResolution = llmScopeDisambiguationService.resolve(question, deterministic.candidates());
-            if (llmResolution.isPresent()) {
-                return llmResolution.get();
-            }
-        }
-        return deterministic;
+        return resolveDeterministic(normalizedQuestion, scopeRequest, candidates);
     }
 
     private ScopeResolution resolveDeterministic(String normalizedQuestion,

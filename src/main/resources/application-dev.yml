@@ -116,6 +116,10 @@ application:
     embedding-batch-size: 64
     embedding-concurrency: 3
     max-history-messages: 5
+    retrieval:
+      scoped-vector:
+        enabled: true
+        min-confidence: 0.85
     enrichment:
       enabled: true
       auto-run-after-ready: true

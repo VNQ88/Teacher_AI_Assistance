@@ -24,7 +24,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,11 +40,16 @@ class VectorRetrievalServiceTest {
     @Mock
     private DocumentChunkRepository documentChunkRepository;
 
+    @Mock
+    private RagScopeResolverService ragScopeResolverService;
+
+    private RagProperties ragProperties;
+
     private VectorRetrievalService service;
 
     @BeforeEach
     void setUp() {
-        RagProperties ragProperties = new RagProperties();
+        ragProperties = new RagProperties();
         ragProperties.setTopK(6);
         ragProperties.setMaxTopK(8);
         ragProperties.setCandidateTopK(24);
@@ -50,7 +59,8 @@ class VectorRetrievalServiceTest {
                 embeddingGateway,
                 documentChunkRepository,
                 ragProperties,
-                new LocalRerankingService()
+                new LocalRerankingService(),
+                ragScopeResolverService
         );
     }
 
@@ -210,6 +220,140 @@ class VectorRetrievalServiceTest {
         assertEquals(501L, response.getSelectedChunks().getFirst().getChunkId());
         assertThat(response.getPromptContextPreview()).contains("[Source 1]");
         assertThat(response.getPromptContextPreview()).contains("Path: Chương 2 > I. Khái niệm");
+    }
+
+    @Test
+    void debugRetrieve_shouldUseScopedVector_whenScopeResolvedWithHighConfidence() {
+        when(embeddingGateway.embed(anyString())).thenReturn(vector1024());
+        ChatSession session = session();
+        String question = "trong chương 3, định lý Pytago được phát biểu thế nào?";
+        DocumentNode scopedNode = DocumentNode.builder()
+                .nodeKey("chapter-3")
+                .nodeType("chapter")
+                .title("Chương 3")
+                .build();
+        scopedNode.setId(42L);
+        DocumentChunk chunk = chunk(601L, "TEXT",
+                "Dinh ly Pytago phat bieu ve tam giac vuong.", "Chương 3", 1, scopedNode);
+
+        when(ragScopeResolverService.hasExplicitScopeHint(question)).thenReturn(true);
+        when(ragScopeResolverService.resolveDeterministicOnly(session, question))
+                .thenReturn(ScopeResolution.resolved(scopedNode, 0.92, "test", List.of(scopedNode)));
+        when(documentChunkRepository.searchByNodeSubtreeVector(eq(1L), eq(42L), anyString(), eq(40), eq(24)))
+                .thenReturn(List.of(chunk));
+
+        RagDebugRetrieveResponse response = service.debugRetrieve(session, question, 4);
+
+        assertEquals("SCOPED_VECTOR", response.getRetrievalMode());
+        assertEquals(42L, response.getScopedNodeId());
+        assertEquals(1, response.getCandidateCount());
+        verify(documentChunkRepository).searchByNodeSubtreeVector(eq(1L), eq(42L), anyString(), eq(40), eq(24));
+        verify(documentChunkRepository, never()).searchBySubjectVector(anyLong(), anyString(), anyInt(), anyInt(), org.mockito.ArgumentMatchers.<Integer>any());
+    }
+
+    @Test
+    void retrieve_shouldFallbackFlat_whenNoScopeKeyword() {
+        when(embeddingGateway.embed(anyString())).thenReturn(vector1024());
+        String question = "Định lý Pytago là gì?";
+        DocumentChunk chunk = chunk(701L, "TEXT",
+                "Dinh ly Pytago la he thuc trong tam giac vuong.", null, 1, null);
+
+        when(ragScopeResolverService.hasExplicitScopeHint(question)).thenReturn(false);
+        when(documentChunkRepository.searchBySubjectVector(anyLong(), anyString(), anyInt(), anyInt(), org.mockito.ArgumentMatchers.<Integer>isNull()))
+                .thenReturn(List.of(chunk));
+
+        List<DocumentChunk> result = service.retrieve(session(), question, 1);
+
+        assertEquals(1, result.size());
+        assertEquals(701L, result.getFirst().getId());
+        verify(ragScopeResolverService, never()).resolveDeterministicOnly(org.mockito.ArgumentMatchers.any(), anyString());
+        verify(documentChunkRepository, never()).searchByNodeSubtreeVector(anyLong(), anyLong(), anyString(), anyInt(), anyInt());
+    }
+
+    @Test
+    void retrieve_shouldFallbackFlat_whenScopeResolutionAmbiguous() {
+        when(embeddingGateway.embed(anyString())).thenReturn(vector1024());
+        ChatSession session = session();
+        String question = "trong chương 3 nói gì?";
+        DocumentChunk chunk = chunk(801L, "TEXT",
+                "Noi dung chuong 3.", "Chương 3", 1, null);
+
+        when(ragScopeResolverService.hasExplicitScopeHint(question)).thenReturn(true);
+        when(ragScopeResolverService.resolveDeterministicOnly(session, question))
+                .thenReturn(ScopeResolution.ambiguous("ambiguous", List.of()));
+        when(documentChunkRepository.searchBySubjectVector(anyLong(), anyString(), anyInt(), anyInt(), anyInt()))
+                .thenReturn(List.of(chunk));
+
+        List<DocumentChunk> result = service.retrieve(session, question, 1);
+
+        assertEquals(1, result.size());
+        assertEquals(801L, result.getFirst().getId());
+        verify(documentChunkRepository, never()).searchByNodeSubtreeVector(anyLong(), anyLong(), anyString(), anyInt(), anyInt());
+    }
+
+    @Test
+    void retrieve_shouldFallbackFlat_whenScopeConfidenceTooLow() {
+        when(embeddingGateway.embed(anyString())).thenReturn(vector1024());
+        ChatSession session = session();
+        String question = "trong chương 3 nói gì?";
+        DocumentNode scopedNode = DocumentNode.builder().nodeKey("chapter-3").build();
+        scopedNode.setId(42L);
+        DocumentChunk chunk = chunk(901L, "TEXT",
+                "Noi dung chuong 3.", "Chương 3", 1, null);
+
+        when(ragScopeResolverService.hasExplicitScopeHint(question)).thenReturn(true);
+        when(ragScopeResolverService.resolveDeterministicOnly(session, question))
+                .thenReturn(ScopeResolution.resolved(scopedNode, 0.70, "test", List.of(scopedNode)));
+        when(documentChunkRepository.searchBySubjectVector(anyLong(), anyString(), anyInt(), anyInt(), anyInt()))
+                .thenReturn(List.of(chunk));
+
+        List<DocumentChunk> result = service.retrieve(session, question, 1);
+
+        assertEquals(1, result.size());
+        assertEquals(901L, result.getFirst().getId());
+        verify(documentChunkRepository, never()).searchByNodeSubtreeVector(anyLong(), anyLong(), anyString(), anyInt(), anyInt());
+    }
+
+    @Test
+    void retrieve_shouldSkipScopeResolver_whenScopedVectorDisabled() {
+        ragProperties.getRetrieval().getScopedVector().setEnabled(false);
+        when(embeddingGateway.embed(anyString())).thenReturn(vector1024());
+        when(documentChunkRepository.searchBySubjectVector(
+                anyLong(), anyString(), anyInt(), anyInt(), eq(3)))
+                .thenReturn(List.of());
+
+        service.retrieve(session(), "trong chương 3 nói gì?", 1);
+
+        verifyNoInteractions(ragScopeResolverService);
+        verify(documentChunkRepository, never()).searchByNodeSubtreeVector(anyLong(), anyLong(), anyString(), anyInt(), anyInt());
+    }
+
+    @Test
+    void debugRetrieve_shouldFallbackFlatAndReuseEmbedding_whenScopedCandidatesEmpty() {
+        when(embeddingGateway.embed(anyString())).thenReturn(vector1024());
+        ChatSession session = session();
+        String question = "trong chương 3 nói gì?";
+        DocumentNode scopedNode = DocumentNode.builder().nodeKey("chapter-3").build();
+        scopedNode.setId(42L);
+        DocumentChunk flatChunk = chunk(1001L, "TEXT",
+                "Noi dung fallback ve chuong 3.", "Chương 3", 1, null);
+
+        when(ragScopeResolverService.hasExplicitScopeHint(question)).thenReturn(true);
+        when(ragScopeResolverService.resolveDeterministicOnly(session, question))
+                .thenReturn(ScopeResolution.resolved(scopedNode, 0.92, "test", List.of(scopedNode)));
+        when(documentChunkRepository.searchByNodeSubtreeVector(eq(1L), eq(42L), anyString(), eq(40), eq(24)))
+                .thenReturn(List.of());
+        when(documentChunkRepository.searchBySubjectVector(eq(1L), anyString(), eq(40), eq(24), eq(3)))
+                .thenReturn(List.of(flatChunk));
+
+        RagDebugRetrieveResponse response = service.debugRetrieve(session, question, 1);
+
+        assertEquals("SCOPED_EMPTY_FALLBACK", response.getRetrievalMode());
+        assertEquals(42L, response.getScopedNodeId());
+        assertEquals(1, response.getCandidateCount());
+        verify(embeddingGateway, times(1)).embed(anyString());
+        verify(documentChunkRepository).searchByNodeSubtreeVector(eq(1L), eq(42L), anyString(), eq(40), eq(24));
+        verify(documentChunkRepository).searchBySubjectVector(eq(1L), anyString(), eq(40), eq(24), eq(3));
     }
 
     private List<Double> vector1024() {

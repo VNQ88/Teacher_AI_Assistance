@@ -15,9 +15,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class RagScopeResolverServiceTest {
+
+    @Test
+    void hasExplicitScopeHint_detectsScopedQuestionsOnly() {
+        RagScopeResolverService resolverService = new RagScopeResolverService(mock(DocumentNodeRepository.class));
+
+        assertThat(resolverService.hasExplicitScopeHint("trong chương 3 nói gì")).isTrue();
+        assertThat(resolverService.hasExplicitScopeHint("chương III nói gì")).isTrue();
+        assertThat(resolverService.hasExplicitScopeHint("mục 2.1 là gì")).isTrue();
+        assertThat(resolverService.hasExplicitScopeHint("định lý 2.1 là gì")).isFalse();
+        assertThat(resolverService.hasExplicitScopeHint("mục tiêu 2 là gì")).isFalse();
+    }
 
     @Test
     void resolve_matchesExplicitChapterNumber() {
@@ -159,6 +171,24 @@ class RagScopeResolverServiceTest {
 
         assertThat(resolved.status()).isEqualTo(ScopeResolution.Status.RESOLVED);
         assertThat(resolved.node()).isEqualTo(sectionA);
+    }
+
+    @Test
+    void resolveDeterministicOnly_doesNotUseLlmForAmbiguousResolution() {
+        DocumentNodeRepository repository = mock(DocumentNodeRepository.class);
+        LlmScopeDisambiguationService llm = mock(LlmScopeDisambiguationService.class);
+        RagScopeResolverService resolverService = new RagScopeResolverService(repository, llm);
+        ChatSession session = session();
+        DocumentNode chapterA = node(101L, "chapter", "Chương I: Mở đầu", "Chương I", 1);
+        DocumentNode chapterB = node(102L, "chapter", "Chương I: Nội dung khác", "Chương I", 2);
+
+        when(repository.findBySubjectIdAndNodeTypeInOrderByOrderIndexAsc(eq(7L), any()))
+                .thenReturn(List.of(chapterA, chapterB));
+
+        ScopeResolution resolved = resolverService.resolveDeterministicOnly(session, "Tóm tắt chương I");
+
+        assertThat(resolved.status()).isEqualTo(ScopeResolution.Status.AMBIGUOUS);
+        verifyNoInteractions(llm);
     }
 
     private ChatSession session() {

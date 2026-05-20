@@ -1,5 +1,7 @@
 package com.example.teacherassistantai.config;
 
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -43,6 +45,8 @@ public class RagProperties {
     private Ai ai = new Ai();
 
     private Enrichment enrichment = new Enrichment();
+
+    private Retrieval retrieval = new Retrieval();
 
     @Data
     public static class Ai {
@@ -270,6 +274,20 @@ public class RagProperties {
 
             @Min(1)
             private int maxAttempts = 2;
+        }
+    }
+
+    @Data
+    public static class Retrieval {
+        private ScopedVector scopedVector = new ScopedVector();
+
+        @Data
+        public static class ScopedVector {
+            private boolean enabled = true;
+
+            @DecimalMin("0.0")
+            @DecimalMax("1.0")
+            private double minConfidence = 0.85;
         }
     }
 }

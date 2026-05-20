@@ -37,6 +37,8 @@ class RagPropertiesTest {
             assertThat(properties.getEnrichment().getRepair().getMaxAttempts()).isEqualTo(2);
             assertThat(properties.getEnrichment().getReviewQuestionComposition().getMaxQuestionsPerChapterInPart()).isEqualTo(5);
             assertThat(properties.getEnrichment().getReviewQuestionComposition().getMaxQuestionsPerChapterInDocument()).isEqualTo(3);
+            assertThat(properties.getRetrieval().getScopedVector().isEnabled()).isTrue();
+            assertThat(properties.getRetrieval().getScopedVector().getMinConfidence()).isEqualTo(0.85);
         });
     }
 
@@ -64,7 +66,9 @@ class RagPropertiesTest {
                         "application.rag.enrichment.repair.max-raw-response-chars=8000",
                         "application.rag.enrichment.repair.max-attempts=3",
                         "application.rag.enrichment.review-question-composition.max-questions-per-chapter-in-part=7",
-                        "application.rag.enrichment.review-question-composition.max-total-questions-in-document=25"
+                        "application.rag.enrichment.review-question-composition.max-total-questions-in-document=25",
+                        "application.rag.retrieval.scoped-vector.enabled=false",
+                        "application.rag.retrieval.scoped-vector.min-confidence=0.75"
                 )
                 .run(context -> {
                     RagProperties properties = context.getBean(RagProperties.class);
@@ -90,6 +94,8 @@ class RagPropertiesTest {
                     assertThat(properties.getEnrichment().getRepair().getMaxAttempts()).isEqualTo(3);
                     assertThat(properties.getEnrichment().getReviewQuestionComposition().getMaxQuestionsPerChapterInPart()).isEqualTo(7);
                     assertThat(properties.getEnrichment().getReviewQuestionComposition().getMaxTotalQuestionsInDocument()).isEqualTo(25);
+                    assertThat(properties.getRetrieval().getScopedVector().isEnabled()).isFalse();
+                    assertThat(properties.getRetrieval().getScopedVector().getMinConfidence()).isEqualTo(0.75);
                 });
     }
 

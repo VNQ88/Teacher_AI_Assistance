@@ -26,6 +26,7 @@ public class VectorRetrievalService {
     private final DocumentChunkRepository documentChunkRepository;
     private final RagProperties ragProperties;
     private final LocalRerankingService localRerankingService;
+    private final RagScopeResolverService ragScopeResolverService;
 
     public List<DocumentChunk> retrieve(ChatSession session, String question, int topK) {
         return retrieveTrace(session, question, topK).selected();
@@ -37,6 +38,8 @@ public class VectorRetrievalService {
                 .collect(java.util.stream.Collectors.groupingBy(localRerankingService::chunkType, LinkedHashMap::new, java.util.stream.Collectors.counting()));
         return RagDebugRetrieveResponse.builder()
                 .query(question)
+                .retrievalMode(trace.retrievalMode().name())
+                .scopedNodeId(trace.scopedNodeId())
                 .intentType(trace.intent().type().name())
                 .sectionNumber(trace.intent().sectionNumber())
                 .candidateCount(trace.candidates().size())
@@ -62,22 +65,60 @@ public class VectorRetrievalService {
         int candidateTopK = Math.max(safeTopK, ragProperties.getCandidateTopK());
         LocalRerankingService.RetrievalIntent intent = localRerankingService.detectIntent(question);
 
-        String embedInput = queryEmbeddingInput(question);
-        log.debug("Query embedding input length: {} (raw question length: {})",
-                embedInput.length(), question.length());
-        List<Double> questionEmbedding = embeddingGateway.embed(embedInput);
-        validateEmbeddingDimensions(questionEmbedding);
+        DocumentNode scopedNode = tryResolveScopedNode(session, question);
+        String queryVectorLiteral = queryVectorLiteral(question);
+        if (scopedNode != null) {
+            return doScopedVector(session, question, intent, safeTopK, candidateTopK, scopedNode, queryVectorLiteral);
+        }
+        return doFlatVector(session, question, intent, safeTopK, candidateTopK, queryVectorLiteral, RetrievalMode.FLAT_VECTOR, null);
+    }
 
-        String literal = toVectorLiteral(questionEmbedding);
-        List<DocumentChunk> candidates = documentChunkRepository.searchBySubjectVector(
+    private DocumentNode tryResolveScopedNode(ChatSession session, String question) {
+        RagProperties.Retrieval.ScopedVector cfg = ragProperties.getRetrieval().getScopedVector();
+        if (!cfg.isEnabled()) {
+            return null;
+        }
+        if (!ragScopeResolverService.hasExplicitScopeHint(question)) {
+            return null;
+        }
+        ScopeResolution resolution = ragScopeResolverService.resolveDeterministicOnly(session, question);
+        if (resolution.status() != ScopeResolution.Status.RESOLVED) {
+            return null;
+        }
+        if (resolution.confidence() < cfg.getMinConfidence()) {
+            return null;
+        }
+        if (resolution.node() == null) {
+            return null;
+        }
+        log.info("RAG scoped retrieval: nodeId={} nodeKey={} confidence={}",
+                resolution.node().getId(), resolution.node().getNodeKey(), resolution.confidence());
+        return resolution.node();
+    }
+
+    private RetrievalTrace doScopedVector(ChatSession session,
+                                          String question,
+                                          LocalRerankingService.RetrievalIntent intent,
+                                          int safeTopK,
+                                          int candidateTopK,
+                                          DocumentNode scopedNode,
+                                          String queryVectorLiteral) {
+        List<DocumentChunk> candidates = documentChunkRepository.searchByNodeSubtreeVector(
                 session.getSubject().getId(),
-                literal,
+                scopedNode.getId(),
+                queryVectorLiteral,
                 ragProperties.getMinChunkChars(),
-                candidateTopK,
-                intent.sectionNumber()
+                candidateTopK
         );
 
-        LocalRerankingService.RerankResult rerankResult = localRerankingService.rerank(question, candidates, intent, safeTopK);
+        if (candidates.isEmpty()) {
+            log.debug("Scoped retrieval empty for nodeId={} - fallback flat", scopedNode.getId());
+            return doFlatVector(session, question, intent, safeTopK, candidateTopK,
+                    queryVectorLiteral, RetrievalMode.SCOPED_EMPTY_FALLBACK, scopedNode.getId());
+        }
+
+        LocalRerankingService.RerankResult rerankResult =
+                localRerankingService.rerank(question, candidates, intent, safeTopK);
         List<DocumentChunk> selected = rerankResult.selected();
 
         logRetrievalDiagnostics(question, intent, candidates, rerankResult.policyCandidates(), selected);
@@ -87,8 +128,52 @@ public class VectorRetrievalService {
                 rerankResult.scored(),
                 rerankResult.policyCandidates(),
                 rerankResult.parentGroups(),
-                selected
+                selected,
+                RetrievalMode.SCOPED_VECTOR,
+                scopedNode.getId()
         );
+    }
+
+    private RetrievalTrace doFlatVector(ChatSession session,
+                                        String question,
+                                        LocalRerankingService.RetrievalIntent intent,
+                                        int safeTopK,
+                                        int candidateTopK,
+                                        String queryVectorLiteral,
+                                        RetrievalMode retrievalMode,
+                                        Long scopedNodeId) {
+        List<DocumentChunk> candidates = documentChunkRepository.searchBySubjectVector(
+                session.getSubject().getId(),
+                queryVectorLiteral,
+                ragProperties.getMinChunkChars(),
+                candidateTopK,
+                intent.sectionNumber()
+        );
+
+        LocalRerankingService.RerankResult rerankResult =
+                localRerankingService.rerank(question, candidates, intent, safeTopK);
+        List<DocumentChunk> selected = rerankResult.selected();
+
+        logRetrievalDiagnostics(question, intent, candidates, rerankResult.policyCandidates(), selected);
+        return new RetrievalTrace(
+                intent,
+                candidates,
+                rerankResult.scored(),
+                rerankResult.policyCandidates(),
+                rerankResult.parentGroups(),
+                selected,
+                retrievalMode,
+                scopedNodeId
+        );
+    }
+
+    private String queryVectorLiteral(String question) {
+        String embedInput = queryEmbeddingInput(question);
+        log.debug("Query embedding input length: {} (raw question length: {})",
+                embedInput.length(), question.length());
+        List<Double> questionEmbedding = embeddingGateway.embed(embedInput);
+        validateEmbeddingDimensions(questionEmbedding);
+        return toVectorLiteral(questionEmbedding);
     }
 
     private String queryEmbeddingInput(String question) {
@@ -232,13 +317,21 @@ public class VectorRetrievalService {
         return builder.toString();
     }
 
+    private enum RetrievalMode {
+        FLAT_VECTOR,
+        SCOPED_VECTOR,
+        SCOPED_EMPTY_FALLBACK
+    }
+
     private record RetrievalTrace(
             LocalRerankingService.RetrievalIntent intent,
             List<DocumentChunk> candidates,
             List<LocalRerankingService.ScoredChunk> scored,
             List<LocalRerankingService.ScoredChunk> policyCandidates,
             List<LocalRerankingService.ScoredParentGroup> parentGroups,
-            List<DocumentChunk> selected
+            List<DocumentChunk> selected,
+            RetrievalMode retrievalMode,
+            Long scopedNodeId
     ) {
     }
 }
