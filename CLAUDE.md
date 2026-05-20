@@ -95,6 +95,14 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - Paging responses use `PageResponse<?>` wrappers (see `QuestionBankService`, `ExamService`, `UserService`).
 - DTO mapping is mostly manual in services (`toResponse(...)` helpers), with selective mapper classes (`mapper/UserMapper.java`).
 
+## RAG Embedding Conventions
+- Document chunks have two text fields:
+    - `content` (TEXT) = breadcrumb + "\n\n" + body; sent to LLM as context/debug/citation text.
+    - `embed_text` (TEXT) = body only; used to generate the embedding vector.
+- Query embeddings must be prefixed with `RagProperties.Ai.queryInstructionPrefix` for Qwen3 asymmetric retrieval.
+- Do not embed structural text (breadcrumb, sectionPath, headings) into document vectors; use `section_path` and `LocalRerankingService` for structural matching.
+- Section/chapter intent detection happens at rerank time, not at embedding time.
+
 ## Integration and Data Flow Hotspots
 - Auth flow: `AuthenticationController` -> `AuthenticationService` -> JWT (`JwtService`) + Redis revocation (`integration/redis/RedisTokenService`).
 - Refresh/logout currently read refresh token from `HttpHeaders.REFERER` (non-standard; preserve unless intentionally refactoring).

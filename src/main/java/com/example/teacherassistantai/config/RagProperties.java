@@ -60,6 +60,9 @@ public class RagProperties {
         @Min(1)
         private int timeoutSeconds = 60;
 
+        private String queryInstructionPrefix =
+                "Instruct: Given an educational question in Vietnamese, retrieve relevant textbook passages that answer it.\nQuery: ";
+
         private EnrichmentAi enrichment = new EnrichmentAi();
 
         private RateLimit rateLimit = new RateLimit();

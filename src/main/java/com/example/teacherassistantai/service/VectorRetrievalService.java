@@ -62,7 +62,10 @@ public class VectorRetrievalService {
         int candidateTopK = Math.max(safeTopK, ragProperties.getCandidateTopK());
         LocalRerankingService.RetrievalIntent intent = localRerankingService.detectIntent(question);
 
-        List<Double> questionEmbedding = embeddingGateway.embed(question);
+        String embedInput = queryEmbeddingInput(question);
+        log.debug("Query embedding input length: {} (raw question length: {})",
+                embedInput.length(), question.length());
+        List<Double> questionEmbedding = embeddingGateway.embed(embedInput);
         validateEmbeddingDimensions(questionEmbedding);
 
         String literal = toVectorLiteral(questionEmbedding);
@@ -86,6 +89,11 @@ public class VectorRetrievalService {
                 rerankResult.parentGroups(),
                 selected
         );
+    }
+
+    private String queryEmbeddingInput(String question) {
+        String prefix = ragProperties.getAi().getQueryInstructionPrefix();
+        return (prefix == null ? "" : prefix) + question;
     }
 
     private void validateEmbeddingDimensions(List<Double> embedding) {

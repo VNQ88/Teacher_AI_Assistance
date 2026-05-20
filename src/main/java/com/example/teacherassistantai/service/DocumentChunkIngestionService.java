@@ -97,7 +97,12 @@ public class DocumentChunkIngestionService {
                         semaphore.acquireUninterruptibly();
                         try {
                             // HTTP call outside transaction — no connection held during network wait
-                            List<String> texts = batch.stream().map(DocumentChunk::getContent).toList();
+                            List<String> texts = batch.stream().map(DocumentChunk::getEmbedText).toList();
+                            if (log.isDebugEnabled() && !texts.isEmpty()) {
+                                String sample = texts.getFirst();
+                                log.debug("First chunk embedText sample (first 100 chars): {}",
+                                        sample.substring(0, Math.min(100, sample.length())));
+                            }
                             List<List<Double>> embeddings = embeddingGateway.embedAll(texts);
 
                             if (embeddings.size() != batch.size()) {
@@ -149,6 +154,7 @@ public class DocumentChunkIngestionService {
         for (int i = 0; i < rawChunks.size(); i++) {
             HierarchicalMarkdownChunk hc = rawChunks.get(i);
             String content = hc.content();
+            String embedText = hc.embedText();
             DocumentNode node = resolveNode(nodeByKey, hc.nodeId(), "nodeId");
             DocumentNode parentNode = resolveNode(nodeByKey, hc.parentNodeId(), "parentNodeId");
             shells.add(DocumentChunk.builder()
@@ -163,6 +169,7 @@ public class DocumentChunkIngestionService {
                     .pageFrom(hc.pageFrom())
                     .pageTo(hc.pageTo())
                     .content(content)
+                    .embedText(embedText)
                     .tokenCount(Math.max(1, content.length() / 4))
                     .metadataJsonb(chunkMetadataBuilder.buildHierarchicalJsonb(
                             hc.pageFrom(), hc.pageTo(), hc.sectionHeader(), hc.chunkType(),

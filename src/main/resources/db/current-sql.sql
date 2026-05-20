@@ -230,6 +230,7 @@ create table document_chunks
     updated_at     timestamp(6)                                  not null,
     chunk_index    integer                                       not null,
     content        text                                          not null,
+    embed_text     text        default ''::text                  not null,
     subject_id     bigint                                        not null,
     document_id    bigint                                        not null
         constraint fkks8knsiau23lcmv9mydqjmj84
@@ -253,6 +254,8 @@ create table document_chunks
 );
 
 comment on column document_chunks.embedding is 'DigitalOcean Qwen3 Embedding 0.6B vectors stored as vector(1024)';
+
+comment on column document_chunks.embed_text is 'Text used to generate the embedding vector; body only, no breadcrumb prefix.';
 
 alter table document_chunks
     owner to postgres;

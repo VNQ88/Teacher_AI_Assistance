@@ -18,12 +18,11 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class DocumentEnrichmentArtifactValidationService {
@@ -49,13 +48,17 @@ public class DocumentEnrichmentArtifactValidationService {
                                                 int minQuestionCount,
                                                 int maxQuestionCount) {
         JsonNode root = normalizeArtifactJson(artifactType, readJsonObject(rawResponse));
+        SummaryCoverage expectedSummaryCoverage = null;
+        SummaryMode expectedSummaryMode = null;
         if (artifactType == DocumentNodeArtifactType.SUMMARY) {
+            expectedSummaryCoverage = SummaryCoverage.chunksOnly(safeSize(scopeChunks), safeSize(scopeChunks));
+            expectedSummaryMode = chunksFallbackMode(node);
             validateSummary(
                     root,
                     scopeChunks,
                     List.of(),
-                    SummaryCoverage.chunksOnly(safeSize(scopeChunks), safeSize(scopeChunks)),
-                    chunksFallbackMode(node)
+                    expectedSummaryCoverage,
+                    expectedSummaryMode
             );
         } else if (artifactType == DocumentNodeArtifactType.REVIEW_QUESTION_SET) {
             validateReviewQuestions(root, scopeChunks, minQuestionCount, maxQuestionCount);
@@ -63,10 +66,13 @@ public class DocumentEnrichmentArtifactValidationService {
             throw new InvalidDataException("Unsupported enrichment artifact type: " + artifactType);
         }
         Map<String, Object> content = toMap(root);
+        if (artifactType == DocumentNodeArtifactType.SUMMARY) {
+            normalizeSummaryContent(content, node, scopeChunks, List.of(), expectedSummaryCoverage, expectedSummaryMode);
+        }
         normalizeReviewQuestionCount(artifactType, content);
-        content.putIfAbsent("nodeTitle", node.getTitle());
-        content.putIfAbsent("sectionPath", node.getSectionPath());
-        content.putIfAbsent("nodeType", node.getNodeType());
+        content.putIfAbsent("nodeTitle", node == null ? null : node.getTitle());
+        content.putIfAbsent("sectionPath", node == null ? null : node.getSectionPath());
+        content.putIfAbsent("nodeType", node == null ? null : node.getNodeType());
         if (artifactType == DocumentNodeArtifactType.REVIEW_QUESTION_SET) {
             content.put("requestedQuestionMinCount", minQuestionCount);
             content.put("requestedQuestionMaxCount", maxQuestionCount);
@@ -84,9 +90,7 @@ public class DocumentEnrichmentArtifactValidationService {
         JsonNode root = normalizeArtifactJson(DocumentNodeArtifactType.SUMMARY, readJsonObject(rawResponse));
         validateSummary(root, directChunks, childSummaries, expectedCoverage, expectedMode);
         Map<String, Object> content = toMap(root);
-        content.putIfAbsent("nodeTitle", node.getTitle());
-        content.putIfAbsent("sectionPath", node.getSectionPath());
-        content.putIfAbsent("nodeType", node.getNodeType());
+        normalizeSummaryContent(content, node, directChunks, childSummaries, expectedCoverage, expectedMode);
         content.put("generated", true);
         return content;
     }
@@ -256,9 +260,7 @@ public class DocumentEnrichmentArtifactValidationService {
                                  SummaryMode expectedMode) {
         requireText(root, "summary", "Summary is required");
         validateSummaryMode(root, expectedMode);
-        validateSummaryCoverage(root.path("coverage"), expectedCoverage);
-        validateChildSummaryRefs(root.path("childSummaryRefs"), childSummaries);
-        validateSummaryChildSummaries(root.path("childSummaries"), childSummaries);
+        validateExpectedSummaryCoverage(expectedCoverage);
         validateSummaryCitations(root.path("citations"), validChunkIds(directChunks), "summary citations");
     }
 
@@ -383,10 +385,10 @@ public class DocumentEnrichmentArtifactValidationService {
     }
 
     private void validateSummaryCitations(JsonNode citations, Set<Long> validChunkIds, String fieldName) {
+        if (validChunkIds.isEmpty()) {
+            return;
+        }
         if (!citations.isArray() || citations.isEmpty()) {
-            if (validChunkIds.isEmpty()) {
-                return;
-            }
             throw new InvalidDataException(fieldName + " must contain at least one citation");
         }
         for (JsonNode citation : citations) {
@@ -411,107 +413,6 @@ public class DocumentEnrichmentArtifactValidationService {
         }
         if (expectedMode != null && actualMode != expectedMode) {
             throw new InvalidDataException("summaryMode must be " + expectedMode);
-        }
-    }
-
-    private void validateSummaryCoverage(JsonNode coverage, SummaryCoverage expectedCoverage) {
-        if (!coverage.isObject()) {
-            throw new InvalidDataException("coverage is required");
-        }
-        if (!coverage.path("complete").asBoolean(false)) {
-            throw new InvalidDataException("coverage.complete must be true");
-        }
-        int expectedChildCount = requireInt(coverage, "expectedChildCount", "coverage.expectedChildCount is required");
-        int usedChildCount = requireInt(coverage, "usedChildCount", "coverage.usedChildCount is required");
-        int directChunkCount = requireInt(coverage, "directChunkCount", "coverage.directChunkCount is required");
-        int usedDirectChunkCount = requireInt(coverage, "usedDirectChunkCount", "coverage.usedDirectChunkCount is required");
-        int fallbackChildCount = coverage.path("fallbackChildCount").asInt(0);
-        List<Long> missingChildNodeIds = requireLongArray(coverage.path("missingChildNodeIds"), "coverage.missingChildNodeIds");
-        if (!missingChildNodeIds.isEmpty()) {
-            throw new InvalidDataException("coverage.missingChildNodeIds must be empty when coverage is complete");
-        }
-        if (usedChildCount > expectedChildCount) {
-            throw new InvalidDataException("coverage.usedChildCount cannot exceed expectedChildCount");
-        }
-        if (fallbackChildCount < 0 || fallbackChildCount > expectedChildCount) {
-            throw new InvalidDataException("coverage.fallbackChildCount out of range");
-        }
-        if (expectedChildCount > 0 && usedChildCount + fallbackChildCount < expectedChildCount) {
-            throw new InvalidDataException(
-                    "coverage incomplete: expected=" + expectedChildCount
-                            + " used=" + usedChildCount
-                            + " fallback=" + fallbackChildCount);
-        }
-        if (usedDirectChunkCount > directChunkCount) {
-            throw new InvalidDataException("coverage.usedDirectChunkCount cannot exceed directChunkCount");
-        }
-        if (expectedCoverage == null) {
-            return;
-        }
-        if (expectedChildCount != expectedCoverage.expectedChildCount()
-                || usedChildCount != expectedCoverage.usedChildCount()
-                || directChunkCount != expectedCoverage.directChunkCount()
-                || usedDirectChunkCount != expectedCoverage.usedDirectChunkCount()
-                || fallbackChildCount != expectedCoverage.fallbackChildCount()
-                || !Objects.equals(missingChildNodeIds, expectedCoverage.missingChildNodeIds())) {
-            throw new InvalidDataException("coverage does not match expected summary input");
-        }
-    }
-
-    private void validateChildSummaryRefs(JsonNode childSummaryRefs, List<ChildSummary> expectedChildSummaries) {
-        List<ChildSummary> safeSummaries = expectedChildSummaries == null ? List.of() : expectedChildSummaries;
-        if (safeSummaries.isEmpty()) {
-            if (childSummaryRefs.isMissingNode() || (childSummaryRefs.isArray() && childSummaryRefs.isEmpty())) {
-                return;
-            }
-            if (!childSummaryRefs.isArray()) {
-                throw new InvalidDataException("childSummaryRefs must be an array");
-            }
-            return;
-        }
-        if (!childSummaryRefs.isArray()) {
-            throw new InvalidDataException("childSummaryRefs must be an array");
-        }
-        if (childSummaryRefs.size() != safeSummaries.size()) {
-            throw new InvalidDataException("childSummaryRefs size must match used child summaries");
-        }
-        Map<Long, ChildSummary> expectedByNodeId = safeSummaries.stream()
-                .filter(summary -> summary.nodeId() != null)
-                .collect(Collectors.toMap(ChildSummary::nodeId, summary -> summary, (first, ignored) -> first));
-        for (JsonNode ref : childSummaryRefs) {
-            Long nodeId = requireLong(ref, "nodeId", "childSummaryRefs.nodeId is required");
-            ChildSummary expected = expectedByNodeId.get(nodeId);
-            if (expected == null) {
-                throw new InvalidDataException("childSummaryRefs contains unexpected nodeId: " + nodeId);
-            }
-            Long artifactId = requireLong(ref, "artifactId", "childSummaryRefs.artifactId is required");
-            if (expected.artifactId() != null && !expected.artifactId().equals(artifactId)) {
-                throw new InvalidDataException("childSummaryRefs artifactId does not match nodeId: " + nodeId);
-            }
-            String sourceHash = requireText(ref, "sourceHash", "childSummaryRefs.sourceHash is required");
-            if (StringUtils.hasText(expected.sourceHash()) && !expected.sourceHash().equals(sourceHash)) {
-                throw new InvalidDataException("childSummaryRefs sourceHash does not match nodeId: " + nodeId);
-            }
-        }
-    }
-
-    private void validateSummaryChildSummaries(JsonNode childSummaries, List<ChildSummary> expectedChildSummaries) {
-        List<ChildSummary> safeSummaries = expectedChildSummaries == null ? List.of() : expectedChildSummaries;
-        if (safeSummaries.isEmpty()) {
-            if (childSummaries.isMissingNode() || (childSummaries.isArray() && childSummaries.isEmpty())) {
-                return;
-            }
-            if (!childSummaries.isArray()) {
-                throw new InvalidDataException("childSummaries must be an array");
-            }
-            return;
-        }
-        if (!childSummaries.isArray() || childSummaries.size() != safeSummaries.size()) {
-            throw new InvalidDataException("childSummaries size must match used child summaries");
-        }
-        for (JsonNode childSummary : childSummaries) {
-            requireLong(childSummary, "nodeId", "childSummaries.nodeId is required");
-            requireText(childSummary, "summary", "childSummaries.summary is required");
         }
     }
 
@@ -545,6 +446,78 @@ public class DocumentEnrichmentArtifactValidationService {
         return chars >= ENOUGH_CONTEXT_CHARS;
     }
 
+    private void normalizeSummaryContent(Map<String, Object> content,
+                                         DocumentNode node,
+                                         List<DocumentChunk> directChunks,
+                                         List<ChildSummary> childSummaries,
+                                         SummaryCoverage expectedCoverage,
+                                         SummaryMode expectedMode) {
+        content.put("nodeTitle", node == null ? null : node.getTitle());
+        content.put("sectionPath", node == null ? null : node.getSectionPath());
+        content.put("nodeType", node == null ? null : node.getNodeType());
+        if (expectedMode != null) {
+            content.put("summaryMode", expectedMode.name());
+        }
+        if (validChunkIds(directChunks).isEmpty()) {
+            content.put("citations", List.of());
+        }
+        content.put("coverage", summaryCoverageMetadata(expectedCoverage));
+        content.put("childSummaries", childSummariesMetadata(childSummaries));
+        content.put("childSummaryRefs", childSummaryRefs(childSummaries));
+    }
+
+    private void validateExpectedSummaryCoverage(SummaryCoverage coverage) {
+        if (coverage == null) {
+            return;
+        }
+        if (!coverage.complete()) {
+            throw new InvalidDataException("expected summary coverage must be complete");
+        }
+        if (coverage.usedChildCount() > coverage.expectedChildCount()) {
+            throw new InvalidDataException("expected summary coverage usedChildCount cannot exceed expectedChildCount");
+        }
+        if (coverage.fallbackChildCount() < 0 || coverage.fallbackChildCount() > coverage.expectedChildCount()) {
+            throw new InvalidDataException("expected summary coverage fallbackChildCount out of range");
+        }
+        if (coverage.expectedChildCount() > 0
+                && coverage.usedChildCount() + coverage.fallbackChildCount() < coverage.expectedChildCount()) {
+            throw new InvalidDataException("expected summary coverage is incomplete");
+        }
+        if (coverage.usedDirectChunkCount() > coverage.directChunkCount()) {
+            throw new InvalidDataException("expected summary coverage usedDirectChunkCount cannot exceed directChunkCount");
+        }
+        if (coverage.missingChildNodeIds() != null && !coverage.missingChildNodeIds().isEmpty()) {
+            throw new InvalidDataException("expected summary coverage missingChildNodeIds must be empty");
+        }
+    }
+
+    private Map<String, Object> summaryCoverageMetadata(SummaryCoverage coverage) {
+        Map<String, Object> metadata = new LinkedHashMap<>();
+        metadata.put("expectedChildCount", coverage == null ? 0 : coverage.expectedChildCount());
+        metadata.put("usedChildCount", coverage == null ? 0 : coverage.usedChildCount());
+        metadata.put("missingChildNodeIds", coverage == null ? List.of() : coverage.missingChildNodeIds());
+        metadata.put("directChunkCount", coverage == null ? 0 : coverage.directChunkCount());
+        metadata.put("usedDirectChunkCount", coverage == null ? 0 : coverage.usedDirectChunkCount());
+        metadata.put("complete", coverage == null || coverage.complete());
+        metadata.put("fallbackChildCount", coverage == null ? 0 : coverage.fallbackChildCount());
+        return metadata;
+    }
+
+    private List<Map<String, Object>> childSummariesMetadata(List<ChildSummary> childSummaries) {
+        return (childSummaries == null ? List.<ChildSummary>of() : childSummaries).stream()
+                .map(summary -> {
+                    Map<String, Object> metadata = new LinkedHashMap<>();
+                    metadata.put("nodeId", summary.nodeId());
+                    metadata.put("nodeType", summary.nodeType());
+                    metadata.put("title", summary.title());
+                    metadata.put("sectionPath", summary.sectionPath());
+                    metadata.put("summary", summary.summary());
+                    metadata.put("citations", summary.citations() == null ? List.of() : summary.citations());
+                    return metadata;
+                })
+                .toList();
+    }
+
     private boolean hasEnoughContext(ReviewQuestionGenerationContext context) {
         int chars = 0;
         for (DocumentChunk chunk : context.allowedCitationChunks()) {
@@ -564,7 +537,7 @@ public class DocumentEnrichmentArtifactValidationService {
         if (coverage == null) {
             return Map.of();
         }
-        Map<String, Object> metadata = new java.util.LinkedHashMap<>();
+        Map<String, Object> metadata = new LinkedHashMap<>();
         metadata.put("expectedChildCount", coverage.expectedChildCount());
         metadata.put("usedChildSummaryCount", coverage.usedChildSummaryCount());
         metadata.put("fallbackChildCount", coverage.fallbackChildCount());
@@ -578,7 +551,7 @@ public class DocumentEnrichmentArtifactValidationService {
     private List<Map<String, Object>> childSummaryRefs(List<ChildSummary> childSummaries) {
         return (childSummaries == null ? List.<ChildSummary>of() : childSummaries).stream()
                 .map(summary -> {
-                    Map<String, Object> ref = new java.util.LinkedHashMap<>();
+                    Map<String, Object> ref = new LinkedHashMap<>();
                     ref.put("nodeId", summary.nodeId());
                     ref.put("artifactId", summary.artifactId());
                     ref.put("sourceHash", summary.sourceHash());
@@ -600,36 +573,6 @@ public class DocumentEnrichmentArtifactValidationService {
             case "part" -> SummaryMode.PART_FALLBACK;
             default -> SummaryMode.CHAPTER_FALLBACK;
         };
-    }
-
-    private int requireInt(JsonNode node, String fieldName, String message) {
-        JsonNode value = node.path(fieldName);
-        if (!value.isIntegralNumber()) {
-            throw new InvalidDataException(message);
-        }
-        return value.asInt();
-    }
-
-    private Long requireLong(JsonNode node, String fieldName, String message) {
-        JsonNode value = node.path(fieldName);
-        if (!value.isIntegralNumber()) {
-            throw new InvalidDataException(message);
-        }
-        return value.asLong();
-    }
-
-    private List<Long> requireLongArray(JsonNode node, String fieldName) {
-        if (!node.isArray()) {
-            throw new InvalidDataException(fieldName + " must be an array");
-        }
-        java.util.ArrayList<Long> values = new java.util.ArrayList<>();
-        for (JsonNode item : node) {
-            if (!item.isIntegralNumber()) {
-                throw new InvalidDataException(fieldName + " must contain only numeric node ids");
-            }
-            values.add(item.asLong());
-        }
-        return values;
     }
 
     private String requireText(JsonNode node, String fieldName, String message) {

@@ -58,6 +58,43 @@ class MarkdownChunkingServiceHierarchyTest {
     }
 
     @Test
+    void parseHierarchicalDocument_keepsBreadcrumbInContentButNotEmbedText() {
+        MarkdownChunkingService.HierarchicalMarkdownDocument document =
+                chunkingService.parseHierarchicalDocument("""
+                        # Tài liệu
+
+                        ### Chương 1: Tổng quan
+
+                        #### I. Khái niệm
+
+                        Nội dung chính.
+                        """);
+
+        HierarchicalMarkdownChunk chunk = document.chunks().getFirst();
+
+        assertThat(chunk.content())
+                .contains("Chương 1: Tổng quan > I. Khái niệm")
+                .contains("Nội dung chính.");
+        assertThat(chunk.embedText())
+                .isEqualTo("Nội dung chính.")
+                .doesNotContain("Chương 1")
+                .doesNotContain(" > ");
+    }
+
+    @Test
+    void chunkHierarchical_setsFlatFallbackEmbedTextEqualToContent() {
+        List<HierarchicalMarkdownChunk> chunks = chunkingService.chunkHierarchical("""
+                Nội dung không có heading.
+
+                Đoạn thứ hai.
+                """);
+
+        assertThat(chunks)
+                .isNotEmpty()
+                .allSatisfy(chunk -> assertThat(chunk.embedText()).isEqualTo(chunk.content()));
+    }
+
+    @Test
     void normalizeMarkdownForHierarchy_repairs_broken_and_attached_headings() {
         String markdown = """
                 ### Chương 5: Luật Hành Chính Hoạt động chấp hành và điều hành là một loại hoạt động quản lý.

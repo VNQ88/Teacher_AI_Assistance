@@ -29,9 +29,12 @@ class DocumentEnrichmentPromptBuilderTest {
         assertThat(prompt).contains("Tao summary");
         assertThat(prompt).contains("Chi dua vao context chunks");
         assertThat(prompt).contains("Chi tra ve mot JSON object hop le");
-        assertThat(prompt).contains("\"summaryMode\": \"string\"");
+        assertThat(prompt).contains("\"summaryMode\": \"CHAPTER_FALLBACK\"");
         assertThat(prompt).contains("\"summary\": \"string\"");
-        assertThat(prompt).contains("\"coverage\"");
+        assertThat(prompt).contains("Backend se tu them metadata node, coverage va child summary refs");
+        assertThat(prompt).doesNotContain("\"coverage\"");
+        assertThat(prompt).doesNotContain("\"childSummaries\"");
+        assertThat(prompt).doesNotContain("\"childSummaryRefs\"");
         assertThat(prompt).contains("summaryMode bat buoc: CHAPTER_FALLBACK");
         assertThat(prompt).contains("chunkId: 200");
         assertThat(prompt).contains("path: Chương 1");

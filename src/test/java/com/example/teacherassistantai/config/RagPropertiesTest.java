@@ -21,6 +21,8 @@ class RagPropertiesTest {
             assertThat(properties.getAi().getBaseUrl()).isEqualTo("https://inference.do-ai.run");
             assertThat(properties.getAi().getChatModel()).isEqualTo("openai-gpt-oss-120b");
             assertThat(properties.getAi().getEmbeddingModel()).isEqualTo("qwen3-embedding-0.6b");
+            assertThat(properties.getAi().getQueryInstructionPrefix())
+                    .isEqualTo("Instruct: Given an educational question in Vietnamese, retrieve relevant textbook passages that answer it.\nQuery: ");
             assertThat(properties.getAi().getEnrichment().getSummaryModel()).isEqualTo("openai-gpt-5-mini");
             assertThat(properties.getAi().getEnrichment().getReviewQuestionModel()).isEqualTo("openai-gpt-oss-120b");
             assertThat(properties.getAi().getEnrichment().getOnDemandReviewQuestionModel()).isEqualTo("gemma-4-31B-it");
@@ -47,6 +49,7 @@ class RagPropertiesTest {
                         "application.rag.ai.chat-model=test-chat",
                         "application.rag.ai.embedding-model=test-embedding",
                         "application.rag.ai.timeout-seconds=45",
+                        "application.rag.ai.query-instruction-prefix=custom query prefix:",
                         "application.rag.ai.enrichment.base-url=https://enrichment.test",
                         "application.rag.ai.enrichment.api-key=test-key",
                         "application.rag.ai.enrichment.summary-model=test-summary",
@@ -71,6 +74,7 @@ class RagPropertiesTest {
                     assertThat(properties.getAi().getChatModel()).isEqualTo("test-chat");
                     assertThat(properties.getAi().getEmbeddingModel()).isEqualTo("test-embedding");
                     assertThat(properties.getAi().getTimeoutSeconds()).isEqualTo(45);
+                    assertThat(properties.getAi().getQueryInstructionPrefix()).isEqualTo("custom query prefix:");
                     assertThat(properties.getAi().getEnrichment().getBaseUrl()).isEqualTo("https://enrichment.test");
                     assertThat(properties.getAi().getEnrichment().getApiKey()).isEqualTo("test-key");
                     assertThat(properties.getAi().getEnrichment().getSummaryModel()).isEqualTo("test-summary");

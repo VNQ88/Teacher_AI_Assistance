@@ -81,7 +81,10 @@ class DocumentChunkIngestionServiceHierarchyTest {
         assertThat(chunks).hasSize(1);
 
         ArgumentCaptor<DocumentChunk> chunkCaptor = ArgumentCaptor.forClass(DocumentChunk.class);
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<String>> embeddingInputsCaptor = ArgumentCaptor.forClass(List.class);
         verify(chunkRepository).save(chunkCaptor.capture());
+        verify(embeddingGateway).embedAll(embeddingInputsCaptor.capture());
         verify(chunkRepository).updateEmbeddingLiteral(eq(99L), eq("[0.1,0.1,0.1,0.1]"));
 
         DocumentChunk saved = chunkCaptor.getValue();
@@ -90,6 +93,14 @@ class DocumentChunkIngestionServiceHierarchyTest {
         assertThat(saved.getSectionPath()).isEqualTo("Chương 1: Tổng quan > I. Khái niệm");
         assertThat(saved.getSourceOrder()).isEqualTo(1);
         assertThat(saved.getPageFrom()).isNull();
+        assertThat(saved.getContent())
+                .contains("Chương 1: Tổng quan > I. Khái niệm")
+                .contains("Nội dung chính.");
+        assertThat(saved.getEmbedText())
+                .isEqualTo("Nội dung chính.")
+                .doesNotContain("Chương 1")
+                .doesNotContain(" > ");
+        assertThat(embeddingInputsCaptor.getValue()).containsExactly("Nội dung chính.");
         assertThat(saved.getMetadataJsonb()).containsEntry("nodeId", "n2");
         assertThat(saved.getMetadataJsonb()).containsEntry("parentNodeId", "n1");
     }

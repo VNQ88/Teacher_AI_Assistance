@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -161,27 +160,15 @@ public class LlmDocumentNodeArtifactGenerator implements DocumentNodeArtifactGen
             return buildReviewQuestionRepairPrompt(context, rawResponse, validationError);
         }
         prompt.append("Schema bat buoc:\n");
-        prompt.append("""
+        prompt.append(String.format("""
                 {
-                  "nodeTitle": "string",
-                  "sectionPath": "string",
-                  "nodeType": "string",
-                  "summaryMode": "SUBSECTION_LEVEL2_FROM_CHUNKS|SUBSECTION_FROM_CHUNKS|SECTION_FROM_CHUNKS_FALLBACK|CHAPTER_FALLBACK|PART_FALLBACK",
+                  "summaryMode": "%s",
                   "summary": "string",
                   "keyPoints": ["string"],
-                  "childSummaries": [],
-                  "childSummaryRefs": [],
-                  "citations": [{"chunkId": 123, "pageFrom": 1, "pageTo": 2}],
-                  "coverage": {
-                    "expectedChildCount": 0,
-                    "usedChildCount": 0,
-                    "missingChildNodeIds": [],
-                    "directChunkCount": 1,
-                    "usedDirectChunkCount": 1,
-                    "complete": true
-                  }
+                  "citations": %s
                 }
-                """);
+                """, summaryModeFor(context), summaryCitationSchema(context.chunks())));
+        prompt.append("Backend se tu them node metadata, coverage, childSummaries va childSummaryRefs; khong can output cac field do.\n");
         prompt.append("\nOriginal prompt/context:\n<<<PROMPT>>>\n")
                 .append(originalPrompt)
                 .append("\n<<<END_PROMPT>>>\n");
@@ -234,46 +221,24 @@ public class LlmDocumentNodeArtifactGenerator implements DocumentNodeArtifactGen
                                             String originalPrompt,
                                             String rawResponse,
                                             String validationError) {
-        SummaryCoverage cov = context.coverage();
-        int expChild = cov != null ? cov.expectedChildCount() : 0;
-        int usedChild = cov != null ? cov.usedChildCount() : 0;
-        int fallback = cov != null ? cov.fallbackChildCount() : 0;
-        int directChunk = cov != null ? cov.directChunkCount() : 0;
-        int usedDirect = cov != null ? cov.usedDirectChunkCount() : 0;
-
         StringBuilder prompt = new StringBuilder();
         prompt.append("Sua JSON summary bottom-up bi loi schema. Chi tra ve mot JSON object hop le, khong markdown/code fence.\n");
         prompt.append("Validation error: ").append(validationError).append("\n");
         prompt.append("Summary mode: ").append(context.summaryMode()).append("\n");
         prompt.append("Node title: ").append(context.node().getTitle()).append("\n");
         prompt.append("Section path: ").append(context.node().getSectionPath()).append("\n\n");
-        prompt.append("Schema bat buoc (tat ca gia tri so va mang phai khop chinh xac voi cac gia tri sau):\n");
+        prompt.append("Backend se tu them node metadata, coverage, childSummaries va childSummaryRefs; khong can output cac field do.\n");
+        prompt.append("Schema bat buoc:\n");
         prompt.append(String.format("""
                 {
-                  "nodeTitle": "string",
-                  "sectionPath": "string",
-                  "nodeType": "string",
                   "summaryMode": "%s",
                   "summary": "string",
                   "keyPoints": ["string"],
-                  "childSummaries": %s,
-                  "childSummaryRefs": %s,
-                  "citations": [],
-                  "coverage": {
-                    "expectedChildCount": %d,
-                    "usedChildCount": %d,
-                    "fallbackChildCount": %d,
-                    "missingChildNodeIds": [],
-                    "directChunkCount": %d,
-                    "usedDirectChunkCount": %d,
-                    "complete": true
-                  }
+                  "citations": %s
                 }
                 """,
                 context.summaryMode().name(),
-                buildChildSummariesSchema(context.childSummaries()),
-                buildChildSummaryRefsSchema(context.childSummaries()),
-                expChild, usedChild, fallback, directChunk, usedDirect
+                summaryCitationSchema(context.directChunks())
         ));
         prompt.append("\nOriginal prompt/context:\n<<<PROMPT>>>\n")
                 .append(originalPrompt)
@@ -303,33 +268,23 @@ public class LlmDocumentNodeArtifactGenerator implements DocumentNodeArtifactGen
         return estimateTokenCount(prompt, response);
     }
 
-    private String buildChildSummaryRefsSchema(List<ChildSummary> childSummaries) {
-        if (childSummaries == null || childSummaries.isEmpty()) {
+    private String summaryCitationSchema(List<com.example.teacherassistantai.entity.DocumentChunk> chunks) {
+        List<com.example.teacherassistantai.entity.DocumentChunk> safeChunks = chunks == null ? List.of() : chunks;
+        if (safeChunks.isEmpty()) {
             return "[]";
         }
-        String entries = childSummaries.stream()
-                .map(cs -> String.format(
-                        "{\"nodeId\": %d, \"artifactId\": %d, \"sourceHash\": \"%s\"}",
-                        cs.nodeId() != null ? cs.nodeId() : 0,
-                        cs.artifactId() != null ? cs.artifactId() : 0,
-                        cs.sourceHash() != null ? cs.sourceHash().replace("\"", "\\\"") : ""
-                ))
-                .collect(Collectors.joining(", "));
-        return "[" + entries + "]";
+        Long chunkId = safeChunks.getFirst().getId();
+        return "[{\"chunkId\": " + (chunkId == null ? 0 : chunkId) + ", \"pageFrom\": 1, \"pageTo\": 1}]";
     }
 
-    private String buildChildSummariesSchema(List<ChildSummary> childSummaries) {
-        if (childSummaries == null || childSummaries.isEmpty()) {
-            return "[]";
-        }
-        String entries = childSummaries.stream()
-                .map(cs -> String.format(
-                        "{\"nodeId\": %d, \"summary\": \"<tom tat noi dung cua %s>\"}",
-                        cs.nodeId() != null ? cs.nodeId() : 0,
-                        cs.title() != null ? cs.title().replace("\"", "\\\"") : "node " + cs.nodeId()
-                ))
-                .collect(Collectors.joining(", "));
-        return "[" + entries + "]";
+    private String summaryModeFor(DocumentNodeArtifactGenerationContext context) {
+        return switch (context.node() == null ? "" : context.node().getNodeType()) {
+            case "subsection_level2" -> SummaryMode.SUBSECTION_LEVEL2_FROM_CHUNKS.name();
+            case "subsection" -> SummaryMode.SUBSECTION_FROM_CHUNKS.name();
+            case "section" -> SummaryMode.SECTION_FROM_CHUNKS_FALLBACK.name();
+            case "part" -> SummaryMode.PART_FALLBACK.name();
+            default -> SummaryMode.CHAPTER_FALLBACK.name();
+        };
     }
 
     private List<Long> allowedCitationIds(DocumentNodeArtifactGenerationContext context) {

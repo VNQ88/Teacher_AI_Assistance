@@ -71,9 +71,12 @@ public class DocumentChunk extends BaseEntity {
     @Column(columnDefinition = "TEXT", nullable = false)
     String content; // Nội dung đoạn văn bản
 
+    @Column(name = "embed_text", columnDefinition = "TEXT", nullable = false)
+    @Builder.Default
+    String embedText = "";
+
     @Column(name = "token_count")
     Integer tokenCount;
-
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "metadata_jsonb", columnDefinition = "jsonb", nullable = false)

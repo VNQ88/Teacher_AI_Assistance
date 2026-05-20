@@ -99,6 +99,7 @@ public class MarkdownChunkingService {
             String content = flatChunks.get(i);
             chunks.add(new HierarchicalMarkdownChunk(
                     content,
+                    content,
                     "TEXT",
                     "body",
                     "flat-" + (i + 1),
@@ -573,8 +574,10 @@ public class MarkdownChunkingService {
             List<String> bodyChunks = chunkTextBlock(segment.content());
             for (String bodyChunk : bodyChunks) {
                 String content = breadcrumbText.isBlank() ? bodyChunk : breadcrumbText + "\n\n" + bodyChunk;
+                String embedText = bodyChunk;
                 output.add(new HierarchicalMarkdownChunk(
                         content,
+                        embedText,
                         segmentChunkType,
                         node.type,
                         node.id,

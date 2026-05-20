@@ -126,63 +126,59 @@ class DocumentEnrichmentArtifactValidationServiceTest {
     }
 
     @Test
-    void parseAndValidateSummary_acceptsParentSummaryWithChildRefs() {
+    void parseAndValidateSummary_injectsParentMetadataAndIgnoresLlmChildMetadata() {
         Fixture fixture = fixture("Ngắn.");
+        ChildSummary childSummary = childSummary();
 
         Map<String, Object> content = validationService.parseAndValidateSummary(
                 """
                         {
-                          "nodeTitle": "Chương 1",
-                          "sectionPath": "Chương 1",
-                          "nodeType": "chapter",
                           "summaryMode": "CHAPTER_FROM_SECTIONS",
                           "summary": "Chương này tổng hợp các section.",
                           "keyPoints": ["Ý chính 1", "Ý chính 2"],
-                          "childSummaries": [
-                            {
-                              "nodeId": 101,
-                              "nodeType": "section",
-                              "title": "1.1",
-                              "sectionPath": "Chương 1 > 1.1",
-                              "summary": "Tóm tắt section."
-                            }
-                          ],
-                          "childSummaryRefs": [
-                            {"nodeId": 101, "artifactId": 901, "sourceHash": "hash-1"}
-                          ],
-                          "citations": [],
+                          "childSummaries": [],
+                          "childSummaryRefs": [],
+                          "citations": [{"chunkId": 999}],
                           "coverage": {
-                            "expectedChildCount": 1,
-                            "usedChildCount": 1,
+                            "expectedChildCount": 0,
+                            "usedChildCount": 0,
                             "missingChildNodeIds": [],
                             "directChunkCount": 0,
                             "usedDirectChunkCount": 0,
                             "complete": true
                           }
                         }
-                        """,
+	                """,
                 fixture.node(),
                 List.of(),
-                List.of(new ChildSummary(
-                        101L,
-                        "section",
-                        "1.1",
-                        "Chương 1 > 1.1",
-                        901L,
-                        "hash-1",
-                        "Tóm tắt section.",
-                        List.of()
-                )),
+                List.of(childSummary),
                 new SummaryCoverage(1, 1, List.of(), 0, 0, true),
                 SummaryMode.CHAPTER_FROM_SECTIONS
         );
 
         assertThat(content).containsEntry("summaryMode", "CHAPTER_FROM_SECTIONS");
         assertThat(content).containsEntry("generated", true);
+        assertThat((List<?>) content.get("citations")).isEmpty();
+
+        Map<?, ?> coverage = (Map<?, ?>) content.get("coverage");
+        assertThat(coverage.get("expectedChildCount")).isEqualTo(1);
+        assertThat(coverage.get("usedChildCount")).isEqualTo(1);
+
+        List<?> childSummaries = (List<?>) content.get("childSummaries");
+        assertThat(childSummaries).hasSize(1);
+        Map<?, ?> injectedChildSummary = (Map<?, ?>) childSummaries.getFirst();
+        assertThat(injectedChildSummary.get("nodeId")).isEqualTo(101L);
+        assertThat(injectedChildSummary.get("summary")).isEqualTo("Tóm tắt section.");
+
+        List<?> childSummaryRefs = (List<?>) content.get("childSummaryRefs");
+        assertThat(childSummaryRefs).hasSize(1);
+        Map<?, ?> injectedRef = (Map<?, ?>) childSummaryRefs.getFirst();
+        assertThat(injectedRef.get("artifactId")).isEqualTo(901L);
+        assertThat(injectedRef.get("sourceHash")).isEqualTo("hash-1");
     }
 
     @Test
-    void parseAndValidateSummary_rejectsIncompleteCoverage() {
+    void parseAndValidateSummary_rejectsIncompleteExpectedCoverage() {
         Fixture fixture = fixture("Ngắn.");
 
         assertThatThrownBy(() -> validationService.parseAndValidateSummary(
@@ -211,7 +207,42 @@ class DocumentEnrichmentArtifactValidationServiceTest {
                 SummaryMode.CHAPTER_FROM_SECTIONS
         ))
                 .isInstanceOf(InvalidDataException.class)
-                .hasMessageContaining("coverage.complete");
+                .hasMessageContaining("expected summary coverage must be complete");
+    }
+
+    @Test
+    void parseAndValidateSummary_overwritesWrongCoverageWithExpectedCoverage() {
+        Fixture fixture = fixture("Ngắn.");
+
+        Map<String, Object> content = validationService.parseAndValidateSummary(
+                """
+                        {
+                          "summaryMode": "CHAPTER_FALLBACK",
+                          "summary": "Tóm tắt từ chunk.",
+                          "keyPoints": ["Ý chính"],
+                          "citations": [{"chunkId": 200}],
+                          "coverage": {
+                            "expectedChildCount": 99,
+                            "usedChildCount": 99,
+                            "missingChildNodeIds": [],
+                            "directChunkCount": 99,
+                            "usedDirectChunkCount": 99,
+                            "complete": true
+                          }
+                        }
+                        """,
+                fixture.node(),
+                List.of(fixture.chunk()),
+                List.of(),
+                SummaryCoverage.chunksOnly(1, 1),
+                SummaryMode.CHAPTER_FALLBACK
+        );
+
+        Map<?, ?> coverage = (Map<?, ?>) content.get("coverage");
+        assertThat(coverage.get("expectedChildCount")).isEqualTo(0);
+        assertThat(coverage.get("usedChildCount")).isEqualTo(0);
+        assertThat(coverage.get("directChunkCount")).isEqualTo(1);
+        assertThat(coverage.get("usedDirectChunkCount")).isEqualTo(1);
     }
 
     @Test
@@ -546,6 +577,19 @@ class DocumentEnrichmentArtifactValidationServiceTest {
                 1,
                 new ReviewQuestionCoverage(1, 1, 0, 1, 0, 1, true),
                 "hash"
+        );
+    }
+
+    private ChildSummary childSummary() {
+        return new ChildSummary(
+                101L,
+                "section",
+                "1.1",
+                "Chương 1 > 1.1",
+                901L,
+                "hash-1",
+                "Tóm tắt section.",
+                List.of(Map.of("chunkId", 200L))
         );
     }
 

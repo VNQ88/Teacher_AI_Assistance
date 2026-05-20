@@ -55,6 +55,23 @@ class VectorRetrievalServiceTest {
     }
 
     @Test
+    void retrieve_shouldPrefixQueryBeforeEmbedding() {
+        when(embeddingGateway.embed(anyString())).thenReturn(vector1024());
+        when(documentChunkRepository.searchBySubjectVector(
+                anyLong(), anyString(), anyInt(), anyInt(), org.mockito.ArgumentMatchers.<Integer>isNull()))
+                .thenReturn(List.of());
+
+        String question = "ATP đóng vai trò gì trong tế bào?";
+
+        service.retrieve(session(), question, 1);
+
+        ArgumentCaptor<String> embeddingInputCaptor = ArgumentCaptor.forClass(String.class);
+        verify(embeddingGateway).embed(embeddingInputCaptor.capture());
+        assertThat(embeddingInputCaptor.getValue())
+                .isEqualTo(new RagProperties().getAi().getQueryInstructionPrefix() + question);
+    }
+
+    @Test
     void retrieve_shouldPreferSectionMatchedChunk_andPassSectionFilterToRepository() {
         when(embeddingGateway.embed(anyString())).thenReturn(vector1024());
 

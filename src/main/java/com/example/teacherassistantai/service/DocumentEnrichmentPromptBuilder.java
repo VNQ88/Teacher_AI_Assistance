@@ -45,10 +45,10 @@ public class DocumentEnrichmentPromptBuilder {
         prompt.append("- Neu node lon hon nhung dang fallback tu chunks, tom tat ngan gon cac y chinh co trong chunks.\n");
         prompt.append("- Khong them kien thuc ngoai tai lieu.\n");
         prompt.append("- Citation ngan phai dung chunkId co trong context.\n");
-        prompt.append("- Coverage.complete bat buoc la true vi day la summary tu chunks duoc cung cap.\n");
+        prompt.append("- Backend se tu them metadata node, coverage va child summary refs; khong can sinh cac field do.\n");
         prompt.append("- Chi tra ve mot JSON object hop le, khong boc trong markdown/code fence.\n\n");
         appendSummarySchema(prompt, context, summaryStyle(node, summaryMode));
-        appendCoverageContract(prompt, context);
+        appendSummaryInputMetadata(prompt, context);
         appendContext(prompt, safeChunks);
         return prompt.toString();
     }
@@ -64,10 +64,11 @@ public class DocumentEnrichmentPromptBuilder {
         prompt.append("- Truong 'summary' phai gom 3-5 cau, bao quat toan bo noi dung section, khong chi liet ke.\n");
         prompt.append("- Output gom 4 den ").append(ragProperties.getEnrichment().getSectionSummaryMaxKeyPoints())
                 .append(" keyPoints, moi keyPoint mo ta mot y/giai doan chinh.\n");
+        prompt.append("- Backend se tu them metadata node, coverage va child summary refs; khong can sinh cac field do.\n");
         prompt.append("- Chi tra ve mot JSON object hop le, khong boc trong markdown/code fence.\n\n");
         int maxKp = ragProperties.getEnrichment().getSectionSummaryMaxKeyPoints();
         appendSummarySchema(prompt, context, "3-5 cau tom tat + 4-" + maxKp + " y chinh");
-        appendCoverageContract(prompt, context);
+        appendSummaryInputMetadata(prompt, context);
         appendChildSummaries(prompt, context.childSummaries());
         appendContext(prompt, context.directChunks());
         return prompt.toString();
@@ -87,10 +88,11 @@ public class DocumentEnrichmentPromptBuilder {
         prompt.append("- Neu la chapter, output gom 6 den ").append(ragProperties.getEnrichment().getChapterSummaryMaxKeyPoints())
                 .append(" keyPoints, moi keyPoint mo ta mot y quan trong hoac giai doan.\n");
         prompt.append("- Khong them kien thuc ngoai input.\n");
+        prompt.append("- Backend se tu them metadata node, coverage va child summary refs; khong can sinh cac field do.\n");
         prompt.append("- Chi tra ve mot JSON object hop le, khong boc trong markdown/code fence.\n\n");
         int maxKp = ragProperties.getEnrichment().getChapterSummaryMaxKeyPoints();
         appendSummarySchema(prompt, context, "4-6 cau tom tat + 6-" + maxKp + " y chinh");
-        appendCoverageContract(prompt, context);
+        appendSummaryInputMetadata(prompt, context);
         appendChildSummaries(prompt, context.childSummaries());
         appendFallbackRawChunks(prompt, context.fallbackRawChunks());
         appendContext(prompt, context.directChunks());
@@ -110,10 +112,11 @@ public class DocumentEnrichmentPromptBuilder {
                 .append(" keyPoints.\n");
         prompt.append("- Khong them kien thuc ngoai input.\n");
         prompt.append("- Citation ngan phai dung chunkId co trong context.\n");
+        prompt.append("- Backend se tu them metadata node, coverage va child summary refs; khong can sinh cac field do.\n");
         prompt.append("- Chi tra ve mot JSON object hop le, khong boc trong markdown/code fence.\n\n");
         int maxKp = ragProperties.getEnrichment().getChapterSummaryMaxKeyPoints();
         appendSummarySchema(prompt, context, "4-6 cau tom tat + 6-" + maxKp + " y chinh tu original summary");
-        appendCoverageContract(prompt, context);
+        appendSummaryInputMetadata(prompt, context);
         appendContext(prompt, context.directChunks());
         return prompt.toString();
     }
@@ -128,9 +131,10 @@ public class DocumentEnrichmentPromptBuilder {
         prompt.append("- Tong hop tu child summaries duoc cung cap; voi chapter thieu summary, tu rut y chinh tu raw chunks fallback.\n");
         prompt.append("- Khong bo sot child summary nao va khong bo sot muc fallback nao.\n");
         prompt.append("- Khong them kien thuc ngoai input.\n");
+        prompt.append("- Backend se tu them metadata node, coverage va child summary refs; khong can sinh cac field do.\n");
         prompt.append("- Chi tra ve mot JSON object hop le, khong boc trong markdown/code fence.\n\n");
         appendSummarySchema(prompt, context, "overview ngan + moi chapter mot doan ngan");
-        appendCoverageContract(prompt, context);
+        appendSummaryInputMetadata(prompt, context);
         appendChildSummaries(prompt, context.childSummaries());
         appendFallbackRawChunks(prompt, context.fallbackRawChunks());
         appendContext(prompt, context.directChunks());
@@ -406,47 +410,30 @@ public class DocumentEnrichmentPromptBuilder {
 
     private void appendSummarySchema(StringBuilder prompt, SummaryGenerationContext context, String summaryStyle) {
         prompt.append("Output JSON schema bat buoc:\n");
-        prompt.append("""
-                {
-                  "nodeTitle": "string",
-                  "sectionPath": "string",
-                  "nodeType": "string",
-                  "summaryMode": "string",
-                  "summary": "string",
-                  "keyPoints": ["string"],
-                  "childSummaries": [
-                    {
-                      "nodeId": 101,
-                      "nodeType": "section",
-                      "title": "string",
-                      "sectionPath": "string",
-                      "summary": "string"
-                    }
-                  ],
-                  "childSummaryRefs": [
-                    {"nodeId": 101, "artifactId": 9001, "sourceHash": "string"}
-                  ],
+        String citationSchema = hasDirectChunks(context)
+                ? """
                   "citations": [
                     {"chunkId": 123, "pageFrom": 1, "pageTo": 2}
-                  ],
-                  "coverage": {
-                    "expectedChildCount": 0,
-                    "usedChildCount": 0,
-                    "missingChildNodeIds": [],
-                    "directChunkCount": 1,
-                    "usedDirectChunkCount": 1,
-                    "complete": true,
-                    "fallbackChildCount": 0
-                  }
+                  ]
+                """
+                : """
+                  "citations": []
+                """;
+        prompt.append(String.format("""
+                {
+                  "summaryMode": "%s",
+                  "summary": "string",
+                  "keyPoints": ["string"],
+                %s
                 }
-                """);
+                """, context.summaryMode().name(), citationSchema));
         prompt.append("Summary style: ").append(summaryStyle).append('\n');
         prompt.append("summaryMode bat buoc: ").append(context.summaryMode().name()).append("\n\n");
     }
 
-    private void appendCoverageContract(StringBuilder prompt, SummaryGenerationContext context) {
+    private void appendSummaryInputMetadata(StringBuilder prompt, SummaryGenerationContext context) {
         SummaryCoverage coverage = context.coverage();
-        prompt.append("Coverage bat buoc:\n");
+        prompt.append("Metadata he thong cua input (chi de biet pham vi; backend se tu them vao JSON da luu):\n");
         prompt.append("- expectedChildCount: ").append(coverage == null ? 0 : coverage.expectedChildCount()).append('\n');
         prompt.append("- usedChildCount: ").append(coverage == null ? 0 : coverage.usedChildCount()).append('\n');
         prompt.append("- missingChildNodeIds: ").append(coverage == null ? List.of() : coverage.missingChildNodeIds()).append('\n');
@@ -454,6 +441,10 @@ public class DocumentEnrichmentPromptBuilder {
         prompt.append("- usedDirectChunkCount: ").append(coverage == null ? 0 : coverage.usedDirectChunkCount()).append('\n');
         prompt.append("- complete: ").append(coverage == null || coverage.complete()).append('\n');
         prompt.append("- fallbackChildCount: ").append(coverage == null ? 0 : coverage.fallbackChildCount()).append("\n\n");
+    }
+
+    private boolean hasDirectChunks(SummaryGenerationContext context) {
+        return context != null && context.directChunks() != null && !context.directChunks().isEmpty();
     }
 
     private void appendFallbackRawChunks(StringBuilder prompt, Map<Long, List<DocumentChunk>> fallbackRawChunks) {
