@@ -39,8 +39,8 @@ dependencies {
 
     implementation("org.yaml:snakeyaml:2.0")
     implementation("io.minio:minio:8.5.17")
-    implementation("org.apache.pdfbox:pdfbox:2.0.31")
-    implementation("me.paulschwarz:spring-dotenv:4.0.0")
+    implementation("org.apache.tika:tika-core:3.3.0")
+    implementation("org.apache.tika:tika-parsers-standard-package:3.3.0")
     implementation("io.github.cdimascio:dotenv-java:3.0.2")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")

@@ -6,7 +6,6 @@ import com.example.teacherassistantai.entity.Role;
 import com.example.teacherassistantai.entity.User;
 import com.example.teacherassistantai.exception.AccessDeniedOperationException;
 import com.example.teacherassistantai.exception.StorageOperationException;
-import com.example.teacherassistantai.repository.ClassroomRepository;
 import com.example.teacherassistantai.repository.DocumentChunkRepository;
 import com.example.teacherassistantai.repository.DocumentRepository;
 import com.example.teacherassistantai.repository.SubjectRepository;
@@ -41,8 +40,6 @@ class DocumentServiceDeleteTest {
     @Mock
     private SubjectRepository subjectRepository;
     @Mock
-    private ClassroomRepository classroomRepository;
-    @Mock
     private UserRepository userRepository;
     @Mock
     private DocumentChunkRepository documentChunkRepository;
@@ -58,7 +55,6 @@ class DocumentServiceDeleteTest {
         documentService = new DocumentService(
                 documentRepository,
                 subjectRepository,
-                classroomRepository,
                 userRepository,
                 documentChunkRepository,
                 minioChannel,

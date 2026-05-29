@@ -1,0 +1,749 @@
+<mxfile host="drawio-plugin" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" modified="2026-05-18T04:46:55.807Z" etag="M60e4cb9VifM806I06R6" version="22.1.22" type="embed" pages="6">
+  <diagram id="user-create" name="1. Admin tạo người dùng">
+    <mxGraphModel dx="969" dy="504" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="980" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Admin tạo người dùng" style="text;html=1;align=center;verticalAlign=middle;fontSize=20;fontStyle=1;fontColor=#172B4D;" parent="1" vertex="1">
+          <mxGeometry x="240" y="20" width="500" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="admin" value="Admin" style="shape=umlLifeline;participant=umlActor;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#E3F2FD;strokeColor=#1E88E5;fontColor=#0D47A1;" parent="1" vertex="1">
+          <mxGeometry x="55" y="90" width="90" height="558" as="geometry" />
+        </mxCell>
+        <mxCell id="ui" value="Giao diện" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#E3F2FD;strokeColor=#1E88E5;fontColor=#0D47A1;" parent="1" vertex="1">
+          <mxGeometry x="210" y="90" width="100" height="558" as="geometry" />
+        </mxCell>
+        <mxCell id="system" value="Hệ thống" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#DCFCE7;strokeColor=#16A34A;fontColor=#14532D;" parent="1" vertex="1">
+          <mxGeometry x="390" y="90" width="110" height="558" as="geometry" />
+        </mxCell>
+        <mxCell id="db" value="Database" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#333333;" parent="1" vertex="1">
+          <mxGeometry x="610" y="90" width="110" height="558" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#333333;strokeWidth=1.3;" parent="1" vertex="1">
+          <mxGeometry x="185" y="297" width="570" height="216" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_label" value="alt" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#333333;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="185" y="297" width="46" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_ok" value="[Email chưa tồn tại và vai trò hợp lệ]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="240" y="303.3" width="280" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_fail" value="[Email đã tồn tại hoặc vai trò không hợp lệ]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="240" y="450" width="300" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="divider" value="" style="endArrow=none;startArrow=none;html=1;dashed=1;strokeColor=#777777;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="185" y="432" as="sourcePoint" />
+            <mxPoint x="755" y="432" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m1" value="1. Nhập thông tin người dùng mới" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="100" y="153" as="sourcePoint" />
+            <mxPoint x="260" y="153" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m2" value="2. POST /api/user" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260" y="198" as="sourcePoint" />
+            <mxPoint x="445" y="198" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m3" value="3. Kiểm tra quyền Admin" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=orthogonalEdgeStyle;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="229.5" as="sourcePoint" />
+            <mxPoint x="445" y="261" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="530" y="229.5" />
+              <mxPoint x="530" y="261" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m4" value="4. Kiểm tra email và vai trò" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="283.5" as="sourcePoint" />
+            <mxPoint x="665" y="283.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m5" value="5a. Hợp lệ: lưu người dùng đã kích hoạt" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="355.5" as="sourcePoint" />
+            <mxPoint x="665" y="355.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m6" value="6. 201 Created + thông tin người dùng" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="409.1" as="sourcePoint" />
+            <mxPoint x="260" y="409.1" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m7" value="5b. Không hợp lệ: trả lỗi" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="490.5" as="sourcePoint" />
+            <mxPoint x="260" y="490.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m8" value="7. Hiển thị kết quả tạo người dùng" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260" y="549" as="sourcePoint" />
+            <mxPoint x="100" y="549" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="user-read" name="2. Admin xem người dùng">
+    <mxGraphModel dx="969" dy="504" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="980" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Admin xem danh sách / chi tiết người dùng" style="text;html=1;align=center;verticalAlign=middle;fontSize=20;fontStyle=1;fontColor=#172B4D;" parent="1" vertex="1">
+          <mxGeometry x="190" y="20" width="600" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="admin" value="Admin" style="shape=umlLifeline;participant=umlActor;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#E3F2FD;strokeColor=#1E88E5;fontColor=#0D47A1;" parent="1" vertex="1">
+          <mxGeometry x="55" y="90" width="90" height="576" as="geometry" />
+        </mxCell>
+        <mxCell id="ui" value="Giao diện" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#E3F2FD;strokeColor=#1E88E5;fontColor=#0D47A1;" parent="1" vertex="1">
+          <mxGeometry x="210" y="90" width="100" height="576" as="geometry" />
+        </mxCell>
+        <mxCell id="system" value="Hệ thống" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#DCFCE7;strokeColor=#16A34A;fontColor=#14532D;" parent="1" vertex="1">
+          <mxGeometry x="390" y="90" width="110" height="576" as="geometry" />
+        </mxCell>
+        <mxCell id="db" value="Database" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#333333;" parent="1" vertex="1">
+          <mxGeometry x="610" y="90" width="110" height="576" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#333333;strokeWidth=1.3;" parent="1" vertex="1">
+          <mxGeometry x="185" y="198" width="570" height="351" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_label" value="alt" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#333333;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="185" y="198" width="46" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_list" value="[Xem danh sách]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="240" y="204.3" width="160" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_detail" value="[Xem chi tiết]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="240" y="334.8" width="160" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="divider" value="" style="endArrow=none;startArrow=none;html=1;dashed=1;strokeColor=#777777;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="185" y="328.5" as="sourcePoint" />
+            <mxPoint x="755" y="328.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="detail_alt_box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#555555;strokeWidth=1.1;" parent="1" vertex="1">
+          <mxGeometry x="210" y="423" width="520" height="117" as="geometry" />
+        </mxCell>
+        <mxCell id="detail_alt_label" value="alt" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="210" y="423" width="46" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="detail_found" value="[Tìm thấy]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="265" y="429.3" width="140" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="detail_not_found" value="[Không tìm thấy]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="265" y="487.8" width="160" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="detail_divider" value="" style="endArrow=none;startArrow=none;html=1;dashed=1;strokeColor=#777777;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="210" y="481.5" as="sourcePoint" />
+            <mxPoint x="730" y="481.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m1" value="1. Chọn chức năng xem người dùng" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="100" y="148.5" as="sourcePoint" />
+            <mxPoint x="260" y="148.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m2" value="2. Kiểm tra quyền Admin" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260" y="180" as="sourcePoint" />
+            <mxPoint x="445" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m3" value="3a. Xem danh sách: GET /api/user/list" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260" y="243" as="sourcePoint" />
+            <mxPoint x="445" y="243" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m4" value="4a. Lấy danh sách người dùng theo trang" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="279" as="sourcePoint" />
+            <mxPoint x="665" y="279" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m5" value="5a. 200 OK + danh sách người dùng" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="306" as="sourcePoint" />
+            <mxPoint x="260" y="306" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m6" value="3b. Xem chi tiết: GET /api/user/{userId}" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260" y="373.5" as="sourcePoint" />
+            <mxPoint x="445" y="373.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m7" value="4b. Tìm người dùng theo id" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="405" as="sourcePoint" />
+            <mxPoint x="665" y="405" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m8" value="5b. 200 OK + chi tiết người dùng" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="463.5" as="sourcePoint" />
+            <mxPoint x="260" y="463.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m9" value="5c. Không tìm thấy: 404 Not Found" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="441" y="522" as="sourcePoint" />
+            <mxPoint x="256" y="522" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m10" value="6. Hiển thị kết quả xem người dùng" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260" y="571.5" as="sourcePoint" />
+            <mxPoint x="100" y="571.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="user-profile" name="3. Hồ sơ cá nhân">
+    <mxGraphModel dx="969" dy="504" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1040" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Xem và cập nhật hồ sơ cá nhân" style="text;html=1;align=center;verticalAlign=middle;fontSize=20;fontStyle=1;fontColor=#172B4D;" parent="1" vertex="1">
+          <mxGeometry x="220" y="20" width="600" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="user" value="Người dùng" style="shape=umlLifeline;participant=umlActor;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#E3F2FD;strokeColor=#1E88E5;fontColor=#0D47A1;" parent="1" vertex="1">
+          <mxGeometry x="55" y="90" width="90" height="680" as="geometry" />
+        </mxCell>
+        <mxCell id="ui" value="Giao diện" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#E3F2FD;strokeColor=#1E88E5;fontColor=#0D47A1;" parent="1" vertex="1">
+          <mxGeometry x="210" y="90" width="100" height="680" as="geometry" />
+        </mxCell>
+        <mxCell id="system" value="Hệ thống" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#DCFCE7;strokeColor=#16A34A;fontColor=#14532D;" parent="1" vertex="1">
+          <mxGeometry x="390" y="90" width="110" height="680" as="geometry" />
+        </mxCell>
+        <mxCell id="db" value="Database" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#333333;" parent="1" vertex="1">
+          <mxGeometry x="610" y="90" width="110" height="680" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#333333;strokeWidth=1.3;" parent="1" vertex="1">
+          <mxGeometry x="185" y="186" width="570" height="528" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_label" value="alt" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#333333;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="185" y="186" width="46" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_current" value="[Xem hồ sơ hiện tại]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="240" y="191.6" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_update" value="[Cập nhật hồ sơ]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="240" y="307.6" width="180" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="divider" value="" style="endArrow=none;startArrow=none;html=1;dashed=1;strokeColor=#777777;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="185" y="302" as="sourcePoint" />
+            <mxPoint x="755" y="302" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="permission_alt_box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#555555;strokeWidth=1.1;" parent="1" vertex="1">
+          <mxGeometry x="210" y="362" width="520" height="304" as="geometry" />
+        </mxCell>
+        <mxCell id="permission_alt_label" value="alt" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="210" y="362" width="46" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="permission_ok" value="[Có quyền sửa]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="265" y="367.6" width="150" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="permission_fail" value="[Không có quyền]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="265" y="610" width="150" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="permission_divider" value="" style="endArrow=none;startArrow=none;html=1;dashed=1;strokeColor=#777777;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="210" y="586" as="sourcePoint" />
+            <mxPoint x="730" y="586" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="email_opt_box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#777777;strokeWidth=1.0;" parent="1" vertex="1">
+          <mxGeometry x="235" y="430" width="470" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="email_opt_label" value="opt" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#777777;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="235" y="430" width="46" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="email_opt_guard" value="[Có đổi email]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="290" y="435.6" width="150" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="m1" value="1. Mở trang hồ sơ" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="100" y="142" as="sourcePoint" />
+            <mxPoint x="260" y="142" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m2" value="2a. Xem hiện tại: GET /api/user/current" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260" y="226" as="sourcePoint" />
+            <mxPoint x="445" y="226" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m3" value="3. Tìm người dùng đang đăng nhập" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="258" as="sourcePoint" />
+            <mxPoint x="665" y="258" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m4" value="4. 200 OK + hồ sơ hiện tại" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="282" as="sourcePoint" />
+            <mxPoint x="260" y="282" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m5" value="2b. Cập nhật: PUT /api/user/{userId}" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260" y="342" as="sourcePoint" />
+            <mxPoint x="445" y="342" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m6" value="3. Kiểm tra quyền sửa" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=orthogonalEdgeStyle;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="382" as="sourcePoint" />
+            <mxPoint x="445" y="402" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="535" y="382" />
+              <mxPoint x="535" y="402" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m7" value="4a. Có quyền: tìm người dùng cần cập nhật" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="422" as="sourcePoint" />
+            <mxPoint x="665" y="422" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m8" value="5. Nếu đổi email: kiểm tra email mới" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="462" as="sourcePoint" />
+            <mxPoint x="665" y="462" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m9" value="6. Lưu thông tin hồ sơ" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="530" as="sourcePoint" />
+            <mxPoint x="665" y="530" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m10" value="7. 200 OK + hồ sơ đã cập nhật" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="441" y="554" as="sourcePoint" />
+            <mxPoint x="256" y="554" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m11" value="4b. Không có quyền: trả lỗi" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="642" as="sourcePoint" />
+            <mxPoint x="260" y="642" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m12" value="8. Hiển thị kết quả hồ sơ" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260" y="694" as="sourcePoint" />
+            <mxPoint x="100" y="694" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="user-change-password" name="4. Đổi mật khẩu">
+    <mxGraphModel dx="808" dy="420" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="980" pageHeight="740" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Đổi mật khẩu" style="text;html=1;align=center;verticalAlign=middle;fontSize=20;fontStyle=1;fontColor=#172B4D;" parent="1" vertex="1">
+          <mxGeometry x="240" y="20" width="500" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="user" value="Người dùng" style="shape=umlLifeline;participant=umlActor;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#E3F2FD;strokeColor=#1E88E5;fontColor=#0D47A1;" parent="1" vertex="1">
+          <mxGeometry x="55" y="90" width="90" height="613.2" as="geometry" />
+        </mxCell>
+        <mxCell id="ui" value="Giao diện" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#E3F2FD;strokeColor=#1E88E5;fontColor=#0D47A1;" parent="1" vertex="1">
+          <mxGeometry x="210" y="90" width="100" height="613.2" as="geometry" />
+        </mxCell>
+        <mxCell id="system" value="Hệ thống" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#DCFCE7;strokeColor=#16A34A;fontColor=#14532D;" parent="1" vertex="1">
+          <mxGeometry x="390" y="90" width="110" height="613.2" as="geometry" />
+        </mxCell>
+        <mxCell id="db" value="Database" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#333333;" parent="1" vertex="1">
+          <mxGeometry x="610" y="90" width="110" height="613.2" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#333333;strokeWidth=1.3;" parent="1" vertex="1">
+          <mxGeometry x="185" y="249.6" width="570" height="361.2" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_label" value="alt" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#333333;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="185" y="249.6" width="46" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_confirm_ok" value="[Xác nhận mật khẩu khớp]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="240" y="255.5" width="220" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_confirm_fail" value="[Xác nhận mật khẩu không khớp]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="240" y="553.7" width="250" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="divider" value="" style="endArrow=none;startArrow=none;html=1;dashed=1;strokeColor=#777777;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="185" y="543.6" as="sourcePoint" />
+            <mxPoint x="755" y="543.6" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="old_password_alt_box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#555555;strokeWidth=1.1;" parent="1" vertex="1">
+          <mxGeometry x="210" y="360.5" width="520" height="159.6" as="geometry" />
+        </mxCell>
+        <mxCell id="old_password_alt_label" value="alt" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="210" y="360.5" width="46" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="old_password_ok" value="[Mật khẩu cũ đúng]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="265" y="370" width="170" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="old_password_fail" value="[Mật khẩu cũ sai]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="265" y="470" width="150" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="old_password_divider" value="" style="endArrow=none;startArrow=none;html=1;dashed=1;strokeColor=#777777;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="210" y="470" as="sourcePoint" />
+            <mxPoint x="730" y="470" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m1" value="1. Nhập mật khẩu cũ và mật khẩu mới" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="96" y="160" as="sourcePoint" />
+            <mxPoint x="256" y="160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m2" value="2. POST /api/user/change-password" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260" y="190.8" as="sourcePoint" />
+            <mxPoint x="445" y="190.8" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m3" value="3. Kiểm tra xác nhận mật khẩu mới" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=orthogonalEdgeStyle;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="224.4" as="sourcePoint" />
+            <mxPoint x="445" y="245.4" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="535" y="224.4" />
+              <mxPoint x="535" y="245.4" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m4" value="4a. Xác nhận khớp: tìm người dùng hiện tại" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="304.2" as="sourcePoint" />
+            <mxPoint x="665" y="304.2" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m5" value="5. So khớp mật khẩu cũ" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=orthogonalEdgeStyle;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="337.8" as="sourcePoint" />
+            <mxPoint x="445" y="350.4" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="535" y="337.8" />
+              <mxPoint x="535" y="350.4" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m6" value="6a. Đúng: mã hóa mật khẩu mới" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=orthogonalEdgeStyle;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="396.6" as="sourcePoint" />
+            <mxPoint x="445" y="421.8" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="535" y="396.6" />
+              <mxPoint x="535" y="421.8" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m7" value="7. Lưu mật khẩu mới" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="438.6" as="sourcePoint" />
+            <mxPoint x="665" y="438.6" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m8" value="8. 200 OK + đổi mật khẩu thành công" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="442.5" y="460" as="sourcePoint" />
+            <mxPoint x="257.5" y="460" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m9" value="6b. Sai: trả lỗi mật khẩu cũ" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="510" as="sourcePoint" />
+            <mxPoint x="260" y="510" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m10" value="4b. Xác nhận không khớp: trả lỗi" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="442.5" y="590" as="sourcePoint" />
+            <mxPoint x="257.5" y="590" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m11" value="9. Hiển thị kết quả đổi mật khẩu" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260" y="648.6" as="sourcePoint" />
+            <mxPoint x="100" y="648.6" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="user-become-teacher" name="5. Admin cấp quyền Teacher">
+    <mxGraphModel dx="969" dy="504" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="980" pageHeight="740" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Admin cấp quyền Teacher" style="text;html=1;align=center;verticalAlign=middle;fontSize=20;fontStyle=1;fontColor=#172B4D;" parent="1" vertex="1">
+          <mxGeometry x="240" y="20" width="500" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="admin" value="Admin" style="shape=umlLifeline;participant=umlActor;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#E3F2FD;strokeColor=#1E88E5;fontColor=#0D47A1;" parent="1" vertex="1">
+          <mxGeometry x="55" y="90" width="90" height="613.2" as="geometry" />
+        </mxCell>
+        <mxCell id="ui" value="Giao diện" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#E3F2FD;strokeColor=#1E88E5;fontColor=#0D47A1;" parent="1" vertex="1">
+          <mxGeometry x="210" y="90" width="100" height="613.2" as="geometry" />
+        </mxCell>
+        <mxCell id="system" value="Hệ thống" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#DCFCE7;strokeColor=#16A34A;fontColor=#14532D;" parent="1" vertex="1">
+          <mxGeometry x="390" y="90" width="110" height="613.2" as="geometry" />
+        </mxCell>
+        <mxCell id="db" value="Database" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#333333;" parent="1" vertex="1">
+          <mxGeometry x="610" y="90" width="110" height="613.2" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#333333;strokeWidth=1.3;" parent="1" vertex="1">
+          <mxGeometry x="185" y="283.2" width="570" height="352.8" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_label" value="alt" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#333333;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="185" y="283.2" width="46" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_found" value="[Tìm thấy người dùng và quyền Teacher]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="240" y="289.1" width="310" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_missing" value="[Không tìm thấy người dùng hoặc quyền Teacher]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="240" y="570.5" width="330" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="divider" value="" style="endArrow=none;startArrow=none;html=1;dashed=1;strokeColor=#777777;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="185" y="560.4" as="sourcePoint" />
+            <mxPoint x="755" y="560.4" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="teacher_alt_box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#555555;strokeWidth=1.1;" parent="1" vertex="1">
+          <mxGeometry x="210" y="350.4" width="520" height="172.2" as="geometry" />
+        </mxCell>
+        <mxCell id="teacher_alt_label" value="alt" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="210" y="350.4" width="46" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="teacher_missing" value="[Chưa có quyền Teacher]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="265" y="356.3" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="teacher_exists" value="[Đã có quyền Teacher]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="265" y="468" width="190" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="teacher_divider" value="" style="endArrow=none;startArrow=none;html=1;dashed=1;strokeColor=#777777;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="210" y="459.6" as="sourcePoint" />
+            <mxPoint x="730" y="459.6" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m1" value="1. Chọn người dùng cần cấp quyền" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="100" y="148.8" as="sourcePoint" />
+            <mxPoint x="260" y="148.8" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m2" value="2. POST /api/user/{userId}/become-teacher" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260" y="195" as="sourcePoint" />
+            <mxPoint x="445" y="195" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m3" value="3. Kiểm tra quyền Admin" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=orthogonalEdgeStyle;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="224.4" as="sourcePoint" />
+            <mxPoint x="445" y="249.6" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="535" y="224.4" />
+              <mxPoint x="535" y="249.6" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m4" value="4. Tìm người dùng và quyền Teacher" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="270.6" as="sourcePoint" />
+            <mxPoint x="665" y="270.6" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m5" value="5a. Tìm thấy: kiểm tra quyền hiện tại" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=orthogonalEdgeStyle;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="321" as="sourcePoint" />
+            <mxPoint x="445" y="346.2" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="535" y="321" />
+              <mxPoint x="535" y="346.2" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m6" value="6a. Chưa có: thêm quyền Teacher và lưu" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="396.6" as="sourcePoint" />
+            <mxPoint x="665" y="396.6" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m7" value="7. 200 OK + đã cấp quyền Teacher" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="438.6" as="sourcePoint" />
+            <mxPoint x="260" y="438.6" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m8" value="6b. Đã có: trả lỗi nghiệp vụ" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="441" y="510" as="sourcePoint" />
+            <mxPoint x="256" y="510" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m9" value="5b. Không tìm thấy: trả lỗi" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="441" y="610" as="sourcePoint" />
+            <mxPoint x="256" y="610" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m10" value="8. Hiển thị kết quả cấp quyền" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260" y="652.8" as="sourcePoint" />
+            <mxPoint x="100" y="652.8" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="user-delete" name="6. Admin xóa người dùng">
+    <mxGraphModel dx="969" dy="504" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="980" pageHeight="740" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Admin xóa người dùng" style="text;html=1;align=center;verticalAlign=middle;fontSize=20;fontStyle=1;fontColor=#172B4D;" parent="1" vertex="1">
+          <mxGeometry x="240" y="20" width="500" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="admin" value="Admin" style="shape=umlLifeline;participant=umlActor;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#E3F2FD;strokeColor=#1E88E5;fontColor=#0D47A1;" parent="1" vertex="1">
+          <mxGeometry x="55" y="90" width="90" height="590" as="geometry" />
+        </mxCell>
+        <mxCell id="ui" value="Giao diện" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#E3F2FD;strokeColor=#1E88E5;fontColor=#0D47A1;" parent="1" vertex="1">
+          <mxGeometry x="210" y="90" width="100" height="590" as="geometry" />
+        </mxCell>
+        <mxCell id="system" value="Hệ thống" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#DCFCE7;strokeColor=#16A34A;fontColor=#14532D;" parent="1" vertex="1">
+          <mxGeometry x="390" y="90" width="110" height="590" as="geometry" />
+        </mxCell>
+        <mxCell id="db" value="Database" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;fontSize=12;size=42;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#333333;" parent="1" vertex="1">
+          <mxGeometry x="610" y="90" width="110" height="590" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#333333;strokeWidth=1.3;" parent="1" vertex="1">
+          <mxGeometry x="185" y="283.2" width="570" height="352.8" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_label" value="alt" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#333333;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="185" y="283.2" width="46" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_found" value="[Người dùng tồn tại]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="240" y="289.1" width="180" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_missing" value="[Người dùng không tồn tại]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="240" y="570.5" width="220" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="divider" value="" style="endArrow=none;startArrow=none;html=1;dashed=1;strokeColor=#777777;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="185" y="560.4" as="sourcePoint" />
+            <mxPoint x="755" y="560.4" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="self_alt_box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#555555;strokeWidth=1.1;" parent="1" vertex="1">
+          <mxGeometry x="210" y="350.4" width="520" height="172.2" as="geometry" />
+        </mxCell>
+        <mxCell id="self_alt_label" value="alt" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="210" y="350.4" width="46" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="not_self" value="[Không phải tài khoản đang đăng nhập]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="265" y="356.3" width="270" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="is_self" value="[Là tài khoản đang đăng nhập]" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="265" y="468" width="230" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="self_divider" value="" style="endArrow=none;startArrow=none;html=1;dashed=1;strokeColor=#777777;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="210" y="459.6" as="sourcePoint" />
+            <mxPoint x="730" y="459.6" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m1" value="1. Chọn người dùng cần xóa" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="100" y="148.8" as="sourcePoint" />
+            <mxPoint x="260" y="148.8" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m2" value="2. DELETE /api/user/{userId}" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260" y="195" as="sourcePoint" />
+            <mxPoint x="445" y="195" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m3" value="3. Kiểm tra quyền Admin" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=orthogonalEdgeStyle;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="224.4" as="sourcePoint" />
+            <mxPoint x="445" y="249.6" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="535" y="224.4" />
+              <mxPoint x="535" y="249.6" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m4" value="4. Tìm người dùng cần xóa" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="270.6" as="sourcePoint" />
+            <mxPoint x="665" y="270.6" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m5" value="5a. Tìm thấy: kiểm tra không xóa chính mình" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=orthogonalEdgeStyle;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="307.2" as="sourcePoint" />
+            <mxPoint x="445" y="332.4" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="535" y="307.2" />
+              <mxPoint x="535" y="332.2" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m6" value="6a. Hợp lệ: xóa người dùng" style="html=1;verticalAlign=bottom;rounded=0;startArrow=none;endArrow=block;endFill=1;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="396.6" as="sourcePoint" />
+            <mxPoint x="665" y="396.6" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m7" value="7. 200 OK + đã xóa người dùng" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="438.6" as="sourcePoint" />
+            <mxPoint x="260" y="438.6" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m8" value="6b. Xóa chính mình: trả lỗi" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="445" y="497.4" as="sourcePoint" />
+            <mxPoint x="260" y="497.4" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m9" value="5b. Không tìm thấy: 404 Not Found" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="442.5" y="610" as="sourcePoint" />
+            <mxPoint x="257.5" y="610" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m10" value="8. Hiển thị kết quả xóa người dùng" style="html=1;verticalAlign=bottom;rounded=0;dashed=1;startArrow=none;endArrow=block;endFill=0;endSize=6;strokeWidth=1.4;fontSize=11;edgeStyle=none;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="256" y="660" as="sourcePoint" />
+            <mxPoint x="96" y="660" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

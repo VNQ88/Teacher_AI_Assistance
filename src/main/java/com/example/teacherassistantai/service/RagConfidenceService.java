@@ -16,13 +16,11 @@ public class RagConfidenceService {
         }
 
         double sourceSupport = Math.min(1.0, sources.size() / 5.0);
-        double citationSupport = computeCitationSupport(answer, sources);
         double lexicalEvidence = computeLexicalEvidence(question, answer, sources);
         double answerPresence = (answer == null || answer.isBlank()) ? 0.0 : 1.0;
 
-        double score = lexicalEvidence * 0.45
-                + citationSupport * 0.25
-                + sourceSupport * 0.20
+        double score = lexicalEvidence * 0.65
+                + sourceSupport * 0.25
                 + answerPresence * 0.10;
         return Math.max(0.05, Math.min(0.95, score));
     }
@@ -31,19 +29,6 @@ public class RagConfidenceService {
         if (score >= 0.80) return "HIGH";
         if (score >= 0.55) return "MEDIUM";
         return "LOW";
-    }
-
-    private double computeCitationSupport(String answer, List<DocumentChunk> sources) {
-        if (answer == null || answer.isBlank()) {
-            return 0.0;
-        }
-        int matched = 0;
-        for (DocumentChunk source : sources) {
-            if (source.getId() != null && answer.contains("[Chunk " + source.getId() + "]")) {
-                matched++;
-            }
-        }
-        return Math.min(1.0, matched / 2.0);
     }
 
     private double computeLexicalEvidence(String question, String answer, List<DocumentChunk> sources) {
@@ -94,4 +79,3 @@ public class RagConfidenceService {
         return tokens;
     }
 }
-

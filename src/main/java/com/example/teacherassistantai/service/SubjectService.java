@@ -7,31 +7,43 @@ import com.example.teacherassistantai.dto.response.SubjectResponse;
 import com.example.teacherassistantai.entity.Role;
 import com.example.teacherassistantai.entity.Subject;
 import com.example.teacherassistantai.entity.User;
+import com.example.teacherassistantai.exception.AccessDeniedOperationException;
 import com.example.teacherassistantai.exception.InvalidDataException;
 import com.example.teacherassistantai.exception.ResourceNotFoundException;
-import com.example.teacherassistantai.repository.ExamQuestionRepository;
-import com.example.teacherassistantai.repository.QuestionBankRepository;
-import com.example.teacherassistantai.repository.QuestionRepository;
-import com.example.teacherassistantai.repository.StudentAnswerRepository;
+import com.example.teacherassistantai.exception.StorageOperationException;
+import com.example.teacherassistantai.integration.minio.MinioChannel;
+import com.example.teacherassistantai.repository.AgentLogRepository;
+import com.example.teacherassistantai.repository.ChatMessageRepository;
+import com.example.teacherassistantai.repository.ChatSessionRepository;
+import com.example.teacherassistantai.repository.DocumentChunkRepository;
+import com.example.teacherassistantai.repository.DocumentNodeArtifactRepository;
+import com.example.teacherassistantai.repository.DocumentNodeRepository;
+import com.example.teacherassistantai.repository.DocumentRepository;
+import com.example.teacherassistantai.repository.DocumentRepository.DocumentStorageObject;
 import com.example.teacherassistantai.repository.SubjectRepository;
 import com.example.teacherassistantai.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import java.util.List;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class SubjectService {
 
     private final SubjectRepository subjectRepository;
-    private final QuestionBankRepository questionBankRepository;
-    private final QuestionRepository questionRepository;
-    private final ExamQuestionRepository examQuestionRepository;
-    private final StudentAnswerRepository studentAnswerRepository;
     private final UserRepository userRepository;
+    private final DocumentRepository documentRepository;
+    private final DocumentChunkRepository documentChunkRepository;
+    private final DocumentNodeRepository documentNodeRepository;
+    private final DocumentNodeArtifactRepository documentNodeArtifactRepository;
+    private final ChatMessageRepository chatMessageRepository;
+    private final ChatSessionRepository chatSessionRepository;
+    private final AgentLogRepository agentLogRepository;
+    private final MinioChannel minioChannel;
 
     @Transactional(readOnly = true)
     public List<SubjectResponse> getAllSubjects() {
@@ -75,12 +87,14 @@ public class SubjectService {
         Subject subject = subjectRepository.findById(subjectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Subject not found with id: " + subjectId));
 
+        validateSubjectOwnership(subject, getCurrentUser());
+
         subject.setName(request.getName().trim());
         subject.setDescription(request.getDescription());
         subject.setActive(request.getActive());
 
         SubjectType subjectType = request.getSubjectType();
-        if  (subjectType == null)
+        if (subjectType == null)
             subjectType = SubjectType.TEXT_BASED;
         subject.setSubjectType(subjectType);
         return toResponse(subjectRepository.save(subject));
@@ -91,35 +105,41 @@ public class SubjectService {
         Subject subject = subjectRepository.findById(subjectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Subject not found with id: " + subjectId));
 
-        User currentUser = getCurrentUser();
+        validateSubjectOwnership(subject, getCurrentUser());
+
+        List<DocumentStorageObject> storageObjects = documentRepository.findStorageObjectsBySubjectId(subjectId);
+        storageObjects.forEach(this::removeDocumentStorageObjects);
+
+        agentLogRepository.deleteBySubjectId(subjectId);
+
+        chatMessageRepository.deleteMessageSourceLinksBySubjectId(subjectId);
+        chatMessageRepository.deleteBySubjectId(subjectId);
+        chatSessionRepository.deleteBySubjectId(subjectId);
+
+        documentChunkRepository.deleteMessageSourceLinksBySubjectId(subjectId);
+        documentNodeArtifactRepository.deleteBySubjectId(subjectId);
+        documentChunkRepository.deleteBySubjectId(subjectId);
+        documentNodeRepository.deleteBySubjectId(subjectId);
+        documentRepository.deleteBySubjectId(subjectId);
+
+        subjectRepository.delete(subject);
+    }
+
+    public void validateSubjectOwnershipById(Long subjectId) {
+        Subject subject = subjectRepository.findById(subjectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Subject not found with id: " + subjectId));
+        validateSubjectOwnership(subject, getCurrentUser());
+    }
+
+    private void validateSubjectOwnership(Subject subject, User currentUser) {
         boolean isAdmin = currentUser.getRoles().stream()
                 .map(Role::getName)
                 .anyMatch("ADMIN"::equalsIgnoreCase);
-
-        Long ownerId = subject.getOwnerId();
-        boolean isOwner = ownerId != null && ownerId.equals(currentUser.getId());
-
+        boolean isOwner = subject.getOwnerId() != null
+                && subject.getOwnerId().equals(currentUser.getId());
         if (!isAdmin && !isOwner) {
-            throw new InvalidDataException("You don't have permission to delete this subject");
+            throw new AccessDeniedOperationException("You don't have permission to modify this subject");
         }
-
-        var questionBanks = questionBankRepository.findBySubject_Id(subjectId);
-        if (!questionBanks.isEmpty()) {
-            for (var questionBank : questionBanks) {
-                List<Long> questionIds = questionRepository.findIdsByQuestionBankId(questionBank.getId());
-                if (!questionIds.isEmpty()) {
-                    List<Long> examQuestionIds = examQuestionRepository.findIdsByQuestionIdIn(questionIds);
-                    if (!examQuestionIds.isEmpty()) {
-                        studentAnswerRepository.deleteByExamQuestionIdIn(examQuestionIds);
-                    }
-                    examQuestionRepository.deleteByQuestionIdIn(questionIds);
-                }
-                questionRepository.deleteByQuestionBankId(questionBank.getId());
-            }
-            questionBankRepository.deleteAll(questionBanks);
-        }
-
-        subjectRepository.delete(subject);
     }
 
     private User getCurrentUser() {
@@ -129,6 +149,28 @@ public class SubjectService {
         }
         return userRepository.findByEmail(auth.getName())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    }
+
+    private void removeDocumentStorageObjects(DocumentStorageObject document) {
+        removeStorageObject(document.getOriginalObjectKey(), document.getId(), "original");
+        removeStorageObject(document.getMarkdownObjectKey(), document.getId(), "markdown");
+        removeStorageObject(document.getHierarchyObjectKey(), document.getId(), "hierarchy");
+        removeStorageObject(document.getChunksObjectKey(), document.getId(), "chunks");
+    }
+
+    private void removeStorageObject(String objectKey, Long documentId, String objectType) {
+        if (!StringUtils.hasText(objectKey)) {
+            return;
+        }
+
+        try {
+            minioChannel.removeObject(objectKey);
+        } catch (StorageOperationException ex) {
+            throw new StorageOperationException(
+                    "Failed to delete %s object for document id=%d".formatted(objectType, documentId),
+                    ex
+            );
+        }
     }
 
     private SubjectResponse toResponse(Subject subject) {
@@ -142,4 +184,3 @@ public class SubjectService {
                 .build();
     }
 }
-

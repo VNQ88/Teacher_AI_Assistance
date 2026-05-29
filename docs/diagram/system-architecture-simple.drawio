@@ -1,0 +1,141 @@
+<mxfile host="drawio-plugin" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" modified="2026-05-16T17:57:26.506Z" etag="q_amkPyiYi5e1AwYhsHJ" version="22.1.22" type="embed">
+  <diagram id="teacher-assistant-ai-architecture" name="System Architecture">
+    <mxGraphModel dx="510" dy="503" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1180" pageHeight="760" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="TeacherAssistantAI - kiến trúc tổng quan" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=22;fontStyle=1;fontColor=#172B4D;" parent="1" vertex="1">
+          <mxGeometry x="300" y="20" width="580" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="clients" value="Client / API Consumer" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#E3F2FD;strokeColor=#1E88E5;fontColor=#0D47A1;fontStyle=1;fontSize=12;spacing=6;" parent="1" vertex="1">
+          <mxGeometry x="80" y="165" width="170" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="spring-app" value="Spring Boot Application" style="swimlane;html=1;startSize=30;rounded=1;arcSize=3;whiteSpace=wrap;fillColor=#F8FAFC;strokeColor=#64748B;fontColor=#0F172A;fontStyle=1;fontSize=13;" parent="1" vertex="1">
+          <mxGeometry x="300" y="95" width="820" height="395" as="geometry" />
+        </mxCell>
+        <mxCell id="api" value="REST API" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#DBEAFE;strokeColor=#2563EB;fontColor=#1E3A8A;fontStyle=1;fontSize=12;spacing=6;" parent="1" vertex="1">
+          <mxGeometry x="335" y="165" width="130" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="security" value="Security" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#FEF3C7;strokeColor=#F59E0B;fontColor=#78350F;fontStyle=1;fontSize=12;spacing=6;" parent="1" vertex="1">
+          <mxGeometry x="490" y="165" width="130" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="controllers" value="Controller Layer" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#D1FAE5;strokeColor=#10B981;fontColor=#064E3B;fontStyle=1;fontSize=12;spacing=6;" parent="1" vertex="1">
+          <mxGeometry x="645" y="165" width="130" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="services" value="Service Layer" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#DCFCE7;strokeColor=#16A34A;fontColor=#14532D;fontStyle=1;fontSize=12;spacing=6;" parent="1" vertex="1">
+          <mxGeometry x="800" y="165" width="130" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="repositories" value="Repository Layer" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#E0E7FF;strokeColor=#6366F1;fontColor=#312E81;fontStyle=1;fontSize=12;spacing=6;" parent="1" vertex="1">
+          <mxGeometry x="955" y="165" width="130" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="document-pipeline" value="Document Pipeline" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#FFEDD5;strokeColor=#F97316;fontColor=#7C2D12;fontStyle=1;fontSize=12;spacing=6;" parent="1" vertex="1">
+          <mxGeometry x="520" y="335" width="150" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="rag" value="RAG Chat + Agents" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#F3E8FF;strokeColor=#9333EA;fontColor=#581C87;fontStyle=1;fontSize=12;spacing=6;" parent="1" vertex="1">
+          <mxGeometry x="710" y="335" width="150" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="integrations" value="Integration Adapters" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#FCE7F3;strokeColor=#DB2777;fontColor=#831843;fontStyle=1;fontSize=12;spacing=6;" parent="1" vertex="1">
+          <mxGeometry x="900" y="335" width="160" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="redis" value="Redis" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#FEE2E2;strokeColor=#DC2626;fontColor=#7F1D1D;fontStyle=1;fontSize=12;spacing=6;" parent="1" vertex="1">
+          <mxGeometry x="330" y="610" width="125" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="minio" value="MinIO Object Storage" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#ECFDF5;strokeColor=#059669;fontColor=#064E3B;fontStyle=1;fontSize=12;spacing=6;" parent="1" vertex="1">
+          <mxGeometry x="500" y="610" width="145" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="ai-provider" value="DigitalOcean AI" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#F5F3FF;strokeColor=#7C3AED;fontColor=#4C1D95;fontStyle=1;fontSize=12;spacing=6;" parent="1" vertex="1">
+          <mxGeometry x="690" y="610" width="145" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="smtp" value="SMTP Mail" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#FEFCE8;strokeColor=#CA8A04;fontColor=#713F12;fontStyle=1;fontSize=12;spacing=6;" parent="1" vertex="1">
+          <mxGeometry x="880" y="610" width="125" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="postgres" value="PostgreSQL + pgvector" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#E0F2FE;strokeColor=#0284C7;fontColor=#0C4A6E;fontStyle=1;fontSize=12;spacing=6;" parent="1" vertex="1">
+          <mxGeometry x="1040" y="610" width="125" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-client-api" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#2563EB;" parent="1" source="clients" target="api" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-api-security" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#D97706;" parent="1" source="api" target="security" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-security-controller" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#059669;" parent="1" source="security" target="controllers" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-controller-service" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#16A34A;" parent="1" source="controllers" target="services" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-service-repo" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#4F46E5;" parent="1" source="services" target="repositories" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-service-document" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#F97316;" parent="1" source="services" target="document-pipeline" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="865" y="280" />
+              <mxPoint x="595" y="280" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-service-rag" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#9333EA;" parent="1" source="services" target="rag" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="865" y="280" />
+              <mxPoint x="785" y="280" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-document-integration" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#DB2777;" parent="1" source="document-pipeline" target="integrations" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="595" y="435" />
+              <mxPoint x="960" y="435" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-rag-integration" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#DB2777;" parent="1" source="rag" target="integrations" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-repo-postgres" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#0284C7;" parent="1" source="repositories" target="postgres" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1103" y="191" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-integration-redis" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#DC2626;" parent="1" source="integrations" target="redis" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="980" y="520" />
+              <mxPoint x="393" y="520" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-integration-minio" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#059669;" parent="1" source="infra-title" target="minio" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="573" y="520" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-integration-ai" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#7C3AED;" parent="1" source="integrations" target="ai-provider" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="980" y="520" />
+              <mxPoint x="763" y="520" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-integration-smtp" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#CA8A04;" parent="1" source="integrations" target="smtp" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="980" y="520" />
+              <mxPoint x="943" y="520" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="infra-title" value="Infrastructure / External Services" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=16;fontStyle=1;fontColor=#172B4D;" parent="1" vertex="1">
+          <mxGeometry x="465" y="545" width="290" height="26" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

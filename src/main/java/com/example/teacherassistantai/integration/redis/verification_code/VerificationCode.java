@@ -24,7 +24,11 @@ public class VerificationCode {
     private String code;
 
     // Lưu userId thay vì cả object User để giảm dung lượng cache
+    @Indexed
     private Long userId;
+
+    @Indexed
+    private VerificationCodePurpose purpose;
 
     // Redis sẽ tự động đếm ngược và xóa record này
     @TimeToLive(unit = TimeUnit.SECONDS)

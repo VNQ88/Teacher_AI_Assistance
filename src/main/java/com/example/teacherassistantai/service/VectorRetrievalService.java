@@ -1,66 +1,184 @@
 package com.example.teacherassistantai.service;
 
 import com.example.teacherassistantai.config.RagProperties;
+import com.example.teacherassistantai.dto.response.RagDebugRetrieveResponse;
 import com.example.teacherassistantai.entity.ChatSession;
 import com.example.teacherassistantai.entity.DocumentChunk;
+import com.example.teacherassistantai.entity.DocumentNode;
 import com.example.teacherassistantai.exception.InvalidDataException;
-import com.example.teacherassistantai.integration.gemini.GeminiEmbeddingGateway;
+import com.example.teacherassistantai.integration.ai.AiEmbeddingGateway;
 import com.example.teacherassistantai.repository.DocumentChunkRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class VectorRetrievalService {
 
-    private static final Pattern SECTION_INTENT_PATTERN = Pattern.compile(
-            "(?i)(?:\\b(section|chapter|part)\\s*(\\d{1,3})\\b|\\b(phan|chuong|muc)\\s*(\\d{1,3})\\b)");
-
-    private final GeminiEmbeddingGateway embeddingGateway;
+    private final AiEmbeddingGateway embeddingGateway;
     private final DocumentChunkRepository documentChunkRepository;
     private final RagProperties ragProperties;
+    private final LocalRerankingService localRerankingService;
+    private final RagScopeResolverService ragScopeResolverService;
 
     public List<DocumentChunk> retrieve(ChatSession session, String question, int topK) {
+        return retrieveTrace(session, question, topK).selected();
+    }
+
+    public RagDebugRetrieveResponse debugRetrieve(ChatSession session, String question, int topK) {
+        RetrievalTrace trace = retrieveTrace(session, question, topK);
+        Map<String, Long> selectedTypeDistribution = trace.selected().stream()
+                .collect(java.util.stream.Collectors.groupingBy(localRerankingService::chunkType, LinkedHashMap::new, java.util.stream.Collectors.counting()));
+        return RagDebugRetrieveResponse.builder()
+                .query(question)
+                .retrievalMode(trace.retrievalMode().name())
+                .scopedNodeId(trace.scopedNodeId())
+                .intentType(trace.intent().type().name())
+                .sectionNumber(trace.intent().sectionNumber())
+                .candidateCount(trace.candidates().size())
+                .policyCandidateCount(trace.policyCandidates().size())
+                .selectedCount(trace.selected().size())
+                .selectedChunkTypes(selectedTypeDistribution)
+                .parentGroups(trace.parentGroups().stream()
+                        .map(this::toDebugParentGroup)
+                        .toList())
+                .candidateChunks(trace.scored().stream()
+                        .sorted(Comparator.comparingDouble(LocalRerankingService.ScoredChunk::score).reversed())
+                        .map(this::toDebugChunk)
+                        .toList())
+                .selectedChunks(trace.selected().stream()
+                        .map(chunk -> toDebugChunk(new LocalRerankingService.ScoredChunk(chunk, scoreOf(trace.scored(), chunk))))
+                        .toList())
+                .promptContextPreview(promptContextPreview(trace.selected()))
+                .build();
+    }
+
+    private RetrievalTrace retrieveTrace(ChatSession session, String question, int topK) {
         int safeTopK = Math.min(Math.max(1, topK), ragProperties.getMaxTopK());
         int candidateTopK = Math.max(safeTopK, ragProperties.getCandidateTopK());
-        RetrievalIntent intent = detectIntent(question);
+        LocalRerankingService.RetrievalIntent intent = localRerankingService.detectIntent(question);
 
-        List<Double> questionEmbedding = embeddingGateway.embed(question);
-        validateEmbeddingDimensions(questionEmbedding);
+        DocumentNode scopedNode = tryResolveScopedNode(session, question);
+        String queryVectorLiteral = queryVectorLiteral(question);
+        if (scopedNode != null) {
+            return doScopedVector(session, question, intent, safeTopK, candidateTopK, scopedNode, queryVectorLiteral);
+        }
+        return doFlatVector(session, question, intent, safeTopK, candidateTopK, queryVectorLiteral, RetrievalMode.FLAT_VECTOR, null);
+    }
 
-        String literal = toVectorLiteral(questionEmbedding);
+    private DocumentNode tryResolveScopedNode(ChatSession session, String question) {
+        RagProperties.Retrieval.ScopedVector cfg = ragProperties.getRetrieval().getScopedVector();
+        if (!cfg.isEnabled()) {
+            return null;
+        }
+        if (!ragScopeResolverService.hasExplicitScopeHint(question)) {
+            return null;
+        }
+        ScopeResolution resolution = ragScopeResolverService.resolveDeterministicOnly(session, question);
+        if (resolution.status() != ScopeResolution.Status.RESOLVED) {
+            return null;
+        }
+        if (resolution.confidence() < cfg.getMinConfidence()) {
+            return null;
+        }
+        if (resolution.node() == null) {
+            return null;
+        }
+        log.info("RAG scoped retrieval: nodeId={} nodeKey={} confidence={}",
+                resolution.node().getId(), resolution.node().getNodeKey(), resolution.confidence());
+        return resolution.node();
+    }
+
+    private RetrievalTrace doScopedVector(ChatSession session,
+                                          String question,
+                                          LocalRerankingService.RetrievalIntent intent,
+                                          int safeTopK,
+                                          int candidateTopK,
+                                          DocumentNode scopedNode,
+                                          String queryVectorLiteral) {
+        List<DocumentChunk> candidates = documentChunkRepository.searchByNodeSubtreeVector(
+                session.getSubject().getId(),
+                scopedNode.getId(),
+                queryVectorLiteral,
+                ragProperties.getMinChunkChars(),
+                candidateTopK
+        );
+
+        if (candidates.isEmpty()) {
+            log.debug("Scoped retrieval empty for nodeId={} - fallback flat", scopedNode.getId());
+            return doFlatVector(session, question, intent, safeTopK, candidateTopK,
+                    queryVectorLiteral, RetrievalMode.SCOPED_EMPTY_FALLBACK, scopedNode.getId());
+        }
+
+        LocalRerankingService.RerankResult rerankResult =
+                localRerankingService.rerank(question, candidates, intent, safeTopK);
+        List<DocumentChunk> selected = rerankResult.selected();
+
+        logRetrievalDiagnostics(question, intent, candidates, rerankResult.policyCandidates(), selected);
+        return new RetrievalTrace(
+                intent,
+                candidates,
+                rerankResult.scored(),
+                rerankResult.policyCandidates(),
+                rerankResult.parentGroups(),
+                selected,
+                RetrievalMode.SCOPED_VECTOR,
+                scopedNode.getId()
+        );
+    }
+
+    private RetrievalTrace doFlatVector(ChatSession session,
+                                        String question,
+                                        LocalRerankingService.RetrievalIntent intent,
+                                        int safeTopK,
+                                        int candidateTopK,
+                                        String queryVectorLiteral,
+                                        RetrievalMode retrievalMode,
+                                        Long scopedNodeId) {
         List<DocumentChunk> candidates = documentChunkRepository.searchBySubjectVector(
                 session.getSubject().getId(),
-                literal,
+                queryVectorLiteral,
                 ragProperties.getMinChunkChars(),
                 candidateTopK,
                 intent.sectionNumber()
         );
 
-        List<ScoredChunk> scored = new ArrayList<>(candidates.size());
-        for (int i = 0; i < candidates.size(); i++) {
-            DocumentChunk chunk = candidates.get(i);
-            scored.add(new ScoredChunk(chunk, rerankScore(question, chunk, intent, i, candidates.size())));
-        }
+        LocalRerankingService.RerankResult rerankResult =
+                localRerankingService.rerank(question, candidates, intent, safeTopK);
+        List<DocumentChunk> selected = rerankResult.selected();
 
-        List<DocumentChunk> selected = scored.stream()
-                .sorted(Comparator.comparingDouble(ScoredChunk::score).reversed())
-                .map(ScoredChunk::chunk)
-                .limit(safeTopK)
-                .toList();
+        logRetrievalDiagnostics(question, intent, candidates, rerankResult.policyCandidates(), selected);
+        return new RetrievalTrace(
+                intent,
+                candidates,
+                rerankResult.scored(),
+                rerankResult.policyCandidates(),
+                rerankResult.parentGroups(),
+                selected,
+                retrievalMode,
+                scopedNodeId
+        );
+    }
 
-        logRetrievalDiagnostics(question, intent, selected);
-        return selected;
+    private String queryVectorLiteral(String question) {
+        String embedInput = queryEmbeddingInput(question);
+        log.debug("Query embedding input length: {} (raw question length: {})",
+                embedInput.length(), question.length());
+        List<Double> questionEmbedding = embeddingGateway.embed(embedInput);
+        validateEmbeddingDimensions(questionEmbedding);
+        return toVectorLiteral(questionEmbedding);
+    }
+
+    private String queryEmbeddingInput(String question) {
+        String prefix = ragProperties.getAi().getQueryInstructionPrefix();
+        return (prefix == null ? "" : prefix) + question;
     }
 
     private void validateEmbeddingDimensions(List<Double> embedding) {
@@ -72,101 +190,121 @@ public class VectorRetrievalService {
         }
     }
 
-    private double rerankScore(String question,
-                               DocumentChunk chunk,
-                               RetrievalIntent intent,
-                               int candidateRank,
-                               int candidateCount) {
-        Set<String> questionTokens = normalizeTokens(question);
-        Set<String> chunkTokens = normalizeTokens(chunk.getContent());
-        if (questionTokens.isEmpty() || chunkTokens.isEmpty()) {
-            return 0.0;
-        }
-
-        int overlap = 0;
-        for (String token : questionTokens) {
-            if (chunkTokens.contains(token)) {
-                overlap++;
-            }
-        }
-
-        double overlapRatio = (double) overlap / questionTokens.size();
-        double lengthPrior = Math.min(1.0, Math.max(0.2, chunk.getContent().length() / 1200.0));
-
-        double vectorRankPrior = candidateCount <= 1
-                ? 1.0
-                : 1.0 - ((double) candidateRank / (candidateCount - 1));
-
-        double sectionBoost = 0.0;
-        if (intent.sectionNumber() != null && containsSectionNumber(chunk.getContent(), intent.sectionNumber())) {
-            sectionBoost = 1.0;
-        }
-
-        return overlapRatio * 0.45
-                + vectorRankPrior * 0.25
-                + sectionBoost * 0.20
-                + lengthPrior * 0.10;
-    }
-
-    private Set<String> normalizeTokens(String text) {
-        if (text == null || text.isBlank()) {
-            return Set.of();
-        }
-
-        String normalized = text.toLowerCase().replaceAll("[^\\p{L}\\p{N}\\s]", " ");
-        String[] rawTokens = normalized.trim().split("\\s+");
-        Set<String> tokens = new HashSet<>();
-        for (String token : rawTokens) {
-            if (token.length() >= 2 || token.chars().allMatch(Character::isDigit)) {
-                tokens.add(token);
-            }
-        }
-        return tokens;
-    }
-
-    private RetrievalIntent detectIntent(String question) {
-        if (question == null || question.isBlank()) {
-            return new RetrievalIntent(null);
-        }
-        Matcher matcher = SECTION_INTENT_PATTERN.matcher(question);
-        if (!matcher.find()) {
-            return new RetrievalIntent(null);
-        }
-
-        String number = matcher.group(2) != null ? matcher.group(2) : matcher.group(4);
-        try {
-            return new RetrievalIntent(Integer.parseInt(number));
-        } catch (NumberFormatException ex) {
-            return new RetrievalIntent(null);
-        }
-    }
-
-    private boolean containsSectionNumber(String content, Integer sectionNumber) {
-        if (content == null || sectionNumber == null) {
-            return false;
-        }
-        String lowered = content.toLowerCase();
-        String n = sectionNumber.toString();
-        return lowered.contains("phan " + n)
-                || lowered.contains("chuong " + n)
-                || lowered.contains("muc " + n)
-                || lowered.contains("section " + n)
-                || lowered.contains("chapter " + n)
-                || lowered.contains("part " + n);
-    }
-
-    private void logRetrievalDiagnostics(String question, RetrievalIntent intent, List<DocumentChunk> selected) {
+    private void logRetrievalDiagnostics(String question,
+                                         LocalRerankingService.RetrievalIntent intent,
+                                         List<DocumentChunk> candidates,
+                                         List<LocalRerankingService.ScoredChunk> policyCandidates,
+                                         List<DocumentChunk> selected) {
         if (!log.isDebugEnabled()) {
             return;
         }
         long sectionMatches = selected.stream()
-                .filter(c -> containsSectionNumber(c.getContent(), intent.sectionNumber()))
+                .filter(c -> localRerankingService.containsSectionNumber(c.getContent(), intent.sectionNumber())
+                        || localRerankingService.containsSectionNumber(c.getSectionPath(), intent.sectionNumber()))
                 .count();
-        log.debug("RAG retrieval diagnostics: question='{}', sectionIntent={}, selected={}, sectionMatches={}",
+        long selectedParents = selected.stream()
+                .map(localRerankingService::parentGroupKey)
+                .distinct()
+                .count();
+        Map<String, Long> selectedTypeDistribution = selected.stream()
+                .collect(java.util.stream.Collectors.groupingBy(localRerankingService::chunkType, LinkedHashMap::new, java.util.stream.Collectors.counting()));
+        log.debug("RAG retrieval diagnostics: question='{}', intentType={}, sectionIntent={}, candidates={}, policyCandidates={}, selected={}, parentGroups={}, sectionMatches={}, selectedTypes={}",
                 question,
+                intent.type(),
                 intent.sectionNumber(),
+                candidates.size(),
+                policyCandidates.size(),
                 selected.size(),
-                sectionMatches);
+                selectedParents,
+                sectionMatches,
+                selectedTypeDistribution);
+    }
+
+    private RagDebugRetrieveResponse.ParentGroup toDebugParentGroup(LocalRerankingService.ScoredParentGroup group) {
+        return RagDebugRetrieveResponse.ParentGroup.builder()
+                .parentKey(group.parentKey())
+                .score(group.score())
+                .childCount(group.children().size())
+                .children(group.children().stream()
+                        .sorted(Comparator.comparingDouble(LocalRerankingService.ScoredChunk::score).reversed())
+                        .map(this::toDebugChunk)
+                        .toList())
+                .build();
+    }
+
+    private RagDebugRetrieveResponse.Chunk toDebugChunk(LocalRerankingService.ScoredChunk scoredChunk) {
+        DocumentChunk chunk = scoredChunk.chunk();
+        DocumentNode node = chunk.getNode();
+        DocumentNode parentNode = chunk.getParentNode();
+        return RagDebugRetrieveResponse.Chunk.builder()
+                .chunkId(chunk.getId())
+                .chunkIndex(chunk.getChunkIndex())
+                .sourceOrder(chunk.getSourceOrder())
+                .chunkType(localRerankingService.chunkType(chunk))
+                .documentId(chunk.getDocument() == null ? null : chunk.getDocument().getId())
+                .documentTitle(chunk.getDocument() == null ? null : chunk.getDocument().getTitle())
+                .nodeId(node == null ? null : node.getId())
+                .nodeKey(node == null ? null : node.getNodeKey())
+                .parentNodeId(parentNode == null ? null : parentNode.getId())
+                .parentNodeKey(parentNode == null ? null : parentNode.getNodeKey())
+                .sectionPath(chunk.getSectionPath())
+                .pageFrom(chunk.getPageFrom())
+                .pageTo(chunk.getPageTo())
+                .score(scoredChunk.score())
+                .snippet(snippet(chunk.getContent()))
+                .build();
+    }
+
+    private double scoreOf(List<LocalRerankingService.ScoredChunk> scored, DocumentChunk chunk) {
+        return scored.stream()
+                .filter(scoredChunk -> sameChunk(scoredChunk.chunk(), chunk))
+                .findFirst()
+                .map(LocalRerankingService.ScoredChunk::score)
+                .orElse(0.0);
+    }
+
+    private boolean sameChunk(DocumentChunk left, DocumentChunk right) {
+        if (left == right) {
+            return true;
+        }
+        return left != null && right != null && left.getId() != null && left.getId().equals(right.getId());
+    }
+
+    private String promptContextPreview(List<DocumentChunk> selected) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < selected.size(); i++) {
+            DocumentChunk chunk = selected.get(i);
+            builder.append("[Source ").append(i + 1).append("]\n")
+                    .append("Document: ").append(chunk.getDocument() == null ? "N/A" : chunk.getDocument().getTitle()).append("\n")
+                    .append("Path: ").append(chunk.getSectionPath() == null ? "N/A" : chunk.getSectionPath()).append("\n")
+                    .append("Pages: ").append(pageRange(chunk)).append("\n")
+                    .append("Chunk type: ").append(localRerankingService.chunkType(chunk)).append("\n")
+                    .append("Content:\n").append(snippet(chunk.getContent())).append("\n\n");
+        }
+        return builder.toString().trim();
+    }
+
+    private String pageRange(DocumentChunk chunk) {
+        Integer pageFrom = chunk.getPageFrom();
+        Integer pageTo = chunk.getPageTo();
+        if (pageFrom == null && pageTo == null) {
+            return "N/A";
+        }
+        if (pageFrom != null && pageTo != null && !pageFrom.equals(pageTo)) {
+            return pageFrom + "-" + pageTo;
+        }
+        return String.valueOf(pageFrom != null ? pageFrom : pageTo);
+    }
+
+    private String snippet(String content) {
+        if (content == null || content.isBlank()) {
+            return "";
+        }
+        String normalized = content.replaceAll("\\s+", " ").trim();
+        if (normalized.length() <= 320) {
+            return normalized;
+        }
+        return normalized.substring(0, 317) + "...";
     }
 
     private String toVectorLiteral(List<Double> values) {
@@ -179,9 +317,21 @@ public class VectorRetrievalService {
         return builder.toString();
     }
 
-    private record RetrievalIntent(Integer sectionNumber) {
+    private enum RetrievalMode {
+        FLAT_VECTOR,
+        SCOPED_VECTOR,
+        SCOPED_EMPTY_FALLBACK
     }
 
-    private record ScoredChunk(DocumentChunk chunk, double score) {
+    private record RetrievalTrace(
+            LocalRerankingService.RetrievalIntent intent,
+            List<DocumentChunk> candidates,
+            List<LocalRerankingService.ScoredChunk> scored,
+            List<LocalRerankingService.ScoredChunk> policyCandidates,
+            List<LocalRerankingService.ScoredParentGroup> parentGroups,
+            List<DocumentChunk> selected,
+            RetrievalMode retrievalMode,
+            Long scopedNodeId
+    ) {
     }
 }

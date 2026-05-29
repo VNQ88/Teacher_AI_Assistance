@@ -6,7 +6,6 @@ import com.example.teacherassistantai.entity.User;
 import com.example.teacherassistantai.exception.ResourceNotFoundException;
 import com.example.teacherassistantai.repository.ChatMessageRepository;
 import com.example.teacherassistantai.repository.ChatSessionRepository;
-import com.example.teacherassistantai.repository.ClassroomRepository;
 import com.example.teacherassistantai.repository.SubjectRepository;
 import com.example.teacherassistantai.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -39,8 +38,6 @@ class ChatSessionServiceDeleteTest {
     @Mock
     private SubjectRepository subjectRepository;
     @Mock
-    private ClassroomRepository classroomRepository;
-    @Mock
     private UserRepository userRepository;
 
     private ChatSessionService chatSessionService;
@@ -51,7 +48,6 @@ class ChatSessionServiceDeleteTest {
                 chatMessageRepository,
                 chatSessionRepository,
                 subjectRepository,
-                classroomRepository,
                 userRepository
         );
     }

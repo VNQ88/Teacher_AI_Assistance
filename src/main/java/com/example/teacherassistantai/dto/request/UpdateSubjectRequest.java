@@ -13,8 +13,7 @@ public class UpdateSubjectRequest {
 
     private Boolean active = true;
 
-    @NotNull(message = "Subject type is required")
-    private SubjectType subjectType;
+    private SubjectType subjectType = SubjectType.TEXT_BASED;
 
     @Size(max =1000, message = "Description must be <=1000 characters")
     private String description;

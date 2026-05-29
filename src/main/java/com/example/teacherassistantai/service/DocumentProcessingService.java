@@ -1,26 +1,21 @@
 package com.example.teacherassistantai.service;
 
 import com.example.teacherassistantai.common.enumerate.DocumentStatus;
+import com.example.teacherassistantai.common.enumerate.DocumentEnrichmentStatus;
+import com.example.teacherassistantai.common.enumerate.DocumentNodeArtifactType;
 import com.example.teacherassistantai.common.file.InMemoryMultipartFile;
-import com.example.teacherassistantai.config.DocumentIngestionProps;
 import com.example.teacherassistantai.entity.Document;
-import com.example.teacherassistantai.exception.DocumentProcessingException;
-import com.example.teacherassistantai.integration.docling.DoclingGateway;
-import com.example.teacherassistantai.integration.docling.DoclingProps;
 import com.example.teacherassistantai.integration.minio.MinioChannel;
 import com.example.teacherassistantai.integration.minio.MinioProps;
-import com.example.teacherassistantai.repository.DocumentChunkRepository;
+import com.example.teacherassistantai.integration.tika.TikaMarkdownParser;
 import com.example.teacherassistantai.repository.DocumentRepository;
 import io.minio.GetObjectResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -36,10 +31,12 @@ public class DocumentProcessingService {
     private final DocumentRepository documentRepository;
     private final MinioChannel minioChannel;
     private final MinioProps minioProps;
-    private final DoclingGateway doclingGateway;
-    private final DoclingProps doclingProps;
-    private final DocumentIngestionProps ingestionProps;
+    private final TikaMarkdownParser tikaMarkdownParser;
     private final DocumentChunkIngestionService documentChunkIngestionService;
+    private final DocumentHierarchyArtifactService documentHierarchyArtifactService;
+    private final DocumentHierarchyArtifactValidationService documentHierarchyArtifactValidationService;
+    private final DocumentHierarchyPersistenceService documentHierarchyPersistenceService;
+    private final DocumentEnrichmentService documentEnrichmentService;
 
     @Async("documentProcessingExecutor")
     public void processDocumentAsync(Long documentId) {
@@ -63,21 +60,51 @@ public class DocumentProcessingService {
         String cleanedMarkdown = sanitizeMarkdown(markdown);
 
         String markdownObjectKey = buildMarkdownObjectKey(document.getSubject().getId());
-        uploadMarkdown(markdownObjectKey, document.getTitle(), cleanedMarkdown);
-
+        String hierarchyObjectKey = buildSiblingObjectKey(markdownObjectKey, ".hierarchy.json");
+        String chunksObjectKey = buildSiblingObjectKey(markdownObjectKey, ".chunks.jsonl");
         document.setMarkdownObjectKey(markdownObjectKey);
+        document.setHierarchyObjectKey(hierarchyObjectKey);
+        document.setChunksObjectKey(chunksObjectKey);
+        DocumentHierarchyArtifactService.Artifacts artifacts =
+                documentHierarchyArtifactService.buildArtifacts(document, cleanedMarkdown);
+        DocumentHierarchyArtifactValidationService.ValidationReport validationReport =
+                documentHierarchyArtifactValidationService.validate(document, artifacts);
+        log.info("Validated hierarchy artifacts: documentId={}, warnings={}",
+                documentId, validationReport.warningCount());
 
-        // Keep skeleton flow explicit so status transitions are visible in DB.
+        uploadArtifact(markdownObjectKey, document.getTitle(), "text/markdown", artifacts.normalizedMarkdown());
+        uploadArtifact(hierarchyObjectKey, document.getTitle(), "application/json", artifacts.hierarchyJson());
+        uploadArtifact(chunksObjectKey, document.getTitle(), "application/x-ndjson", artifacts.chunksJsonl());
+
         document.setStatus(DocumentStatus.CHUNKING);
         documentRepository.save(document);
 
-        documentChunkIngestionService.ingest(document, cleanedMarkdown);
+        documentChunkIngestionService.deleteExistingChunks(documentId);
+        DocumentHierarchyPersistenceService.HierarchyPersistenceResult persistenceResult =
+                documentHierarchyPersistenceService.persist(document, artifacts.hierarchyDocument());
+        log.info("Persisted document hierarchy nodes: documentId={}, nodeCount={}",
+                documentId, persistenceResult.nodes().size());
 
         document.setStatus(DocumentStatus.EMBEDDING);
         documentRepository.save(document);
 
-        document.setStatus(DocumentStatus.READY);
+        var chunks = documentChunkIngestionService.ingest(
+                document,
+                artifacts.hierarchyDocument(),
+                persistenceResult.nodeByKey()
+        );
+        log.info("Persisted document hierarchical chunks and embeddings: documentId={}, chunkCount={}",
+                documentId, chunks.size());
+
+        document.setStatus(DocumentStatus.SUMMARISING);
+        document.setEnrichmentStatus(DocumentEnrichmentStatus.QUEUED);
+        document.setEnrichmentError(null);
         documentRepository.save(document);
+        documentEnrichmentService.enqueueDocumentEnrichment(
+                documentId,
+                false,
+                List.of(DocumentNodeArtifactType.SUMMARY)
+        );
     }
 
     private byte[] downloadOriginal(String objectKey) throws Exception {
@@ -87,77 +114,11 @@ public class DocumentProcessingService {
     }
 
     private String toMarkdown(Document document, byte[] sourceBytes) {
-        boolean doOcr = doclingProps.getParse().isDoOcr();
-        boolean includeImages = doclingProps.getParse().isIncludeImages();
-
-        if ("PDF".equalsIgnoreCase(document.getFileType())) {
-            List<byte[]> chunks = splitPdfByPageWindow(sourceBytes, ingestionProps.getPdfSplitPages());
-            return parsePdfChunksSequential(chunks, doOcr, includeImages);
-        }
-
-        return doclingGateway.parseFile(
+        return tikaMarkdownParser.parseToMarkdown(
                 sourceBytes,
                 document.getTitle(),
-                mapMimeType(document.getFileType()),
-                doOcr,
-                includeImages
+                mapMimeType(document.getFileType())
         );
-    }
-
-    private List<byte[]> splitPdfByPageWindow(byte[] pdfBytes, int windowSize) {
-        List<byte[]> chunks = new ArrayList<>();
-
-        try (PDDocument sourceDoc = PDDocument.load(pdfBytes)) {
-            int totalPages = sourceDoc.getNumberOfPages();
-            int pageWindow = resolvePdfWindowSize(windowSize, totalPages);
-            log.info("Split PDF: totalPages={}, pageWindow={}", totalPages, pageWindow);
-            for (int start = 0; start < totalPages; start += pageWindow) {
-                int endExclusive = Math.min(start + pageWindow, totalPages);
-                try (PDDocument chunkDoc = new PDDocument();
-                     ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-                    for (int page = start; page < endExclusive; page++) {
-                        chunkDoc.importPage(sourceDoc.getPage(page));
-                    }
-                    chunkDoc.save(outputStream);
-                    chunks.add(outputStream.toByteArray());
-                }
-            }
-        } catch (Exception ex) {
-            throw new DocumentProcessingException("Failed to split PDF by page window", ex);
-        }
-
-        return chunks.isEmpty() ? List.of(pdfBytes) : chunks;
-    }
-
-    private String parsePdfChunksSequential(List<byte[]> chunks,
-                                             boolean doOcr,
-                                             boolean includeImages) {
-         List<String> markdownParts = new ArrayList<>(chunks.size());
-         long chunkDelayMillis = resolveChunkDelayMillis(chunks.size());
-         try {
-             for (int i = 0; i < chunks.size(); i++) {
-                 String chunkName = "chunk-" + (i + 1) + ".pdf";
-                 log.info("Parse PDF chunk {}/{} with Docling", i + 1, chunks.size());
-                 String markdown = doclingGateway.parseFile(
-                         chunks.get(i),
-                         chunkName,
-                         "application/pdf",
-                         doOcr,
-                         includeImages
-                 );
-                 markdownParts.add(markdown);
-
-                 if (i < chunks.size() - 1 && chunkDelayMillis > 0) {
-                     pauseBetweenChunks(chunkDelayMillis);
-                 }
-             }
-             return String.join("\n\n", markdownParts);
-         } catch (InterruptedException interruptedException) {
-             Thread.currentThread().interrupt();
-             throw new DocumentProcessingException("PDF chunk parsing interrupted", interruptedException);
-         } catch (RuntimeException ex) {
-             throw new DocumentProcessingException("Docling PDF chunk parse failed: " + ex.getMessage(), ex);
-         }
     }
 
     private String sanitizeMarkdown(String markdown) {
@@ -170,14 +131,26 @@ public class DocumentProcessingService {
         return String.format("uploads/subjects/%d/md/%s.md", subjectId, UUID.randomUUID());
     }
 
-    private void uploadMarkdown(String objectKey, String title, String markdown) throws Exception {
-        byte[] bytes = markdown.getBytes(StandardCharsets.UTF_8);
-        String fileName = (title == null || title.isBlank() ? "document" : title.replaceAll("[^a-zA-Z0-9._-]", "_")) + ".md";
+    private String buildSiblingObjectKey(String markdownObjectKey, String suffix) {
+        if (markdownObjectKey == null || !markdownObjectKey.endsWith(".md")) {
+            return markdownObjectKey + suffix;
+        }
+        return markdownObjectKey.substring(0, markdownObjectKey.length() - 3) + suffix;
+    }
+
+    private void uploadArtifact(String objectKey, String title, String contentType, String content) throws Exception {
+        byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
+        String extension = switch (contentType) {
+            case "application/json" -> ".hierarchy.json";
+            case "application/x-ndjson" -> ".chunks.jsonl";
+            default -> ".md";
+        };
+        String fileName = (title == null || title.isBlank() ? "document" : title.replaceAll("[^a-zA-Z0-9._-]", "_")) + extension;
 
         InMemoryMultipartFile markdownFile = new InMemoryMultipartFile(
                 "file",
                 fileName,
-                "text/markdown",
+                contentType,
                 bytes
         );
         minioChannel.upload(markdownFile, objectKey);
@@ -190,27 +163,6 @@ public class DocumentProcessingService {
             case "PDF" -> "application/pdf";
             default -> "application/octet-stream";
         };
-    }
-
-    private int resolvePdfWindowSize(int defaultWindowSize, int totalPages) {
-        int defaultWindow = Math.max(1, defaultWindowSize);
-        if (totalPages >= ingestionProps.getPdfLargeThresholdPages()) {
-            return Math.min(defaultWindow, Math.max(1, ingestionProps.getPdfLargeSplitPages()));
-        }
-        return defaultWindow;
-    }
-
-    private long resolveChunkDelayMillis(int chunkCount) {
-        int largeChunkThreshold = Math.max(1,
-                (int) Math.ceil((double) ingestionProps.getPdfLargeThresholdPages() / Math.max(1, ingestionProps.getPdfLargeSplitPages())));
-        if (chunkCount >= largeChunkThreshold) {
-            return Math.max(0L, ingestionProps.getPdfLargeChunkDelayMillis());
-        }
-        return Math.max(0L, ingestionProps.getPdfChunkDelayMillis());
-    }
-
-    private void pauseBetweenChunks(long delayMillis) throws InterruptedException {
-        java.util.concurrent.TimeUnit.MILLISECONDS.sleep(delayMillis);
     }
 
     protected void markFailed(Long documentId, Exception ex) {

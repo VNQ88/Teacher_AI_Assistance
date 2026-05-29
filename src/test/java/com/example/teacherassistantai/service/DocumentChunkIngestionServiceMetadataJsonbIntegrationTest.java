@@ -2,11 +2,12 @@ package com.example.teacherassistantai.service;
 
 import com.example.teacherassistantai.common.enumerate.DocumentStatus;
 import com.example.teacherassistantai.common.enumerate.SubjectType;
+import com.example.teacherassistantai.config.RagProperties;
 import com.example.teacherassistantai.entity.Document;
 import com.example.teacherassistantai.entity.DocumentChunk;
 import com.example.teacherassistantai.entity.Subject;
 import com.example.teacherassistantai.entity.User;
-import com.example.teacherassistantai.integration.gemini.GeminiEmbeddingGateway;
+import com.example.teacherassistantai.integration.ai.AiEmbeddingGateway;
 import com.example.teacherassistantai.repository.DocumentRepository;
 import com.example.teacherassistantai.repository.SubjectRepository;
 import com.example.teacherassistantai.repository.UserRepository;
@@ -19,11 +20,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.data.domain.AuditorAware;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
@@ -120,15 +125,42 @@ class DocumentChunkIngestionServiceMetadataJsonbIntegrationTest {
 
         @Bean
         @Primary
-        GeminiEmbeddingGateway geminiEmbeddingGateway() {
-            return new GeminiEmbeddingGateway(null, null) {
+        AiEmbeddingGateway aiEmbeddingGateway() {
+            return new AiEmbeddingGateway() {
                 @Override
                 public List<Double> embed(String input) {
-                    return IntStream.range(0, 3072)
-                            .mapToObj(i -> 0.01d)
-                            .toList();
+                    return IntStream.range(0, 1024).mapToObj(i -> 0.01d).toList();
+                }
+
+                @Override
+                public List<List<Double>> embedAll(List<String> inputs) {
+                    List<Double> vec = IntStream.range(0, 1024).mapToObj(i -> 0.01d).toList();
+                    return inputs.stream().map(t -> vec).toList();
+                }
+
+                @Override
+                public String embeddingModel() {
+                    return "qwen3-embedding-0.6b";
                 }
             };
+        }
+
+        @Bean
+        @Primary
+        RagProperties ragProperties() {
+            RagProperties properties = new RagProperties();
+            properties.setEmbeddingDimensions(1024);
+            return properties;
+        }
+
+        @Bean(name = "auditorProvider")
+        AuditorAware<Long> auditorProvider() {
+            return () -> Optional.of(1L);
+        }
+
+        @Bean
+        CacheManager cacheManager() {
+            return new ConcurrentMapCacheManager();
         }
     }
 }

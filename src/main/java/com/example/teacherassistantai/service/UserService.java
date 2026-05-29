@@ -2,14 +2,27 @@ package com.example.teacherassistantai.service;
 
 import com.example.teacherassistantai.common.response.PageResponse;
 import com.example.teacherassistantai.dto.request.ChangePasswordRequest;
+import com.example.teacherassistantai.dto.request.CreateUserRequest;
 import com.example.teacherassistantai.dto.request.UpdateUserRequest;
 import com.example.teacherassistantai.dto.response.UserResponse;
 import com.example.teacherassistantai.entity.Role;
 import com.example.teacherassistantai.entity.User;
+import com.example.teacherassistantai.exception.AccessDeniedOperationException;
 import com.example.teacherassistantai.exception.InvalidDataException;
 import com.example.teacherassistantai.exception.ResourceNotFoundException;
+import com.example.teacherassistantai.exception.StorageOperationException;
+import com.example.teacherassistantai.integration.minio.MinioChannel;
 import com.example.teacherassistantai.mapper.UserMapper;
+import com.example.teacherassistantai.repository.AgentLogRepository;
+import com.example.teacherassistantai.repository.ChatMessageRepository;
+import com.example.teacherassistantai.repository.ChatSessionRepository;
+import com.example.teacherassistantai.repository.DocumentChunkRepository;
+import com.example.teacherassistantai.repository.DocumentNodeArtifactRepository;
+import com.example.teacherassistantai.repository.DocumentNodeRepository;
+import com.example.teacherassistantai.repository.DocumentRepository;
+import com.example.teacherassistantai.repository.DocumentRepository.DocumentStorageObject;
 import com.example.teacherassistantai.repository.RoleRepository;
+import com.example.teacherassistantai.repository.SubjectRepository;
 import com.example.teacherassistantai.repository.UserRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -21,9 +34,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -32,6 +46,32 @@ public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final DocumentRepository documentRepository;
+    private final DocumentChunkRepository documentChunkRepository;
+    private final DocumentNodeRepository documentNodeRepository;
+    private final DocumentNodeArtifactRepository documentNodeArtifactRepository;
+    private final ChatMessageRepository chatMessageRepository;
+    private final ChatSessionRepository chatSessionRepository;
+    private final SubjectRepository subjectRepository;
+    private final AgentLogRepository agentLogRepository;
+    private final MinioChannel minioChannel;
+
+    @Transactional
+    public UserResponse createUser(CreateUserRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new InvalidDataException("Email already exists: " + request.getEmail());
+        }
+        Role role = roleRepository.findByName(request.getRole())
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + request.getRole()));
+        User user = User.builder()
+                .email(request.getEmail())
+                .fullName(request.getFullName().trim())
+                .password(request.getPassword())
+                .enabled(true)
+                .roles(Set.of(role))
+                .build();
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
 
     public PageResponse<?> getAllUsers(int pageNo, @Min(10) int pageSize) {
         Page<User> userPage = userRepository.findAll(PageRequest.of(pageNo, pageSize));
@@ -63,12 +103,7 @@ public class UserService {
     }
 
     public UserResponse getCurrentUser() {
-        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        Optional<User> user = userRepository.findByEmail(userEmail);
-        if (user.isEmpty()) {
-            throw new ResourceNotFoundException("Current user not found");
-        }
-        return userMapper.toUserResponse(user.get());
+        return userMapper.toUserResponse(getCurrentUserEntity());
     }
 
     public void changePassword(@Valid ChangePasswordRequest request) {
@@ -100,6 +135,8 @@ public class UserService {
 
     @Transactional
     public UserResponse updateUser(@Min(1) long userId, @Valid UpdateUserRequest request) {
+        validateUpdatePermission(userId);
+
         User user = getUserById(userId);
 
         // Check if email is being changed and if new email already exists
@@ -121,6 +158,24 @@ public class UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
+    private void validateUpdatePermission(long userId) {
+        User currentUser = getCurrentUserEntity();
+        boolean isAdmin = currentUser.getRoles().stream()
+                .map(Role::getName)
+                .anyMatch("ADMIN"::equalsIgnoreCase);
+        boolean isSelf = currentUser.getId() != null && currentUser.getId().equals(userId);
+
+        if (!isAdmin && !isSelf) {
+            throw new AccessDeniedOperationException("You don't have permission to update this user");
+        }
+    }
+
+    private User getCurrentUserEntity() {
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("Current user not found"));
+    }
+
     @Transactional
     public void deleteUser(@Min(1) long userId) {
         User user = getUserById(userId);
@@ -131,6 +186,45 @@ public class UserService {
             throw new InvalidDataException("Cannot delete currently logged-in user");
         }
 
+        List<DocumentStorageObject> storageObjects = documentRepository.findStorageObjectsForUserDeletion(userId);
+        storageObjects.forEach(this::removeDocumentStorageObjects);
+
+        agentLogRepository.deleteByUserId(userId);
+
+        chatMessageRepository.deleteMessageSourceLinksByUserId(userId);
+        chatMessageRepository.deleteByUserId(userId);
+        chatSessionRepository.deleteByUserId(userId);
+
+        documentChunkRepository.deleteMessageSourceLinksByUserId(userId);
+        documentNodeArtifactRepository.deleteByUserId(userId);
+        documentChunkRepository.deleteByUserId(userId);
+        documentNodeRepository.deleteByUserId(userId);
+        documentRepository.deleteByUserId(userId);
+
+        subjectRepository.deleteByOwnerId(userId);
+        userRepository.deleteRoleLinksByUserId(userId);
         userRepository.delete(user);
+    }
+
+    private void removeDocumentStorageObjects(DocumentStorageObject document) {
+        removeStorageObject(document.getOriginalObjectKey(), document.getId(), "original");
+        removeStorageObject(document.getMarkdownObjectKey(), document.getId(), "markdown");
+        removeStorageObject(document.getHierarchyObjectKey(), document.getId(), "hierarchy");
+        removeStorageObject(document.getChunksObjectKey(), document.getId(), "chunks");
+    }
+
+    private void removeStorageObject(String objectKey, Long documentId, String objectType) {
+        if (!StringUtils.hasText(objectKey)) {
+            return;
+        }
+
+        try {
+            minioChannel.removeObject(objectKey);
+        } catch (StorageOperationException ex) {
+            throw new StorageOperationException(
+                    "Failed to delete %s object for document id=%d".formatted(objectType, documentId),
+                    ex
+            );
+        }
     }
 }

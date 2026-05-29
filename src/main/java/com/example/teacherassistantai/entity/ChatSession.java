@@ -46,14 +46,6 @@ public class ChatSession extends BaseEntity {
     @JoinColumn(name = "subject_id")
     Subject subject;
 
-    /**
-     * Lớp học cụ thể (nullable).
-     * Giúp RAG ưu tiên tài liệu của lớp đó trước, sau đó mới đến tài liệu chung của môn.
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "classroom_id")
-    Classroom classroom;
-
     @Column(length = 255)
     String title; // Tiêu đề tóm tắt phiên (có thể do AI tạo từ câu hỏi đầu tiên)
 

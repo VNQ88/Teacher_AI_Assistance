@@ -1,0 +1,196 @@
+<mxfile host="drawio-plugin" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" modified="2026-05-16T16:04:47.403Z" version="22.1.22" etag="yZyHY294LHP0hUN1tN4M" type="embed">
+  <diagram id="rag_chat_activity_3_flows" name="RAG Chat Activity - 3 Flows">
+    <mxGraphModel dx="930" dy="387" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="980" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Activity Diagram - Chat Flow: Factual QA, Summary, Review Questions" style="text;html=1;align=center;verticalAlign=middle;fontSize=20;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="210" y="20" width="1080" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="start" value="" style="ellipse;html=1;shape=startState;fillColor=#000000;strokeColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="735" y="80" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="send" value="User gửi câu hỏi trong chat session" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="620" y="135" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="validate" value="Validate session, quyền truy cập, lưu USER message" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="600" y="215" width="300" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="ready" value="Document READY?" style="rhombus;whiteSpace=wrap;html=1;fontSize=12;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="655" y="305" width="190" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="not_ready" value="Trả thông báo: tài liệu đang xử lý / lỗi xử lý" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="330" y="318" width="245" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="route" value="Phân loại intent" style="rhombus;whiteSpace=wrap;html=1;fontSize=12;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="655" y="420" width="190" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="h_factual" value="Luồng 1: Hỏi đáp thường" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=13;align=center;" parent="1" vertex="1">
+          <mxGeometry x="120" y="545" width="360" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="h_summary" value="Luồng 2: Tóm tắt" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=13;align=center;" parent="1" vertex="1">
+          <mxGeometry x="570" y="545" width="360" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="h_questions" value="Luồng 3: Tạo câu hỏi ôn tập" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=13;align=center;" parent="1" vertex="1">
+          <mxGeometry x="990" y="545" width="360" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="f1" value="Retrieve context chunks&#xa;(embedding + pgvector + rerank)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="150" y="620" width="300" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="f2" value="Build prompt từ câu hỏi, history, context" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="150" y="710" width="300" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="f3" value="Gọi AI sinh câu trả lời" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="150" y="796" width="300" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="s1" value="Resolve scope&#xa;(document / part / chapter / section)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="600" y="620" width="300" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="s2" value="Có summary sẵn?" style="rhombus;whiteSpace=wrap;html=1;fontSize=12;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="650" y="710" width="200" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="s3a" value="Render summary artifact&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="520" y="820" width="180" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="s3b" value="RAG fallback: &lt;br&gt;gọi AI summarize, lưu artifact" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="765" y="820" width="195" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="q1" value="Resolve scope&#xa;(document / part / chapter / section)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="1030" y="610" width="300" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="q2" value="Scope rộng?&#xa;(part / document / subject)" style="rhombus;whiteSpace=wrap;html=1;fontSize=12;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="1070" y="710" width="200" height="86" as="geometry" />
+        </mxCell>
+        <mxCell id="q3a" value="Compose từ completed &lt;br&gt;chapter question artifacts" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="1000" y="830" width="190" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="q3b" value="Dùng question artifact nếu có; &lt;br&gt;nếu chưa có thì generate&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="1205" y="830" width="165" height="68.5" as="geometry" />
+        </mxCell>
+        <mxCell id="result" value="Tạo AgentResult&#xa;(answer + sources + confidence nếu có)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="605" y="960" width="290" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="save_assistant" value="Append nguồn tham khảo, lưu ASSISTANT message và AgentLog" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="590" y="1050" width="320" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="response" target="end">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="response" value="Return ResponseData&lt;ChatMessageResponse&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fontSize=12;fillColor=#ffffff;strokeColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="600" y="1140" width="300" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="end" value="" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="735" y="1230" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;" parent="1" source="start" target="send" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;" parent="1" source="send" target="validate" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;" parent="1" source="validate" target="ready" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" value="No" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;fontSize=11;" parent="1" source="ready" target="not_ready" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" value="Yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;fontSize=11;" parent="1" source="ready" target="route" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f" value="FACTUAL_QA" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;fontSize=11;" parent="1" source="route" target="f1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_s" value="SECTION_SUMMARY" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;fontSize=11;" parent="1" source="route" target="s1" edge="1">
+          <mxGeometry x="-0.6667" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_q" value="REVIEW_QUESTION_GENERATION" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;fontSize=11;" parent="1" source="route" target="q1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1170" y="460" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ef1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;" parent="1" source="f1" target="f2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ef2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;" parent="1" source="f2" target="f3" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ef3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="f3" target="result" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="300" y="910" />
+              <mxPoint x="750" y="910" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;" parent="1" source="s1" target="s2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es2" value="Yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;fontSize=11;" parent="1" source="s2" target="s3a" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es3" value="No" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;fontSize=11;" parent="1" source="s2" target="s3b" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;" parent="1" source="s3a" target="result" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="605" y="910" />
+              <mxPoint x="750" y="910" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;" parent="1" source="s3b" target="result" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="862" y="910" />
+              <mxPoint x="750" y="910" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eq1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;" parent="1" source="q1" target="q2" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1170" y="680" />
+              <mxPoint x="1170" y="680" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eq2" value="Yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;fontSize=11;" parent="1" source="q2" target="q3a" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eq3" value="No" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;fontSize=11;" parent="1" source="q2" target="q3b" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eq4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="q3a" target="result" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1095" y="910" />
+              <mxPoint x="750" y="910" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eq5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="q3b" target="result" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1288" y="910" />
+              <mxPoint x="750" y="910" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ex1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;" parent="1" source="result" target="save_assistant" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ex2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;" parent="1" source="save_assistant" target="response" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ex3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=1.5;" parent="1" source="response" target="end" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

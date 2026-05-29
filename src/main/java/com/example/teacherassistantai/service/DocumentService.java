@@ -1,10 +1,10 @@
 package com.example.teacherassistantai.service;
 
 import com.example.teacherassistantai.common.enumerate.DocumentStatus;
+import com.example.teacherassistantai.common.enumerate.DocumentEnrichmentStatus;
 import com.example.teacherassistantai.common.response.PageResponse;
 import com.example.teacherassistantai.config.DocumentIngestionProps;
 import com.example.teacherassistantai.dto.response.DocumentResponse;
-import com.example.teacherassistantai.entity.Classroom;
 import com.example.teacherassistantai.entity.Document;
 import com.example.teacherassistantai.entity.Role;
 import com.example.teacherassistantai.entity.Subject;
@@ -14,7 +14,6 @@ import com.example.teacherassistantai.exception.InvalidDataException;
 import com.example.teacherassistantai.exception.ResourceNotFoundException;
 import com.example.teacherassistantai.exception.StorageOperationException;
 import com.example.teacherassistantai.integration.minio.MinioChannel;
-import com.example.teacherassistantai.repository.ClassroomRepository;
 import com.example.teacherassistantai.repository.DocumentChunkRepository;
 import com.example.teacherassistantai.repository.DocumentRepository;
 import com.example.teacherassistantai.repository.SubjectRepository;
@@ -28,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -45,7 +43,6 @@ public class DocumentService {
 
     private final DocumentRepository documentRepository;
     private final SubjectRepository subjectRepository;
-    private final ClassroomRepository classroomRepository;
     private final UserRepository userRepository;
     private final DocumentChunkRepository documentChunkRepository;
     private final MinioChannel minioChannel;
@@ -55,22 +52,12 @@ public class DocumentService {
     @Transactional
     public DocumentResponse uploadDocument(MultipartFile file,
                                            Long subjectId,
-                                           @Nullable  Long classroomId,
                                            String title,
                                            String description) {
         validateUploadRequest(file);
 
         Subject subject = subjectRepository.findById(subjectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Subject not found with id: " + subjectId));
-
-        Classroom classroom = null;
-        if (classroomId != null) {
-            classroom = classroomRepository.findById(classroomId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Classroom not found with id: " + classroomId));
-            if (!classroom.getSubject().getId().equals(subjectId)) {
-                throw new InvalidDataException("Classroom does not belong to provided subject");
-            }
-        }
 
         User currentUser = getCurrentUser();
         String extension = getExtension(file.getOriginalFilename());
@@ -97,7 +84,6 @@ public class DocumentService {
                 .fileType(normalizedType)
                 .fileSizeBytes(file.getSize())
                 .subject(subject)
-                .classroom(classroom)
                 .uploadedBy(currentUser)
                 .status(DocumentStatus.UPLOADED)
                 .build();
@@ -154,6 +140,8 @@ public class DocumentService {
 
         removeStorageObject(document.getOriginalObjectKey(), documentId, "original");
         removeStorageObject(document.getMarkdownObjectKey(), documentId, "markdown");
+        removeStorageObject(document.getHierarchyObjectKey(), documentId, "hierarchy");
+        removeStorageObject(document.getChunksObjectKey(), documentId, "chunks");
 
         documentChunkRepository.deleteMessageSourceLinksByDocumentId(documentId);
         documentChunkRepository.deleteByDocumentId(documentId);
@@ -164,6 +152,25 @@ public class DocumentService {
     @Transactional
     public void deleteDocumentById(Long documentId) {
         deleteDocument(documentId);
+    }
+
+    @Transactional
+    public DocumentResponse reprocessDocument(Long documentId) {
+        Document document = documentRepository.findById(documentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + documentId));
+
+        User currentUser = getCurrentUser();
+        validateDeletePermission(document, currentUser);
+
+        document.setStatus(DocumentStatus.UPLOADED);
+        document.setProcessingError(null);
+        document.setEnrichmentStatus(DocumentEnrichmentStatus.NOT_STARTED);
+        document.setEnrichmentError(null);
+        Document saved = documentRepository.save(document);
+        log.info("Reprocessing document id={}", documentId);
+
+        triggerProcessingAfterCommit(documentId);
+        return toResponse(saved);
     }
 
     private void validateUploadRequest(MultipartFile file) {
@@ -256,16 +263,59 @@ public class DocumentService {
                 .description(document.getDescription())
                 .subjectId(document.getSubject().getId())
                 .subjectName(document.getSubject().getName())
-                .classroomId(document.getClassroom() != null ? document.getClassroom().getId() : null)
-                .classroomName(document.getClassroom() != null ? document.getClassroom().getName() : null)
                 .fileType(document.getFileType())
                 .fileSizeBytes(document.getFileSizeBytes())
                 .originalObjectKey(document.getOriginalObjectKey())
                 .markdownObjectKey(document.getMarkdownObjectKey())
+                .hierarchyObjectKey(document.getHierarchyObjectKey())
+                .chunksObjectKey(document.getChunksObjectKey())
                 .status(document.getStatus())
+                .statusLabel(statusLabel(document.getStatus()))
+                .enrichmentStatus(document.getEnrichmentStatus())
+                .enrichmentStatusLabel(enrichmentStatusLabel(document.getEnrichmentStatus()))
+                .ragReady(isRagReady(document.getStatus()))
+                .learningMaterialsReady(document.getStatus() == DocumentStatus.READY
+                        && document.getEnrichmentStatus() == DocumentEnrichmentStatus.ENRICHED)
                 .processingError(document.getProcessingError())
+                .enrichmentError(document.getEnrichmentError())
+                .enrichmentStartedAt(document.getEnrichmentStartedAt())
+                .enrichmentCompletedAt(document.getEnrichmentCompletedAt())
                 .createdAt(document.getCreatedAt())
                 .updatedAt(document.getUpdatedAt())
                 .build();
+    }
+
+    private boolean isRagReady(DocumentStatus status) {
+        return status == DocumentStatus.READY;
+    }
+
+    private String statusLabel(DocumentStatus status) {
+        if (status == null) {
+            return null;
+        }
+        return switch (status) {
+            case UPLOADED -> "Đã tải lên";
+            case PARSING -> "Đang đọc";
+            case CHUNKING -> "Đang chia đoạn";
+            case EMBEDDING -> "Đang lập chỉ mục";
+            case SUMMARISING -> "Đang tạo học liệu";
+            case READY -> "Sẵn sàng học tập";
+            case FAILED -> "Lỗi xử lý";
+        };
+    }
+
+    private String enrichmentStatusLabel(DocumentEnrichmentStatus status) {
+        if (status == null) {
+            return null;
+        }
+        return switch (status) {
+            case NOT_STARTED -> "Chưa tạo học liệu";
+            case QUEUED -> "Đang chờ";
+            case RUNNING -> "Đang tạo học liệu";
+            case ENRICHED -> "Đủ học liệu";
+            case PARTIAL_FAILED -> "Thiếu một phần";
+            case FAILED -> "Lỗi học liệu";
+            case SKIPPED -> "Đã bỏ qua";
+        };
     }
 }
