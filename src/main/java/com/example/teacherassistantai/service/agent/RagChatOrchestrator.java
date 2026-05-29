@@ -51,6 +51,7 @@ public class RagChatOrchestrator {
     private final FactualQaAgent factualQaAgent;
     private final DocumentScopeAgent documentScopeAgent;
     private final SummaryAgent summaryAgent;
+    private final OutlineAgent outlineAgent;
     private final QuizAgent quizAgent;
     private final SourceAttributionFormatter sourceAttributionFormatter;
     private final InternalCitationSanitizer citationSanitizer;
@@ -84,7 +85,27 @@ public class RagChatOrchestrator {
         AgentResult result;
         AgentType agentType;
 
-        if (intent == RagChatIntent.SECTION_SUMMARY) {
+        if (intent == RagChatIntent.DOCUMENT_OUTLINE) {
+            ScopeResolution resolution =
+                    documentScopeAgent.resolveDetailed(session, effectiveQuestion);
+            if (resolution.status() != ScopeResolution.Status.RESOLVED) {
+                result = documentScopeAgent.unresolved(resolution);
+            } else {
+                RagChatState state = RagChatState.builder()
+                        .question(effectiveQuestion)
+                        .originalQuestion(request.getQuestion())
+                        .effectiveQuestion(effectiveQuestion)
+                        .followUp(followUpResolution.followUp())
+                        .anchoredSourceChunks(followUpResolution.previousSourceChunks())
+                        .session(session)
+                        .intent(intent)
+                        .resolvedNode(resolution.node())
+                        .startedAt(startedAt)
+                        .build();
+                result = outlineAgent.execute(state);
+            }
+            agentType = AgentType.KNOWLEDGE_CHATBOT;
+        } else if (intent == RagChatIntent.SECTION_SUMMARY) {
             ScopeResolution resolution =
                     documentScopeAgent.resolveDetailed(session, effectiveQuestion);
             if (resolution.status() != ScopeResolution.Status.RESOLVED) {

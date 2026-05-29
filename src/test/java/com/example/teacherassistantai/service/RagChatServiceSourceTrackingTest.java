@@ -18,6 +18,7 @@ import com.example.teacherassistantai.repository.DocumentRepository;
 import com.example.teacherassistantai.service.agent.AgentResult;
 import com.example.teacherassistantai.service.agent.DocumentScopeAgent;
 import com.example.teacherassistantai.service.agent.FactualQaAgent;
+import com.example.teacherassistantai.service.agent.OutlineAgent;
 import com.example.teacherassistantai.service.agent.QuizAgent;
 import com.example.teacherassistantai.service.agent.RagChatOrchestrator;
 import com.example.teacherassistantai.service.agent.SummaryAgent;
@@ -56,6 +57,7 @@ class RagChatServiceSourceTrackingTest {
                 factualQaAgent,
                 mock(DocumentScopeAgent.class),
                 mock(SummaryAgent.class),
+                mock(OutlineAgent.class),
                 mock(QuizAgent.class),
                 new SourceAttributionFormatter(),
                 new InternalCitationSanitizer()
@@ -120,6 +122,7 @@ class RagChatServiceSourceTrackingTest {
                 mock(FactualQaAgent.class),
                 mock(DocumentScopeAgent.class),
                 mock(SummaryAgent.class),
+                mock(OutlineAgent.class),
                 mock(QuizAgent.class),
                 new SourceAttributionFormatter(),
                 new InternalCitationSanitizer()

@@ -48,6 +48,24 @@ class DocumentReadinessServiceTest {
     }
 
     @Test
+    void refreshDocumentReadyStatus_keepsSummarisingBelowSeventyFivePercentSummary() {
+        Fixture fixture = fixture();
+        DocumentReadinessService service = service(fixture);
+        mockArtifacts(
+                fixture,
+                fixture.chapters().subList(0, 2),
+                fixture.chapters(),
+                List.of()
+        );
+
+        service.refreshDocumentReadyStatus(fixture.document().getId());
+
+        assertThat(fixture.document().getStatus()).isEqualTo(DocumentStatus.SUMMARISING);
+        assertThat(fixture.document().getEnrichmentStatus()).isEqualTo(DocumentEnrichmentStatus.PARTIAL_FAILED);
+        assertThat(fixture.document().getEnrichmentError()).contains("2/4").contains("75%");
+    }
+
+    @Test
     void refreshDocumentReadyStatus_marksReadyAfterMaxRetriesWhenSummaryIsReady() {
         Fixture fixture = fixture();
         fixture.document().setEnrichmentRetryCount(fixture.ragProperties().getEnrichment().getAutoRetryMaxAttempts());
@@ -77,6 +95,10 @@ class DocumentReadinessServiceTest {
     }
 
     private Fixture fixture() {
+        return fixture(4);
+    }
+
+    private Fixture fixture(int chapterCount) {
         Document document = Document.builder()
                 .title("Document")
                 .status(DocumentStatus.SUMMARISING)
@@ -84,12 +106,9 @@ class DocumentReadinessServiceTest {
                 .build();
         document.setId(10L);
 
-        List<DocumentNode> chapters = List.of(
-                chapter(document, 1L),
-                chapter(document, 2L),
-                chapter(document, 3L),
-                chapter(document, 4L)
-        );
+        List<DocumentNode> chapters = java.util.stream.LongStream.rangeClosed(1, chapterCount)
+                .mapToObj(id -> chapter(document, id))
+                .toList();
 
         DocumentRepository documentRepository = mock(DocumentRepository.class);
         DocumentNodeRepository nodeRepository = mock(DocumentNodeRepository.class);

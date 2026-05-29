@@ -79,7 +79,7 @@ public class AuthenticationController {
             description = "Kích hoạt tài khoản bằng mã code đã được gửi qua email."
     )
     @PostMapping("/activate-account")
-    public ResponseData<?> confirmAccount(@RequestParam String code) {
+    public ResponseData<?> confirmAccount(@RequestParam @NotBlank String code) {
         authenticationService.activateAccount(code);
         return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Account activated.");
     }

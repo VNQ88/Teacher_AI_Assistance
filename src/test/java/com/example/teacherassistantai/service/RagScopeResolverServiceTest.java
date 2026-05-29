@@ -29,6 +29,7 @@ class RagScopeResolverServiceTest {
         assertThat(resolverService.hasExplicitScopeHint("mục 2.1 là gì")).isTrue();
         assertThat(resolverService.hasExplicitScopeHint("định lý 2.1 là gì")).isFalse();
         assertThat(resolverService.hasExplicitScopeHint("mục tiêu 2 là gì")).isFalse();
+        assertThat(resolverService.hasExplicitScopeHint("mục lục tài liệu")).isFalse();
     }
 
     @Test
@@ -171,7 +172,11 @@ class RagScopeResolverServiceTest {
                 "Khái quát toàn bộ tài liệu",
                 "Môn học này nói về gì?",
                 "Cho tôi tóm tắt nội dung chính của môn học",
-                "Tổng hợp ý chính giáo trình"
+                "Tổng hợp ý chính giáo trình",
+                "Cấu trúc giáo trình",
+                "Tài liệu gồm những chương nào?",
+                "Mục lục tài liệu",
+                "Môn học gồm những phần nào?"
         )) {
             ScopeResolution resolved = resolverService.resolveDetailed(session, question);
 
@@ -183,6 +188,25 @@ class RagScopeResolverServiceTest {
                     .isEqualTo(documentRoot);
         }
         verifyNoInteractions(llm);
+    }
+
+    @Test
+    void resolveDetailed_explicitPartScopeBeatsWholeDocumentOutlinePhrase() {
+        DocumentNodeRepository repository = mock(DocumentNodeRepository.class);
+        RagScopeResolverService resolverService = new RagScopeResolverService(repository);
+        ChatSession session = session();
+        DocumentNode documentRoot = node(10L, "document", "Giáo trình Triết học", "Giáo trình Triết học", 0);
+        DocumentNode partOne = node(20L, "part", "Phần I", "Phần I", 1);
+        DocumentNode partTwo = node(21L, "part", "Phần II", "Phần II", 2);
+
+        when(repository.findBySubjectIdAndNodeTypeInOrderByOrderIndexAsc(eq(7L), any()))
+                .thenReturn(List.of(documentRoot, partOne, partTwo));
+
+        ScopeResolution resolved = resolverService.resolveDetailed(
+                session, "Cấu trúc tài liệu Phần I gồm những chương nào?");
+
+        assertThat(resolved.status()).isEqualTo(ScopeResolution.Status.RESOLVED);
+        assertThat(resolved.node()).isEqualTo(partOne);
     }
 
     @Test

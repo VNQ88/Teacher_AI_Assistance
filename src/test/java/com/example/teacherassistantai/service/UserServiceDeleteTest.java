@@ -1,10 +1,10 @@
 package com.example.teacherassistantai.service;
 
 import com.example.teacherassistantai.entity.Role;
-import com.example.teacherassistantai.entity.Subject;
 import com.example.teacherassistantai.entity.User;
-import com.example.teacherassistantai.exception.AccessDeniedOperationException;
+import com.example.teacherassistantai.exception.InvalidDataException;
 import com.example.teacherassistantai.integration.minio.MinioChannel;
+import com.example.teacherassistantai.mapper.UserMapper;
 import com.example.teacherassistantai.repository.AgentLogRepository;
 import com.example.teacherassistantai.repository.ChatMessageRepository;
 import com.example.teacherassistantai.repository.ChatSessionRepository;
@@ -13,6 +13,7 @@ import com.example.teacherassistantai.repository.DocumentNodeArtifactRepository;
 import com.example.teacherassistantai.repository.DocumentNodeRepository;
 import com.example.teacherassistantai.repository.DocumentRepository;
 import com.example.teacherassistantai.repository.DocumentRepository.DocumentStorageObject;
+import com.example.teacherassistantai.repository.RoleRepository;
 import com.example.teacherassistantai.repository.SubjectRepository;
 import com.example.teacherassistantai.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -25,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,12 +39,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class SubjectServiceDeleteTest {
+class UserServiceDeleteTest {
 
     @Mock
-    private SubjectRepository subjectRepository;
-    @Mock
     private UserRepository userRepository;
+    @Mock
+    private UserMapper userMapper;
+    @Mock
+    private PasswordEncoder passwordEncoder;
+    @Mock
+    private RoleRepository roleRepository;
     @Mock
     private DocumentRepository documentRepository;
     @Mock
@@ -56,23 +62,28 @@ class SubjectServiceDeleteTest {
     @Mock
     private ChatSessionRepository chatSessionRepository;
     @Mock
+    private SubjectRepository subjectRepository;
+    @Mock
     private AgentLogRepository agentLogRepository;
     @Mock
     private MinioChannel minioChannel;
 
-    private SubjectService subjectService;
+    private UserService userService;
 
     @BeforeEach
     void setUp() {
-        subjectService = new SubjectService(
-                subjectRepository,
+        userService = new UserService(
                 userRepository,
+                userMapper,
+                passwordEncoder,
+                roleRepository,
                 documentRepository,
                 documentChunkRepository,
                 documentNodeRepository,
                 documentNodeArtifactRepository,
                 chatMessageRepository,
                 chatSessionRepository,
+                subjectRepository,
                 agentLogRepository,
                 minioChannel
         );
@@ -84,19 +95,17 @@ class SubjectServiceDeleteTest {
     }
 
     @Test
-    void deleteSubject_shouldDelete_whenCurrentUserIsAdmin() {
-        Long subjectId = 1L;
-        User owner = user(2L, "owner@mail.com", "TEACHER");
-        Subject subject = subject(subjectId, owner.getId());
+    void deleteUser_shouldDeleteRelatedData_whenDeletingAnotherUser() {
+        long userId = 2L;
+        User target = user(userId, "target@mail.com", "TEACHER");
 
         authenticateAs("admin@mail.com");
-        when(userRepository.findByEmail("admin@mail.com")).thenReturn(Optional.of(user(9L, "admin@mail.com", "ADMIN")));
-        when(subjectRepository.findById(subjectId)).thenReturn(Optional.of(subject));
-        when(documentRepository.findStorageObjectsBySubjectId(subjectId)).thenReturn(List.of(
+        when(userRepository.findById(userId)).thenReturn(Optional.of(target));
+        when(documentRepository.findStorageObjectsForUserDeletion(userId)).thenReturn(List.of(
                 storageObject(10L, "uploads/original.pdf", "uploads/markdown.md", "uploads/hierarchy.json", "uploads/chunks.json")
         ));
 
-        subjectService.deleteSubject(subjectId);
+        userService.deleteUser(userId);
 
         verify(minioChannel).removeObject("uploads/original.pdf");
         verify(minioChannel).removeObject("uploads/markdown.md");
@@ -111,68 +120,46 @@ class SubjectServiceDeleteTest {
                 documentNodeArtifactRepository,
                 documentNodeRepository,
                 documentRepository,
-                subjectRepository
+                subjectRepository,
+                userRepository
         );
-        deletionOrder.verify(agentLogRepository).deleteBySubjectId(subjectId);
-        deletionOrder.verify(chatMessageRepository).deleteMessageSourceLinksBySubjectId(subjectId);
-        deletionOrder.verify(chatMessageRepository).deleteBySubjectId(subjectId);
-        deletionOrder.verify(chatSessionRepository).deleteBySubjectId(subjectId);
-        deletionOrder.verify(documentChunkRepository).deleteMessageSourceLinksBySubjectId(subjectId);
-        deletionOrder.verify(documentNodeArtifactRepository).deleteBySubjectId(subjectId);
-        deletionOrder.verify(documentChunkRepository).deleteBySubjectId(subjectId);
-        deletionOrder.verify(documentNodeRepository).deleteBySubjectId(subjectId);
-        deletionOrder.verify(documentRepository).deleteBySubjectId(subjectId);
-        deletionOrder.verify(subjectRepository).delete(subject);
+        deletionOrder.verify(agentLogRepository).deleteByUserId(userId);
+        deletionOrder.verify(chatMessageRepository).deleteMessageSourceLinksByUserId(userId);
+        deletionOrder.verify(chatMessageRepository).deleteByUserId(userId);
+        deletionOrder.verify(chatSessionRepository).deleteByUserId(userId);
+        deletionOrder.verify(documentChunkRepository).deleteMessageSourceLinksByUserId(userId);
+        deletionOrder.verify(documentNodeArtifactRepository).deleteByUserId(userId);
+        deletionOrder.verify(documentChunkRepository).deleteByUserId(userId);
+        deletionOrder.verify(documentNodeRepository).deleteByUserId(userId);
+        deletionOrder.verify(documentRepository).deleteByUserId(userId);
+        deletionOrder.verify(subjectRepository).deleteByOwnerId(userId);
+        deletionOrder.verify(userRepository).deleteRoleLinksByUserId(userId);
+        deletionOrder.verify(userRepository).delete(target);
     }
 
     @Test
-    void deleteSubject_shouldDelete_whenCurrentUserIsOwner() {
-        Long subjectId = 2L;
-        User owner = user(5L, "owner@mail.com", "TEACHER");
-        Subject subject = subject(subjectId, owner.getId());
+    void deleteUser_shouldThrow_whenDeletingCurrentUser() {
+        long userId = 3L;
+        User currentUser = user(userId, "current@mail.com", "ADMIN");
 
-        authenticateAs("owner@mail.com");
-        when(userRepository.findByEmail("owner@mail.com")).thenReturn(Optional.of(owner));
-        when(subjectRepository.findById(subjectId)).thenReturn(Optional.of(subject));
-        when(documentRepository.findStorageObjectsBySubjectId(subjectId)).thenReturn(List.of());
+        authenticateAs(currentUser.getEmail());
+        when(userRepository.findById(userId)).thenReturn(Optional.of(currentUser));
 
-        subjectService.deleteSubject(subjectId);
+        assertThrows(InvalidDataException.class, () -> userService.deleteUser(userId));
 
-        verify(chatMessageRepository).deleteMessageSourceLinksBySubjectId(subjectId);
-        verify(chatMessageRepository).deleteBySubjectId(subjectId);
-        verify(chatSessionRepository).deleteBySubjectId(subjectId);
-        verify(documentChunkRepository).deleteMessageSourceLinksBySubjectId(subjectId);
-        verify(documentNodeArtifactRepository).deleteBySubjectId(subjectId);
-        verify(documentChunkRepository).deleteBySubjectId(subjectId);
-        verify(documentNodeRepository).deleteBySubjectId(subjectId);
-        verify(documentRepository).deleteBySubjectId(subjectId);
-        verify(agentLogRepository).deleteBySubjectId(subjectId);
-        verify(subjectRepository).delete(subject);
-    }
-
-    @Test
-    void deleteSubject_shouldThrow_whenCurrentUserIsNotAdminOrOwner() {
-        Long subjectId = 3L;
-        User owner = user(7L, "owner@mail.com", "TEACHER");
-        Subject subject = subject(subjectId, owner.getId());
-
-        authenticateAs("other@mail.com");
-        when(userRepository.findByEmail("other@mail.com")).thenReturn(Optional.of(user(8L, "other@mail.com", "TEACHER")));
-        when(subjectRepository.findById(subjectId)).thenReturn(Optional.of(subject));
-
-        assertThrows(AccessDeniedOperationException.class, () -> subjectService.deleteSubject(subjectId));
-
-        verify(documentRepository, never()).findStorageObjectsBySubjectId(subjectId);
-        verify(chatMessageRepository, never()).deleteMessageSourceLinksBySubjectId(subjectId);
-        verify(chatMessageRepository, never()).deleteBySubjectId(subjectId);
-        verify(chatSessionRepository, never()).deleteBySubjectId(subjectId);
-        verify(documentChunkRepository, never()).deleteMessageSourceLinksBySubjectId(subjectId);
-        verify(documentNodeArtifactRepository, never()).deleteBySubjectId(subjectId);
-        verify(documentChunkRepository, never()).deleteBySubjectId(subjectId);
-        verify(documentNodeRepository, never()).deleteBySubjectId(subjectId);
-        verify(documentRepository, never()).deleteBySubjectId(subjectId);
-        verify(agentLogRepository, never()).deleteBySubjectId(subjectId);
-        verify(subjectRepository, never()).delete(subject);
+        verify(documentRepository, never()).findStorageObjectsForUserDeletion(userId);
+        verify(agentLogRepository, never()).deleteByUserId(userId);
+        verify(chatMessageRepository, never()).deleteMessageSourceLinksByUserId(userId);
+        verify(chatMessageRepository, never()).deleteByUserId(userId);
+        verify(chatSessionRepository, never()).deleteByUserId(userId);
+        verify(documentChunkRepository, never()).deleteMessageSourceLinksByUserId(userId);
+        verify(documentNodeArtifactRepository, never()).deleteByUserId(userId);
+        verify(documentChunkRepository, never()).deleteByUserId(userId);
+        verify(documentNodeRepository, never()).deleteByUserId(userId);
+        verify(documentRepository, never()).deleteByUserId(userId);
+        verify(subjectRepository, never()).deleteByOwnerId(userId);
+        verify(userRepository, never()).deleteRoleLinksByUserId(userId);
+        verify(userRepository, never()).delete(currentUser);
     }
 
     private void authenticateAs(String email) {
@@ -191,17 +178,6 @@ class SubjectServiceDeleteTest {
                 .build();
         user.setId(id);
         return user;
-    }
-
-    private Subject subject(Long id, Long ownerId) {
-        Subject subject = Subject.builder()
-                .name("Math")
-                .code("MATH")
-                .active(true)
-                .ownerId(ownerId)
-                .build();
-        subject.setId(id);
-        return subject;
     }
 
     private DocumentStorageObject storageObject(Long id,

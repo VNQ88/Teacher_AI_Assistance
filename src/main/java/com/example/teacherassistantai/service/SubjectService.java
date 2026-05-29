@@ -10,6 +10,16 @@ import com.example.teacherassistantai.entity.User;
 import com.example.teacherassistantai.exception.AccessDeniedOperationException;
 import com.example.teacherassistantai.exception.InvalidDataException;
 import com.example.teacherassistantai.exception.ResourceNotFoundException;
+import com.example.teacherassistantai.exception.StorageOperationException;
+import com.example.teacherassistantai.integration.minio.MinioChannel;
+import com.example.teacherassistantai.repository.AgentLogRepository;
+import com.example.teacherassistantai.repository.ChatMessageRepository;
+import com.example.teacherassistantai.repository.ChatSessionRepository;
+import com.example.teacherassistantai.repository.DocumentChunkRepository;
+import com.example.teacherassistantai.repository.DocumentNodeArtifactRepository;
+import com.example.teacherassistantai.repository.DocumentNodeRepository;
+import com.example.teacherassistantai.repository.DocumentRepository;
+import com.example.teacherassistantai.repository.DocumentRepository.DocumentStorageObject;
 import com.example.teacherassistantai.repository.SubjectRepository;
 import com.example.teacherassistantai.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +27,7 @@ import java.util.List;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 
 @Service
@@ -25,6 +36,14 @@ public class SubjectService {
 
     private final SubjectRepository subjectRepository;
     private final UserRepository userRepository;
+    private final DocumentRepository documentRepository;
+    private final DocumentChunkRepository documentChunkRepository;
+    private final DocumentNodeRepository documentNodeRepository;
+    private final DocumentNodeArtifactRepository documentNodeArtifactRepository;
+    private final ChatMessageRepository chatMessageRepository;
+    private final ChatSessionRepository chatSessionRepository;
+    private final AgentLogRepository agentLogRepository;
+    private final MinioChannel minioChannel;
 
     @Transactional(readOnly = true)
     public List<SubjectResponse> getAllSubjects() {
@@ -88,6 +107,21 @@ public class SubjectService {
 
         validateSubjectOwnership(subject, getCurrentUser());
 
+        List<DocumentStorageObject> storageObjects = documentRepository.findStorageObjectsBySubjectId(subjectId);
+        storageObjects.forEach(this::removeDocumentStorageObjects);
+
+        agentLogRepository.deleteBySubjectId(subjectId);
+
+        chatMessageRepository.deleteMessageSourceLinksBySubjectId(subjectId);
+        chatMessageRepository.deleteBySubjectId(subjectId);
+        chatSessionRepository.deleteBySubjectId(subjectId);
+
+        documentChunkRepository.deleteMessageSourceLinksBySubjectId(subjectId);
+        documentNodeArtifactRepository.deleteBySubjectId(subjectId);
+        documentChunkRepository.deleteBySubjectId(subjectId);
+        documentNodeRepository.deleteBySubjectId(subjectId);
+        documentRepository.deleteBySubjectId(subjectId);
+
         subjectRepository.delete(subject);
     }
 
@@ -117,6 +151,28 @@ public class SubjectService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
+    private void removeDocumentStorageObjects(DocumentStorageObject document) {
+        removeStorageObject(document.getOriginalObjectKey(), document.getId(), "original");
+        removeStorageObject(document.getMarkdownObjectKey(), document.getId(), "markdown");
+        removeStorageObject(document.getHierarchyObjectKey(), document.getId(), "hierarchy");
+        removeStorageObject(document.getChunksObjectKey(), document.getId(), "chunks");
+    }
+
+    private void removeStorageObject(String objectKey, Long documentId, String objectType) {
+        if (!StringUtils.hasText(objectKey)) {
+            return;
+        }
+
+        try {
+            minioChannel.removeObject(objectKey);
+        } catch (StorageOperationException ex) {
+            throw new StorageOperationException(
+                    "Failed to delete %s object for document id=%d".formatted(objectType, documentId),
+                    ex
+            );
+        }
+    }
+
     private SubjectResponse toResponse(Subject subject) {
         return SubjectResponse.builder()
                 .id(subject.getId())
@@ -128,4 +184,3 @@ public class SubjectService {
                 .build();
     }
 }
-

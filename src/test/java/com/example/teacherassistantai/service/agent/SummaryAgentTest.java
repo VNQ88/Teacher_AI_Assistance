@@ -159,11 +159,11 @@ class SummaryAgentTest {
     void execute_partReturnsOutlineSummary() {
         DocumentNode part = node(30L, "part", "Phần I", "Phần I");
         when(artifactRepository.findLatestCompletedSummaryByNodeId(30L)).thenReturn(Optional.empty());
-        when(outlineSummaryRenderer.render(part)).thenReturn(Optional.of("Tóm tắt tổng quan Phần I"));
+        when(outlineSummaryRenderer.render(part)).thenReturn(Optional.of("Cấu trúc Phần I"));
 
         AgentResult result = summaryAgent.execute(state(part));
 
-        assertThat(result.answer()).contains("Tóm tắt tổng quan Phần I");
+        assertThat(result.answer()).contains("Cấu trúc Phần I");
     }
 
     @Test

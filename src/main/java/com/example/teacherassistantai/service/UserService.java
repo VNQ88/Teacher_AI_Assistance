@@ -10,8 +10,19 @@ import com.example.teacherassistantai.entity.User;
 import com.example.teacherassistantai.exception.AccessDeniedOperationException;
 import com.example.teacherassistantai.exception.InvalidDataException;
 import com.example.teacherassistantai.exception.ResourceNotFoundException;
+import com.example.teacherassistantai.exception.StorageOperationException;
+import com.example.teacherassistantai.integration.minio.MinioChannel;
 import com.example.teacherassistantai.mapper.UserMapper;
+import com.example.teacherassistantai.repository.AgentLogRepository;
+import com.example.teacherassistantai.repository.ChatMessageRepository;
+import com.example.teacherassistantai.repository.ChatSessionRepository;
+import com.example.teacherassistantai.repository.DocumentChunkRepository;
+import com.example.teacherassistantai.repository.DocumentNodeArtifactRepository;
+import com.example.teacherassistantai.repository.DocumentNodeRepository;
+import com.example.teacherassistantai.repository.DocumentRepository;
+import com.example.teacherassistantai.repository.DocumentRepository.DocumentStorageObject;
 import com.example.teacherassistantai.repository.RoleRepository;
+import com.example.teacherassistantai.repository.SubjectRepository;
 import com.example.teacherassistantai.repository.UserRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -23,6 +34,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -34,6 +46,15 @@ public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final DocumentRepository documentRepository;
+    private final DocumentChunkRepository documentChunkRepository;
+    private final DocumentNodeRepository documentNodeRepository;
+    private final DocumentNodeArtifactRepository documentNodeArtifactRepository;
+    private final ChatMessageRepository chatMessageRepository;
+    private final ChatSessionRepository chatSessionRepository;
+    private final SubjectRepository subjectRepository;
+    private final AgentLogRepository agentLogRepository;
+    private final MinioChannel minioChannel;
 
     @Transactional
     public UserResponse createUser(CreateUserRequest request) {
@@ -165,6 +186,45 @@ public class UserService {
             throw new InvalidDataException("Cannot delete currently logged-in user");
         }
 
+        List<DocumentStorageObject> storageObjects = documentRepository.findStorageObjectsForUserDeletion(userId);
+        storageObjects.forEach(this::removeDocumentStorageObjects);
+
+        agentLogRepository.deleteByUserId(userId);
+
+        chatMessageRepository.deleteMessageSourceLinksByUserId(userId);
+        chatMessageRepository.deleteByUserId(userId);
+        chatSessionRepository.deleteByUserId(userId);
+
+        documentChunkRepository.deleteMessageSourceLinksByUserId(userId);
+        documentNodeArtifactRepository.deleteByUserId(userId);
+        documentChunkRepository.deleteByUserId(userId);
+        documentNodeRepository.deleteByUserId(userId);
+        documentRepository.deleteByUserId(userId);
+
+        subjectRepository.deleteByOwnerId(userId);
+        userRepository.deleteRoleLinksByUserId(userId);
         userRepository.delete(user);
+    }
+
+    private void removeDocumentStorageObjects(DocumentStorageObject document) {
+        removeStorageObject(document.getOriginalObjectKey(), document.getId(), "original");
+        removeStorageObject(document.getMarkdownObjectKey(), document.getId(), "markdown");
+        removeStorageObject(document.getHierarchyObjectKey(), document.getId(), "hierarchy");
+        removeStorageObject(document.getChunksObjectKey(), document.getId(), "chunks");
+    }
+
+    private void removeStorageObject(String objectKey, Long documentId, String objectType) {
+        if (!StringUtils.hasText(objectKey)) {
+            return;
+        }
+
+        try {
+            minioChannel.removeObject(objectKey);
+        } catch (StorageOperationException ex) {
+            throw new StorageOperationException(
+                    "Failed to delete %s object for document id=%d".formatted(objectType, documentId),
+                    ex
+            );
+        }
     }
 }

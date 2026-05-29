@@ -37,8 +37,8 @@ public class DocumentOutlineSummaryRenderer {
         }
 
         StringBuilder answer = new StringBuilder();
-        answer.append("Tóm tắt tổng quan ").append(displayPath(partNode)).append(":\n\n");
-        answer.append("Phần này bao gồm các chương/nội dung chính sau:");
+        answer.append("Cấu trúc ").append(displayPath(partNode)).append(":\n\n");
+        answer.append("Phần này gồm các chương/nội dung chính sau:");
         appendNodeList(answer, chapters, "");
         return answer.toString();
     }
@@ -46,7 +46,7 @@ public class DocumentOutlineSummaryRenderer {
     private String renderDocument(DocumentNode documentNode) {
         List<DocumentNode> topLevelNodes = documentNodeRepository.findByParentIdOrderByOrderIndexAsc(documentNode.getId());
         StringBuilder answer = new StringBuilder();
-        answer.append("Tóm tắt tổng quan ").append(displayPath(documentNode)).append(":\n\n");
+        answer.append("Cấu trúc ").append(displayPath(documentNode)).append(":\n\n");
         answer.append("Tài liệu gồm các phần/chương chính sau:");
         for (DocumentNode topLevelNode : topLevelNodes) {
             if ("part".equals(topLevelNode.getNodeType())) {

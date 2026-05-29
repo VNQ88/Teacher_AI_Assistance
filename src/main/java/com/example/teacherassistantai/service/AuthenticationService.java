@@ -9,6 +9,7 @@ import com.example.teacherassistantai.integration.email.EmailTemplateName;
 import com.example.teacherassistantai.integration.redis.RedisToken;
 import com.example.teacherassistantai.integration.redis.RedisTokenService;
 import com.example.teacherassistantai.integration.redis.verification_code.VerificationCode;
+import com.example.teacherassistantai.integration.redis.verification_code.VerificationCodePurpose;
 import com.example.teacherassistantai.integration.redis.verification_code.VerificationCodeRepository;
 import com.example.teacherassistantai.repository.RoleRepository;
 import com.example.teacherassistantai.repository.UserRepository;
@@ -81,7 +82,7 @@ public class AuthenticationService {
             if (existingUser.isEnabled()) {
                 throw new RuntimeException("User with this email already exists and is activated");
             } else {
-                sendValidationEmail((User) existingUser, EmailTemplateName.ACTIVATE_ACCOUNT);
+                sendValidationEmail((User) existingUser, EmailTemplateName.ACTIVATE_ACCOUNT, VerificationCodePurpose.ACTIVATE_ACCOUNT);
             }
             return;
         }
@@ -90,17 +91,17 @@ public class AuthenticationService {
                 .orElseThrow(() -> new RuntimeException("Role STUDENT was not initialized"));
         var user = User.builder()
                 .email(registrationRequest.getEmail())
-                .password(passwordEncoder.encode(registrationRequest.getPassword())) // Đừng quên mã hóa password khi tạo mới
+                .password(registrationRequest.getPassword())
                 .fullName(registrationRequest.getFullName())
                 .enabled(false)
                 .roles(Set.of(userRole))
                 .build();
         userRepository.save(user);
-        sendValidationEmail(user, EmailTemplateName.ACTIVATE_ACCOUNT);
+        sendValidationEmail(user, EmailTemplateName.ACTIVATE_ACCOUNT, VerificationCodePurpose.ACTIVATE_ACCOUNT);
     }
 
-    private void sendValidationEmail(User user, EmailTemplateName templateName) throws MessagingException {
-        var newCode = generateAndSaveActivationCode(user);
+    private void sendValidationEmail(User user, EmailTemplateName templateName, VerificationCodePurpose purpose) throws MessagingException {
+        var newCode = generateAndSaveVerificationCode(user, purpose);
 
         emailService.sendEmail(user.getEmail(),
                 user.getFullName(),
@@ -110,15 +111,20 @@ public class AuthenticationService {
                 "Activate your account");
     }
 
-    private String generateAndSaveActivationCode(User user) {
+    private String generateAndSaveVerificationCode(User user, VerificationCodePurpose purpose) {
         String generatedCode = generateActivationCode(verificationCodeLength);
 
         // Tính toán TTL ra giây cho Redis
         long ttlInSeconds = verificationCodeExpirationMinutes * 60L;
 
+        verificationCodeRepository.deleteAll(
+                verificationCodeRepository.findAllByUserIdAndPurpose(user.getId(), purpose)
+        );
+
         var token = VerificationCode.builder()
                 .code(generatedCode)
                 .userId(user.getId()) // Lưu ID thay vì object User
+                .purpose(purpose)
                 .timeToLive(ttlInSeconds) // Giao cho Redis tự xóa khi hết hạn
                 .build();
         verificationCodeRepository.save(token);
@@ -140,7 +146,7 @@ public class AuthenticationService {
 
     @Transactional
     public void activateAccount(String code) {
-        VerificationCode savedToken = verifyCode(code);
+        VerificationCode savedToken = verifyCode(code, VerificationCodePurpose.ACTIVATE_ACCOUNT);
 
         // Lấy lại User từ DB bằng userId lưu trong Redis
         var user = userRepository.findById(savedToken.getUserId())
@@ -161,7 +167,7 @@ public class AuthenticationService {
             throw new RuntimeException("Account is already activated.");
         }
 
-        sendValidationEmail(user, EmailTemplateName.ACTIVATE_ACCOUNT);
+        sendValidationEmail(user, EmailTemplateName.ACTIVATE_ACCOUNT, VerificationCodePurpose.ACTIVATE_ACCOUNT);
     }
 
     public AuthenticationResponse refreshToken(HttpServletRequest request) {
@@ -231,23 +237,17 @@ public class AuthenticationService {
             throw new RuntimeException("User with this email does not exist");
         User existingUser = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         if (!existingUser.isEnabled()) {
-            sendValidationEmail(existingUser, EmailTemplateName.ACTIVATE_ACCOUNT);
+            sendValidationEmail(existingUser, EmailTemplateName.ACTIVATE_ACCOUNT, VerificationCodePurpose.ACTIVATE_ACCOUNT);
             return "Your account is not activated. An activation email has been sent to your email address.";
         }
         else {
-            sendValidationEmail(existingUser, EmailTemplateName.RESET_PASSWORD);
+            sendValidationEmail(existingUser, EmailTemplateName.RESET_PASSWORD, VerificationCodePurpose.RESET_PASSWORD);
             return "A password reset email has been sent to your email address.";
         }
     }
 
     public void verifyResetCode(VerifyCodeRequest request)  {
-        VerificationCode resetCode = verifyCode(request.getCode());
-        User user = userRepository.findById(resetCode.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        if (!user.getEmail().equals(request.getEmail())) {
-            throw new RuntimeException("Code does not match email");
-        }
+        verifyCode(request.getCode(), VerificationCodePurpose.RESET_PASSWORD);
         // Với Redis, ta không cần đánh dấu 'validatedAt'. Cứ để nguyên đó để hàm resetPassword sử dụng,
         // nếu quá thời gian nó sẽ tự mất.
     }
@@ -255,16 +255,12 @@ public class AuthenticationService {
     @Transactional
     public void resetPassword(SetNewPasswordRequest request) {
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-            throw new RuntimeException("Password and confirm password do not match");
+            throw new IllegalArgumentException("Password and confirm password do not match");
         }
 
-        VerificationCode resetCode = verifyCode(request.getCode());
+        VerificationCode resetCode = verifyCode(request.getCode(), VerificationCodePurpose.RESET_PASSWORD);
         User user = userRepository.findById(resetCode.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
-        if (!user.getEmail().equals(request.getEmail())) {
-            throw new RuntimeException("Code does not match email");
-        }
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         user.setEnabled(true);
@@ -276,10 +272,14 @@ public class AuthenticationService {
 
 
     //    ----------------- Private methods -----------------
-    private VerificationCode verifyCode(String code){
+    private VerificationCode verifyCode(String code, VerificationCodePurpose purpose){
         // Do Redis có cơ chế tự hủy (TTL), nếu record vẫn còn tồn tại thì tức là còn hạn.
         // Nếu không tìm thấy, nghĩa là mã sai hoặc mã đã hết thời gian lưu trữ.
-        return verificationCodeRepository.findByCode(code.strip())
-                .orElseThrow(() -> new RuntimeException("Code is invalid or has expired"));
+        if (StringUtils.isBlank(code)) {
+            throw new IllegalArgumentException("Code is invalid or has expired");
+        }
+
+        return verificationCodeRepository.findByPurposeAndCode(purpose, code.strip())
+                .orElseThrow(() -> new IllegalArgumentException("Code is invalid or has expired"));
     }
 }

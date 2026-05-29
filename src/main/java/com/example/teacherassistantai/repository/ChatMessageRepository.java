@@ -32,4 +32,54 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
     void deleteMessageSourceLinksBySessionId(@Param("sessionId") Long sessionId);
 
     void deleteBySessionId(Long sessionId);
+
+    @Modifying
+    @Query(value = """
+            DELETE FROM message_source_chunks
+            WHERE message_id IN (
+                SELECT cm.id
+                FROM chat_messages cm
+                JOIN chat_sessions cs ON cm.session_id = cs.id
+                WHERE cs.subject_id = :subjectId
+            )
+            """, nativeQuery = true)
+    void deleteMessageSourceLinksBySubjectId(@Param("subjectId") Long subjectId);
+
+    @Modifying
+    @Query(value = """
+            DELETE FROM chat_messages
+            WHERE session_id IN (
+                SELECT id FROM chat_sessions WHERE subject_id = :subjectId
+            )
+            """, nativeQuery = true)
+    void deleteBySubjectId(@Param("subjectId") Long subjectId);
+
+    @Modifying
+    @Query(value = """
+            DELETE FROM message_source_chunks
+            WHERE message_id IN (
+                SELECT cm.id
+                FROM chat_messages cm
+                JOIN chat_sessions cs ON cm.session_id = cs.id
+                WHERE cs.user_id = :userId
+                   OR cs.subject_id IN (
+                        SELECT id FROM subjects WHERE owner_id = :userId
+                   )
+            )
+            """, nativeQuery = true)
+    void deleteMessageSourceLinksByUserId(@Param("userId") Long userId);
+
+    @Modifying
+    @Query(value = """
+            DELETE FROM chat_messages
+            WHERE session_id IN (
+                SELECT id
+                FROM chat_sessions
+                WHERE user_id = :userId
+                   OR subject_id IN (
+                        SELECT id FROM subjects WHERE owner_id = :userId
+                   )
+            )
+            """, nativeQuery = true)
+    void deleteByUserId(@Param("userId") Long userId);
 }

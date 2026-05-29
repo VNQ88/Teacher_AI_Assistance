@@ -89,10 +89,38 @@ public class RagIntentRouterService {
             "brief"
     );
 
+    private static final List<String> DOCUMENT_OUTLINE_PHRASES = List.of(
+            "muc luc",
+            "outline",
+            "dan y",
+            "cau truc",
+            "cau truc tai lieu",
+            "cau truc giao trinh",
+            "tai lieu gom nhung phan nao",
+            "tai lieu gom nhung chuong nao",
+            "giao trinh gom nhung chuong nao",
+            "mon hoc gom nhung chuong nao",
+            "mon hoc gom nhung phan nao",
+            "gom nhung phan nao",
+            "gom nhung chuong nao",
+            "gom cac phan nao",
+            "gom cac chuong nao",
+            "co nhung phan nao",
+            "co nhung chuong nao",
+            "danh sach chuong",
+            "danh sach phan",
+            "cac chuong trong tai lieu",
+            "cac phan trong tai lieu"
+    );
+
     private static final List<String> DEFINITION_KEYWORD_PHRASES = List.of(
             "tom tat",
             "tom luoc",
             "khai quat",
+            "muc luc",
+            "outline",
+            "dan y",
+            "cau truc",
             "trac nghiem",
             "dung sai",
             "dien khuyet",
@@ -121,6 +149,9 @@ public class RagIntentRouterService {
         if (isReviewQuestionGeneration(normalized)) {
             return RagChatIntent.REVIEW_QUESTION_GENERATION;
         }
+        if (isDocumentOutline(normalized)) {
+            return RagChatIntent.DOCUMENT_OUTLINE;
+        }
         if (isSectionSummary(normalized)) {
             return RagChatIntent.SECTION_SUMMARY;
         }
@@ -138,6 +169,10 @@ public class RagIntentRouterService {
 
     private boolean isSectionSummary(String text) {
         return containsAny(text, SECTION_SUMMARY_PHRASES);
+    }
+
+    private boolean isDocumentOutline(String text) {
+        return containsAny(text, DOCUMENT_OUTLINE_PHRASES);
     }
 
     private boolean isDefinitionQuestion(String text) {

@@ -1,0 +1,14 @@
+.git
+.gradle
+.idea
+.vscode
+build
+out
+bin
+.env
+.env.*
+!.env.prod.example
+docs
+input
+output
+*.iml

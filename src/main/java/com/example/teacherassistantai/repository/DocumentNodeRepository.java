@@ -16,6 +16,24 @@ public interface DocumentNodeRepository extends JpaRepository<DocumentNode, Long
     @Query(value = "DELETE FROM document_nodes WHERE document_id = :documentId", nativeQuery = true)
     void deleteByDocumentId(@Param("documentId") Long documentId);
 
+    @Modifying
+    @Query(value = "DELETE FROM document_nodes WHERE subject_id = :subjectId", nativeQuery = true)
+    void deleteBySubjectId(@Param("subjectId") Long subjectId);
+
+    @Modifying
+    @Query(value = """
+            DELETE FROM document_nodes
+            WHERE document_id IN (
+                SELECT id
+                FROM documents
+                WHERE uploaded_by = :userId
+                   OR subject_id IN (
+                        SELECT id FROM subjects WHERE owner_id = :userId
+                   )
+            )
+            """, nativeQuery = true)
+    void deleteByUserId(@Param("userId") Long userId);
+
     List<DocumentNode> findByDocumentIdOrderByOrderIndexAsc(Long documentId);
 
     List<DocumentNode> findByDocumentIdAndParentIsNullOrderByOrderIndexAsc(Long documentId);

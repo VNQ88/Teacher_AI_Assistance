@@ -53,6 +53,29 @@ public interface DocumentNodeArtifactRepository extends JpaRepository<DocumentNo
     void deleteByDocumentId(Long documentId);
 
     @Modifying
+    @Query(value = """
+            DELETE FROM document_node_artifacts
+            WHERE document_id IN (
+                SELECT id FROM documents WHERE subject_id = :subjectId
+            )
+            """, nativeQuery = true)
+    void deleteBySubjectId(@Param("subjectId") Long subjectId);
+
+    @Modifying
+    @Query(value = """
+            DELETE FROM document_node_artifacts
+            WHERE document_id IN (
+                SELECT id
+                FROM documents
+                WHERE uploaded_by = :userId
+                   OR subject_id IN (
+                        SELECT id FROM subjects WHERE owner_id = :userId
+                   )
+            )
+            """, nativeQuery = true)
+    void deleteByUserId(@Param("userId") Long userId);
+
+    @Modifying
     void deleteByDocumentIdAndArtifactTypeIn(Long documentId, Collection<DocumentNodeArtifactType> artifactTypes);
 
     @Modifying

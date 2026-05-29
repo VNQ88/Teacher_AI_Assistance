@@ -1,0 +1,200 @@
+spring:
+  datasource:
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      pool-name: HikariPool
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+    database: postgresql
+  liquibase:
+    enabled: false
+  mail:
+    from: ${MAIL_FROM}
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: ${MAIL_SSL_TRUST:${MAIL_HOST}}
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+  cache:
+    type: redis
+    redis:
+      time-to-live: 300000
+      cache-null-values: false
+  ai:
+    retry:
+      max-attempts: 3
+      backoff:
+        initial-interval: 3s
+        multiplier: 2
+        max-interval: 40s
+      on-http-codes: 424
+    openai:
+      api-key: ${DIGITALOCEAN_RAG_MODEL_ACCESS_KEY}
+      chat:
+        base-url: ${DIGITALOCEAN_RAG_BASE_URL:${DIGITALOCEAN_BASE_URL}}
+        completions-path: /v1/chat/completions
+        options:
+          model: ${DIGITALOCEAN_RAG_CHAT_MODEL:${DIGITALOCEAN_CHAT_MODEL}}
+          temperature: 0.2
+      embedding:
+        base-url: ${DIGITALOCEAN_RAG_BASE_URL:${DIGITALOCEAN_BASE_URL}}
+        embeddings-path: /v1/embeddings
+        options:
+          model: ${DIGITALOCEAN_EMBEDDING_MODEL}
+    chat:
+      memory:
+        repository:
+          jdbc:
+            initialize-schema: always
+    vectorstore:
+      pgvector:
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+
+application:
+  encryption:
+    key: ${APP_ENCRYPTION_KEY}
+  jwt:
+    signer-key: ${JWT_SECRET_KEY}
+    valid-duration: 36000
+    refreshable-duration: 360000
+  mailing:
+    front-end:
+      verification-code-length: 6
+      verification-code-expiration-minutes: 2
+      activation-url: ${MAIL_ACTIVATION_URL}
+  minio:
+    endpoint: ${MINIO_ENDPOINT}
+    server-url: ${MINIO_SERVER_URL}
+    access-key: ${MINIO_ROOT_USER}
+    secret-key: ${MINIO_ROOT_PASSWORD}
+    bucket: ${MINIO_BUCKET}
+    key-prefix: uploads/
+    presign-expiry-seconds: 7200
+    make-bucket-public: false
+  google:
+    oauth2:
+      client-id: ${GOOGLE_CLIENT_ID}
+  document:
+    max-docx-bytes: 102400
+    max-txt-bytes: 102400
+    parse-concurrency: 2
+    tika-max-chars: 5000000
+  rag:
+    top-k: 6
+    max-top-k: 8
+    candidate-top-k: 24
+    min-chunk-chars: 40
+    embedding-dimensions: 1024
+    embedding-batch-size: 64
+    embedding-concurrency: 3
+    max-history-messages: 5
+    retrieval:
+      scoped-vector:
+        enabled: true
+        min-confidence: 0.85
+    enrichment:
+      enabled: true
+      auto-run-after-ready: true
+      prompt-version: enrichment-v2-bottom-up
+      summary-enabled: true
+      review-questions-enabled: true
+      default-review-question-min-count: 15
+      default-review-question-max-count: 20
+      review-question-counts:
+        subsection_level2:
+          min: 4
+          max: 10
+        subsection:
+          min: 6
+          max: 15
+        section:
+          min: 8
+          max: 20
+        chapter:
+          min: 12
+          max: 30
+      review-question-resume-batch-size: 10
+      review-question-composition:
+        max-questions-per-chapter-in-part: 5
+        max-questions-per-chapter-in-document: 3
+        max-total-questions-in-part: 30
+        max-total-questions-in-document: 50
+        max-missing-queue-per-request: 10
+      max-node-chunks: 120
+      max-node-context-chars: 60000
+      max-concurrency: 6
+      intra-document-concurrency: 6
+      auto-retry-on-partial-failed: true
+      auto-retry-delay-minutes: 35
+      auto-retry-max-attempts: 3
+      representative-section-chunks: 3
+      parent-summary-max-child-chars: 8000
+      subsection-summary-max-chars: 2500
+      section-summary-max-key-points: 6
+      chapter-summary-max-key-points: 10
+    ai:
+      base-url: ${DIGITALOCEAN_RAG_BASE_URL:${DIGITALOCEAN_BASE_URL}}
+      api-key: ${DIGITALOCEAN_RAG_MODEL_ACCESS_KEY}
+      chat-model: ${DIGITALOCEAN_RAG_CHAT_MODEL:${DIGITALOCEAN_CHAT_MODEL}}
+      embedding-model: ${DIGITALOCEAN_EMBEDDING_MODEL}
+      timeout-seconds: 80
+      enrichment:
+        base-url: ${DIGITALOCEAN_ENRICHMENT_BASE_URL:${DIGITALOCEAN_BASE_URL}}
+        api-key: ${DIGITALOCEAN_ENRICHMENT_MODEL_ACCESS_KEY}
+        summary-model: ${DIGITALOCEAN_ENRICH_SUMMARY_MODEL:deepseek-3.2}
+        review-question-model: ${DIGITALOCEAN_ENRICH_REVIEW_QUESTION_MODEL:openai-gpt-oss-120b}
+        ondemand-review-question-model: ${DIGITALOCEAN_ONDEMAND_REVIEW_QUESTION_MODEL:gemma-4-31B-it}
+        timeout-seconds: 150
+        ondemand-timeout-seconds: 120
+        pause-all-on-429: true
+      rate-limit:
+        enabled: true
+        total-requests-per-minute: 180
+        total-requests-per-hour: 4500
+        background-requests-per-minute: 65
+        background-requests-per-hour: 4000
+        background-pause-remaining-threshold: 500
+        background-resume-remaining-threshold: 1000
+        background-hourly-pause-minutes: 10
+        background-resume-batch-size: 30
+        enrichment-pause-minutes-on-429: 10
+        enrichment-min-remaining-tokens-per-minute: 1000
+        enrichment-min-remaining-tokens-per-day: 10000
+
+logging:
+  level:
+    root: INFO
+    liquibase: INFO
+    org.springframework: INFO
+
+server:
+  port: 8080
+  forward-headers-strategy: framework

@@ -49,6 +49,22 @@ public class RagScopeResolverService {
             "mon hoc nay noi ve gi",
             "tai lieu nay noi ve gi",
             "giao trinh nay noi ve gi",
+            "muc luc tai lieu",
+            "muc luc giao trinh",
+            "muc luc mon hoc",
+            "cau truc tai lieu",
+            "cau truc giao trinh",
+            "cau truc mon hoc",
+            "tai lieu gom nhung phan nao",
+            "tai lieu gom nhung chuong nao",
+            "giao trinh gom nhung phan nao",
+            "giao trinh gom nhung chuong nao",
+            "mon hoc gom nhung phan nao",
+            "mon hoc gom nhung chuong nao",
+            "danh sach phan trong tai lieu",
+            "danh sach chuong trong tai lieu",
+            "danh sach phan trong giao trinh",
+            "danh sach chuong trong giao trinh",
             "cau hoi on tap toan bo",
             "cau hoi on tap mon hoc",
             "cau hoi on tap tai lieu",
@@ -68,7 +84,7 @@ public class RagScopeResolverService {
             \\b(mon\\s+hoc|tai\\s+lieu|giao\\s+trinh|toan\\s+bo)\\b
             """, Pattern.CASE_INSENSITIVE | Pattern.COMMENTS);
     private static final Pattern EXPLICIT_SCOPE_PATTERN = Pattern.compile("""
-            \\b(tieu\\s+muc|subsection|phan|part|chuong|chapter|muc|section)\\s+([ivxlcdm]+|\\d+(?:\\.\\d+)*)
+            \\b(tieu\\s+muc|subsection|phan|part|chuong|chapter|muc|section)\\s+([ivxlcdm]+|\\d+(?:\\.\\d+)*)(?=\\s|$|[^\\p{L}\\p{N}])
             """, Pattern.CASE_INSENSITIVE | Pattern.COMMENTS);
     private static final int MIN_LEXICAL_SCORE = 10;
     private static final int MIN_LEXICAL_MARGIN = 5;
@@ -183,13 +199,12 @@ public class RagScopeResolverService {
     }
 
     private ScopeRequest scopeRequest(String normalizedQuestion) {
-        if (isWholeDocumentRequest(normalizedQuestion)) {
-            return new ScopeRequest(DOCUMENT_TYPES, null, true);
-        }
-
         ScopeHint hint = extractScopeHint(normalizedQuestion);
         if (hint != null) {
             return new ScopeRequest(typesForKeyword(hint.keyword()), hint, false);
+        }
+        if (isWholeDocumentRequest(normalizedQuestion)) {
+            return new ScopeRequest(DOCUMENT_TYPES, null, true);
         }
         return new ScopeRequest(ALL_SCOPE_NODE_TYPES, null, false);
     }

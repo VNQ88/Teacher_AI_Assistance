@@ -20,6 +20,48 @@ public interface DocumentChunkRepository extends JpaRepository<DocumentChunk, Lo
 
     void deleteByDocumentId(Long documentId);
 
+    @Modifying
+    @Query(value = """
+            DELETE FROM message_source_chunks
+            WHERE chunk_id IN (
+                SELECT id FROM document_chunks WHERE subject_id = :subjectId
+            )
+            """, nativeQuery = true)
+    void deleteMessageSourceLinksBySubjectId(@Param("subjectId") Long subjectId);
+
+    @Modifying
+    @Query(value = "DELETE FROM document_chunks WHERE subject_id = :subjectId", nativeQuery = true)
+    void deleteBySubjectId(@Param("subjectId") Long subjectId);
+
+    @Modifying
+    @Query(value = """
+            DELETE FROM message_source_chunks
+            WHERE chunk_id IN (
+                SELECT dc.id
+                FROM document_chunks dc
+                JOIN documents d ON dc.document_id = d.id
+                WHERE d.uploaded_by = :userId
+                   OR d.subject_id IN (
+                        SELECT id FROM subjects WHERE owner_id = :userId
+                   )
+            )
+            """, nativeQuery = true)
+    void deleteMessageSourceLinksByUserId(@Param("userId") Long userId);
+
+    @Modifying
+    @Query(value = """
+            DELETE FROM document_chunks
+            WHERE document_id IN (
+                SELECT id
+                FROM documents
+                WHERE uploaded_by = :userId
+                   OR subject_id IN (
+                        SELECT id FROM subjects WHERE owner_id = :userId
+                   )
+            )
+            """, nativeQuery = true)
+    void deleteByUserId(@Param("userId") Long userId);
+
     List<DocumentChunk> findByDocumentIdOrderByChunkIndexAsc(Long documentId);
 
     List<DocumentChunk> findByDocumentIdAndChunkTypeOrderBySourceOrderAsc(Long documentId, String chunkType);

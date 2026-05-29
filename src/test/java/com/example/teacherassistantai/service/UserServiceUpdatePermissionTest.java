@@ -5,8 +5,17 @@ import com.example.teacherassistantai.dto.response.UserResponse;
 import com.example.teacherassistantai.entity.Role;
 import com.example.teacherassistantai.entity.User;
 import com.example.teacherassistantai.exception.AccessDeniedOperationException;
+import com.example.teacherassistantai.integration.minio.MinioChannel;
 import com.example.teacherassistantai.mapper.UserMapper;
+import com.example.teacherassistantai.repository.AgentLogRepository;
+import com.example.teacherassistantai.repository.ChatMessageRepository;
+import com.example.teacherassistantai.repository.ChatSessionRepository;
+import com.example.teacherassistantai.repository.DocumentChunkRepository;
+import com.example.teacherassistantai.repository.DocumentNodeArtifactRepository;
+import com.example.teacherassistantai.repository.DocumentNodeRepository;
+import com.example.teacherassistantai.repository.DocumentRepository;
 import com.example.teacherassistantai.repository.RoleRepository;
+import com.example.teacherassistantai.repository.SubjectRepository;
 import com.example.teacherassistantai.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,12 +48,44 @@ class UserServiceUpdatePermissionTest {
     private PasswordEncoder passwordEncoder;
     @Mock
     private RoleRepository roleRepository;
+    @Mock
+    private DocumentRepository documentRepository;
+    @Mock
+    private DocumentChunkRepository documentChunkRepository;
+    @Mock
+    private DocumentNodeRepository documentNodeRepository;
+    @Mock
+    private DocumentNodeArtifactRepository documentNodeArtifactRepository;
+    @Mock
+    private ChatMessageRepository chatMessageRepository;
+    @Mock
+    private ChatSessionRepository chatSessionRepository;
+    @Mock
+    private SubjectRepository subjectRepository;
+    @Mock
+    private AgentLogRepository agentLogRepository;
+    @Mock
+    private MinioChannel minioChannel;
 
     private UserService userService;
 
     @BeforeEach
     void setUp() {
-        userService = new UserService(userRepository, userMapper, passwordEncoder, roleRepository);
+        userService = new UserService(
+                userRepository,
+                userMapper,
+                passwordEncoder,
+                roleRepository,
+                documentRepository,
+                documentChunkRepository,
+                documentNodeRepository,
+                documentNodeArtifactRepository,
+                chatMessageRepository,
+                chatSessionRepository,
+                subjectRepository,
+                agentLogRepository,
+                minioChannel
+        );
     }
 
     @AfterEach

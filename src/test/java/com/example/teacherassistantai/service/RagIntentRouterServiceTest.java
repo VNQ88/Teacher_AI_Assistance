@@ -46,6 +46,32 @@ class RagIntentRouterServiceTest {
                 .isEqualTo(RagChatIntent.REVIEW_QUESTION_GENERATION);
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "Mục lục tài liệu",
+            "Cấu trúc giáo trình",
+            "Tài liệu gồm những chương nào?",
+            "Môn học gồm những phần nào?",
+            "Danh sách chương trong tài liệu",
+            "Phần I gồm những chương nào?"
+    })
+    void route_detectsDocumentOutlineIntentVariants(String question) {
+        assertThat(routerService.route(question))
+                .isEqualTo(RagChatIntent.DOCUMENT_OUTLINE);
+    }
+
+    @Test
+    void route_outlineWordsTakePriorityOverSummaryWords() {
+        assertThat(routerService.route("Tóm tắt cấu trúc tài liệu"))
+                .isEqualTo(RagChatIntent.DOCUMENT_OUTLINE);
+    }
+
+    @Test
+    void route_contentSummaryStillUsesSectionSummary() {
+        assertThat(routerService.route("Tóm tắt nội dung môn học"))
+                .isEqualTo(RagChatIntent.SECTION_SUMMARY);
+    }
+
     @Test
     void route_defaultsToFactualQa() {
         assertThat(routerService.route("Khái niệm vật chất là gì?"))
@@ -56,6 +82,8 @@ class RagIntentRouterServiceTest {
     @ValueSource(strings = {
             "Trắc nghiệm là gì?",
             "Tóm tắt là gì?",
+            "Mục lục là gì?",
+            "Cấu trúc là gì?",
             "Multiple choice là gì?"
     })
     void route_keepsDefinitionQuestionsAsFactualQa(String question) {
