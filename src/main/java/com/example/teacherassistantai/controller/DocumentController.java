@@ -4,6 +4,7 @@ import com.example.teacherassistantai.common.enumerate.DocumentStatus;
 import com.example.teacherassistantai.common.response.PageResponse;
 import com.example.teacherassistantai.common.response.ResponseData;
 import com.example.teacherassistantai.dto.request.DocumentEnrichmentRequest;
+import com.example.teacherassistantai.dto.request.UpdateDocumentRequest;
 import com.example.teacherassistantai.dto.response.DocumentChunkDebugResponse;
 import com.example.teacherassistantai.dto.response.DocumentEnrichmentJobResponse;
 import com.example.teacherassistantai.dto.response.DocumentHierarchyDebugResponse;
@@ -15,14 +16,16 @@ import com.example.teacherassistantai.service.DocumentEnrichmentAdminService;
 import com.example.teacherassistantai.service.DocumentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -70,6 +73,16 @@ public class DocumentController {
                                                       @RequestParam(defaultValue = "20") @Min(1) int pageSize) {
         return new ResponseData<>(HttpStatus.OK.value(), "Documents",
                 documentService.getDocuments(subjectId, status, pageNo, pageSize));
+    }
+
+    @PatchMapping("/{documentId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
+    @Operation(summary = "Update document metadata", description = "Update title and description of a document")
+    public ResponseData<DocumentResponse> updateDocument(@PathVariable @Min(1) Long documentId,
+                                                         @RequestBody @Valid UpdateDocumentRequest request) {
+        log.info("Update document metadata: id={}", documentId);
+        return new ResponseData<>(HttpStatus.OK.value(), "Document updated",
+                documentService.updateDocument(documentId, request));
     }
 
     @PostMapping("/{documentId}/reprocess")

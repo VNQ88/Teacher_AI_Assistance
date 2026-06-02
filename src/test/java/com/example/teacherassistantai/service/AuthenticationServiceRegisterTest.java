@@ -11,7 +11,6 @@ import com.example.teacherassistantai.repository.RoleRepository;
 import com.example.teacherassistantai.repository.UserRepository;
 import com.example.teacherassistantai.security.JwtService;
 import com.example.teacherassistantai.security.UserDetailServiceImpl;
-import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -74,7 +73,7 @@ class AuthenticationServiceRegisterTest {
     }
 
     @Test
-    void register_shouldSaveRawPasswordForUserPrePersistEncoding() throws MessagingException {
+    void register_shouldSaveRawPasswordForUserPrePersistEncoding() {
         RegistrationRequest request = new RegistrationRequest();
         request.setEmail("student@mail.com");
         request.setPassword("secret123");

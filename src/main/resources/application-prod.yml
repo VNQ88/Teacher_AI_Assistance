@@ -21,23 +21,6 @@ spring:
     database: postgresql
   liquibase:
     enabled: false
-  mail:
-    from: ${MAIL_FROM}
-    host: ${MAIL_HOST}
-    port: ${MAIL_PORT}
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-          ssl:
-            trust: ${MAIL_SSL_TRUST:${MAIL_HOST}}
-          connectiontimeout: 5000
-          timeout: 3000
-          writetimeout: 5000
   data:
     redis:
       host: ${REDIS_HOST}
@@ -79,13 +62,15 @@ spring:
         distance-type: COSINE_DISTANCE
 
 application:
-  encryption:
-    key: ${APP_ENCRYPTION_KEY}
   jwt:
     signer-key: ${JWT_SECRET_KEY}
     valid-duration: 36000
     refreshable-duration: 360000
   mailing:
+    sendgrid:
+      api-key: ${SENDGRID_API_KEY}
+      from-email: ${SENDGRID_FROM_EMAIL}
+      from-name: ${SENDGRID_FROM_NAME:Teacher Assistant AI}
     front-end:
       verification-code-length: 6
       verification-code-expiration-minutes: 2
@@ -99,9 +84,6 @@ application:
     key-prefix: uploads/
     presign-expiry-seconds: 7200
     make-bucket-public: false
-  google:
-    oauth2:
-      client-id: ${GOOGLE_CLIENT_ID}
   document:
     max-docx-bytes: 102400
     max-txt-bytes: 102400

@@ -1,0 +1,33 @@
+{
+        email {$TLS_EMAIL}
+}
+
+{$APP_DOMAIN} {
+        encode zstd gzip
+        reverse_proxy app:8080
+}
+
+{$MINIO_DOMAIN} {
+        encode zstd gzip
+        reverse_proxy minio:9100
+}
+
+{$MINIO_CONSOLE_DOMAIN} {
+        encode zstd gzip
+        reverse_proxy minio:9101
+}
+
+{$PGADMIN_DOMAIN} {
+        encode zstd gzip
+        reverse_proxy pgadmin:80
+}
+
+
+filemanager.io.vn {
+    encode zstd gzip
+    reverse_proxy teacher-ai-frontend:3000
+}
+
+www.filemanager.io.vn {
+    redir https://filemanager.io.vn{uri} permanent
+}

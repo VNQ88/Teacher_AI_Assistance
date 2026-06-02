@@ -4,6 +4,7 @@ import com.example.teacherassistantai.dto.auth.SetNewPasswordRequest;
 import com.example.teacherassistantai.dto.auth.VerifyCodeRequest;
 import com.example.teacherassistantai.entity.User;
 import com.example.teacherassistantai.integration.email.EmailService;
+import com.example.teacherassistantai.integration.email.EmailTemplateName;
 import com.example.teacherassistantai.integration.redis.RedisTokenService;
 import com.example.teacherassistantai.integration.redis.verification_code.VerificationCode;
 import com.example.teacherassistantai.integration.redis.verification_code.VerificationCodePurpose;
@@ -12,7 +13,6 @@ import com.example.teacherassistantai.repository.RoleRepository;
 import com.example.teacherassistantai.repository.UserRepository;
 import com.example.teacherassistantai.security.JwtService;
 import com.example.teacherassistantai.security.UserDetailServiceImpl;
-import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +28,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -74,7 +76,7 @@ class AuthenticationServiceOtpTest {
     }
 
     @Test
-    void forgotPassword_shouldDeleteExistingResetCodeBeforeSavingNewCode() throws MessagingException {
+    void forgotPassword_shouldDeleteExistingResetCodeBeforeSavingNewCode() {
         User user = user(7L, "student@mail.com", true);
         VerificationCode oldCode = VerificationCode.builder()
                 .code("111111")
@@ -98,6 +100,14 @@ class AuthenticationServiceOtpTest {
         assertEquals(user.getId(), savedCode.getUserId());
         assertEquals(VerificationCodePurpose.RESET_PASSWORD, savedCode.getPurpose());
         assertEquals(15 * 60L, savedCode.getTimeToLive());
+        verify(emailService).sendEmail(
+                eq("student@mail.com"),
+                eq("Student"),
+                eq(EmailTemplateName.RESET_PASSWORD),
+                eq("http://localhost/activate"),
+                anyString(),
+                eq("Reset your password")
+        );
     }
 
     @Test

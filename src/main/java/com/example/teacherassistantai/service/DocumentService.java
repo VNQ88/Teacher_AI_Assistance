@@ -4,6 +4,7 @@ import com.example.teacherassistantai.common.enumerate.DocumentStatus;
 import com.example.teacherassistantai.common.enumerate.DocumentEnrichmentStatus;
 import com.example.teacherassistantai.common.response.PageResponse;
 import com.example.teacherassistantai.config.DocumentIngestionProps;
+import com.example.teacherassistantai.dto.request.UpdateDocumentRequest;
 import com.example.teacherassistantai.dto.response.DocumentResponse;
 import com.example.teacherassistantai.entity.Document;
 import com.example.teacherassistantai.entity.Role;
@@ -152,6 +153,21 @@ public class DocumentService {
     @Transactional
     public void deleteDocumentById(Long documentId) {
         deleteDocument(documentId);
+    }
+
+    @Transactional
+    public DocumentResponse updateDocument(Long documentId, UpdateDocumentRequest request) {
+        Document document = documentRepository.findById(documentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + documentId));
+
+        User currentUser = getCurrentUser();
+        validateDeletePermission(document, currentUser);
+
+        document.setTitle(request.getTitle().trim());
+        document.setDescription(request.getDescription());
+        Document saved = documentRepository.save(document);
+        log.info("Updated document id={}", documentId);
+        return toResponse(saved);
     }
 
     @Transactional

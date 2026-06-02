@@ -12,7 +12,6 @@ import com.example.teacherassistantai.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -47,7 +46,7 @@ public class AuthenticationController {
     )
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseData<?> register(@RequestBody @Valid RegistrationRequest registrationRequest) throws MessagingException {
+    public ResponseData<?> register(@RequestBody @Valid RegistrationRequest registrationRequest) {
         authenticationService.register(registrationRequest);
         return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Registration successful. Please check your email to activate your account.");
     }
@@ -89,7 +88,7 @@ public class AuthenticationController {
             description = "Gửi email đặt lại mật khẩu cho người dùng."
     )
     @PostMapping("/forgot-password")
-    public ResponseData<?> forgotPassword(@RequestParam @NotBlank String email) throws MessagingException {
+    public ResponseData<?> forgotPassword(@RequestParam @NotBlank String email) {
         return new ResponseData<>(HttpStatus.OK.value(),
                 authenticationService.forgotPassword(email));
     }
@@ -110,7 +109,7 @@ public class AuthenticationController {
             description = "Gửi lại mã kích hoạt tài khoản bằng email (Dùng khi mã cũ bị hết hạn)."
     )
     @PostMapping("/resend-activation-code")
-    public ResponseData<?> resendActivationCode(@RequestParam @NotBlank String email) throws MessagingException {
+    public ResponseData<?> resendActivationCode(@RequestParam @NotBlank String email) {
         authenticationService.resendActivationCode(email);
         return new ResponseData<>(HttpStatus.OK.value(), "A new activation code has been sent to your email.");
     }

@@ -16,7 +16,6 @@ import com.example.teacherassistantai.repository.UserRepository;
 import com.example.teacherassistantai.security.JwtService;
 import com.example.teacherassistantai.security.UserDetailServiceImpl;
 import io.micrometer.common.util.StringUtils;
-import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.exceptions.TemplateInputException;
 
 import java.security.SecureRandom;
 import java.util.Set;
@@ -75,8 +73,8 @@ public class AuthenticationService {
                 .build();
     }
 
-    @Transactional(rollbackOn = {MessagingException.class, TemplateInputException.class})
-    public void register(RegistrationRequest registrationRequest) throws MessagingException {
+    @Transactional
+    public void register(RegistrationRequest registrationRequest) {
         if (userRepository.existsByEmail(registrationRequest.getEmail())) {
             var existingUser = userDetailService.loadUserByUsername(registrationRequest.getEmail());
             if (existingUser.isEnabled()) {
@@ -100,7 +98,7 @@ public class AuthenticationService {
         sendValidationEmail(user, EmailTemplateName.ACTIVATE_ACCOUNT, VerificationCodePurpose.ACTIVATE_ACCOUNT);
     }
 
-    private void sendValidationEmail(User user, EmailTemplateName templateName, VerificationCodePurpose purpose) throws MessagingException {
+    private void sendValidationEmail(User user, EmailTemplateName templateName, VerificationCodePurpose purpose) {
         var newCode = generateAndSaveVerificationCode(user, purpose);
 
         emailService.sendEmail(user.getEmail(),
@@ -108,7 +106,14 @@ public class AuthenticationService {
                 templateName,
                 activationUrl,
                 newCode,
-                "Activate your account");
+                emailSubject(templateName));
+    }
+
+    private String emailSubject(EmailTemplateName templateName) {
+        return switch (templateName) {
+            case ACTIVATE_ACCOUNT -> "Activate your account";
+            case RESET_PASSWORD -> "Reset your password";
+        };
     }
 
     private String generateAndSaveVerificationCode(User user, VerificationCodePurpose purpose) {
@@ -159,7 +164,7 @@ public class AuthenticationService {
         verificationCodeRepository.delete(savedToken);
     }
 
-    public void resendActivationCode(String email) throws MessagingException {
+    public void resendActivationCode(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -231,7 +236,7 @@ public class AuthenticationService {
                 .build());
     }
 
-    public String forgotPassword(String email) throws MessagingException {
+    public String forgotPassword(String email) {
         log.info("---------- forgotPassword ----------");
         if (!userRepository.existsByEmail(email))
             throw new RuntimeException("User with this email does not exist");

@@ -83,7 +83,7 @@ Strong success criteria let Codex loop independently. Weak criteria like "make i
 ## Runtime + Dependencies
 - Java 21 + Gradle Kotlin DSL (`build.gradle.kts`).
 - Infra in `compose.yml`: PostgreSQL + pgvector, Redis, MinIO.
-- Core integrations: JWT security, Redis token blacklist/OTP storage, MinIO object storage, SMTP email, OpenAPI.
+- Core integrations: JWT security, Redis token blacklist/OTP storage, MinIO object storage, SendGrid email, OpenAPI.
 - AI integration uses DigitalOcean Serverless Inference through Spring AI OpenAI-compatible APIs.
 - Current AI models: chat `openai-gpt-oss-120b`, embeddings `qwen3-embedding-0.6b` with `vector(1024)` pgvector storage.
 - Entry point enables async/scheduling/caching/auditing in `TeacherAssistantAiApplication.java`.
