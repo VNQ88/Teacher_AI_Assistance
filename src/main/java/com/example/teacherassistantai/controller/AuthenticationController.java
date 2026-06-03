@@ -2,6 +2,7 @@ package com.example.teacherassistantai.controller;
 
 import com.example.teacherassistantai.common.response.ResponseData;
 import com.example.teacherassistantai.dto.auth.AuthenticationRequest;
+import com.example.teacherassistantai.dto.auth.RefreshTokenRequest;
 import com.example.teacherassistantai.dto.auth.RegistrationRequest;
 import com.example.teacherassistantai.dto.auth.SetNewPasswordRequest;
 import com.example.teacherassistantai.dto.auth.VerifyCodeRequest;
@@ -60,9 +61,9 @@ public class AuthenticationController {
     )
     @PostMapping("/refresh")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseData<?> refreshToken(HttpServletRequest request) {
+    public ResponseData<?> refreshToken(@RequestBody @Valid RefreshTokenRequest request) {
         return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Token refreshed successfully",
-                authenticationService.refreshToken(request));
+                authenticationService.refreshToken(request.getRefreshToken()));
     }
 
     @Operation(
@@ -71,8 +72,9 @@ public class AuthenticationController {
     )
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseData<?> logout(HttpServletRequest request) {
-        authenticationService.logout(request);
+    public ResponseData<?> logout(HttpServletRequest request,
+                                  @RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
+        authenticationService.logout(request, refreshTokenRequest.getRefreshToken());
         return new ResponseData<>(HttpStatus.OK.value(), "Logout successful");
     }
 
