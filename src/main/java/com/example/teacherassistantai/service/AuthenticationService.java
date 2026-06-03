@@ -74,15 +74,17 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public void register(RegistrationRequest registrationRequest) {
+    public OtpSentResponse register(RegistrationRequest registrationRequest) {
         if (userRepository.existsByEmail(registrationRequest.getEmail())) {
             var existingUser = userDetailService.loadUserByUsername(registrationRequest.getEmail());
             if (existingUser.isEnabled()) {
                 throw new RuntimeException("User with this email already exists and is activated");
-            } else {
-                sendValidationEmail((User) existingUser, EmailTemplateName.ACTIVATE_ACCOUNT, VerificationCodePurpose.ACTIVATE_ACCOUNT);
             }
-            return;
+            sendValidationEmail((User) existingUser, EmailTemplateName.ACTIVATE_ACCOUNT, VerificationCodePurpose.ACTIVATE_ACCOUNT);
+            return OtpSentResponse.builder()
+                    .expiresInSeconds(verificationCodeExpirationMinutes * 60)
+                    .resent(true)
+                    .build();
         }
 
         var userRole = roleRepository.findByName("STUDENT")
@@ -96,6 +98,9 @@ public class AuthenticationService {
                 .build();
         userRepository.save(user);
         sendValidationEmail(user, EmailTemplateName.ACTIVATE_ACCOUNT, VerificationCodePurpose.ACTIVATE_ACCOUNT);
+        return OtpSentResponse.builder()
+                .expiresInSeconds(verificationCodeExpirationMinutes * 60)
+                .build();
     }
 
     private void sendValidationEmail(User user, EmailTemplateName templateName, VerificationCodePurpose purpose) {
@@ -164,7 +169,7 @@ public class AuthenticationService {
         verificationCodeRepository.delete(savedToken);
     }
 
-    public void resendActivationCode(String email) {
+    public OtpSentResponse resendActivationCode(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -173,6 +178,9 @@ public class AuthenticationService {
         }
 
         sendValidationEmail(user, EmailTemplateName.ACTIVATE_ACCOUNT, VerificationCodePurpose.ACTIVATE_ACCOUNT);
+        return OtpSentResponse.builder()
+                .expiresInSeconds(verificationCodeExpirationMinutes * 60)
+                .build();
     }
 
     public AuthenticationResponse refreshToken(HttpServletRequest request) {
@@ -236,19 +244,31 @@ public class AuthenticationService {
                 .build());
     }
 
-    public String forgotPassword(String email) {
+    public OtpSentResponse forgotPassword(String email) {
         log.info("---------- forgotPassword ----------");
         if (!userRepository.existsByEmail(email))
             throw new RuntimeException("User with this email does not exist");
         User existingUser = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         if (!existingUser.isEnabled()) {
             sendValidationEmail(existingUser, EmailTemplateName.ACTIVATE_ACCOUNT, VerificationCodePurpose.ACTIVATE_ACCOUNT);
-            return "Your account is not activated. An activation email has been sent to your email address.";
-        }
-        else {
+        } else {
             sendValidationEmail(existingUser, EmailTemplateName.RESET_PASSWORD, VerificationCodePurpose.RESET_PASSWORD);
-            return "A password reset email has been sent to your email address.";
         }
+        return OtpSentResponse.builder()
+                .expiresInSeconds(verificationCodeExpirationMinutes * 60)
+                .build();
+    }
+
+    public OtpSentResponse resendResetCode(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (!user.isEnabled()) {
+            throw new RuntimeException("Account is not activated.");
+        }
+        sendValidationEmail(user, EmailTemplateName.RESET_PASSWORD, VerificationCodePurpose.RESET_PASSWORD);
+        return OtpSentResponse.builder()
+                .expiresInSeconds(verificationCodeExpirationMinutes * 60)
+                .build();
     }
 
     public void verifyResetCode(VerifyCodeRequest request)  {

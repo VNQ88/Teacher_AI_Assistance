@@ -47,8 +47,11 @@ public class AuthenticationController {
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseData<?> register(@RequestBody @Valid RegistrationRequest registrationRequest) {
-        authenticationService.register(registrationRequest);
-        return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Registration successful. Please check your email to activate your account.");
+        var result = authenticationService.register(registrationRequest);
+        String message = result.isResent()
+                ? "Account already exists but not activated. A new activation code has been sent."
+                : "Registration successful. Please check your email to activate your account.";
+        return new ResponseData<>(HttpStatus.ACCEPTED.value(), message, result);
     }
 
     @Operation(
@@ -89,8 +92,8 @@ public class AuthenticationController {
     )
     @PostMapping("/forgot-password")
     public ResponseData<?> forgotPassword(@RequestParam @NotBlank String email) {
-        return new ResponseData<>(HttpStatus.OK.value(),
-                authenticationService.forgotPassword(email));
+        var result = authenticationService.forgotPassword(email);
+        return new ResponseData<>(HttpStatus.OK.value(), "An email has been sent to your email address.", result);
     }
 
 
@@ -110,8 +113,18 @@ public class AuthenticationController {
     )
     @PostMapping("/resend-activation-code")
     public ResponseData<?> resendActivationCode(@RequestParam @NotBlank String email) {
-        authenticationService.resendActivationCode(email);
-        return new ResponseData<>(HttpStatus.OK.value(), "A new activation code has been sent to your email.");
+        var result = authenticationService.resendActivationCode(email);
+        return new ResponseData<>(HttpStatus.OK.value(), "A new activation code has been sent to your email.", result);
+    }
+
+    @Operation(
+            summary = "Resend reset code",
+            description = "Gửi lại mã đặt lại mật khẩu (dùng khi mã cũ đã hết hạn)."
+    )
+    @PostMapping("/resend-reset-code")
+    public ResponseData<?> resendResetCode(@RequestParam @NotBlank String email) {
+        var result = authenticationService.resendResetCode(email);
+        return new ResponseData<>(HttpStatus.OK.value(), "A new reset code has been sent to your email.", result);
     }
 
     @Operation(

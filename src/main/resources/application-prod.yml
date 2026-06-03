@@ -64,7 +64,7 @@ spring:
 application:
   jwt:
     signer-key: ${JWT_SECRET_KEY}
-    valid-duration: 36000
+    valid-duration: 6000
     refreshable-duration: 360000
   mailing:
     sendgrid:
@@ -73,7 +73,7 @@ application:
       from-name: ${SENDGRID_FROM_NAME:Teacher Assistant AI}
     front-end:
       verification-code-length: 6
-      verification-code-expiration-minutes: 2
+      verification-code-expiration-minutes: 1
       activation-url: ${MAIL_ACTIVATION_URL}
   minio:
     endpoint: ${MINIO_ENDPOINT}
@@ -82,7 +82,7 @@ application:
     secret-key: ${MINIO_ROOT_PASSWORD}
     bucket: ${MINIO_BUCKET}
     key-prefix: uploads/
-    presign-expiry-seconds: 7200
+    presign-expiry-seconds: 900
     make-bucket-public: false
   document:
     max-docx-bytes: 102400
