@@ -42,7 +42,7 @@ dependencies {
     implementation("org.apache.tika:tika-core:3.3.0")
     implementation("org.apache.tika:tika-parsers-standard-package:3.3.0")
     implementation("io.github.cdimascio:dotenv-java:3.0.2")
-    implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("com.sendgrid:sendgrid-java:4.10.3")
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")
     implementation("org.springframework.data:spring-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-cache")

@@ -21,23 +21,6 @@ spring:
     database: postgresql
   liquibase:
     enabled: false
-  mail:
-    from: ${MAIL_FROM}
-    host: ${MAIL_HOST}
-    port: ${MAIL_PORT}
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-          ssl:
-            trust: smtp.gmail.com
-          connectiontimeout: 5000
-          timeout: 3000
-          writetimeout: 5000
   data:
     redis:
       host: ${REDIS_HOST}
@@ -79,16 +62,18 @@ spring:
         distance-type: COSINE_DISTANCE
 
 application:
-  encryption:
-    key: ${APP_ENCRYPTION_KEY}
   jwt:
     signer-key: ${JWT_SECRET_KEY}
-    valid-duration: 36000 # in seconds
-    refreshable-duration: 360000 # in seconds
+    valid-duration: 600 # in seconds
+    refreshable-duration: 604800 # in seconds
   mailing:
+    sendgrid:
+      api-key: ${SENDGRID_API_KEY}
+      from-email: ${SENDGRID_FROM_EMAIL}
+      from-name: ${SENDGRID_FROM_NAME:Teacher Assistant AI}
     front-end:
       verification-code-length: 6
-      verification-code-expiration-minutes: 2 # in minutes
+      verification-code-expiration-minutes: 1 # in minutes
       activation-url: ${MAIL_ACTIVATION_URL}
   minio:
     endpoint: ${MINIO_ENDPOINT}
@@ -97,11 +82,8 @@ application:
     secret-key: ${MINIO_ROOT_PASSWORD}
     bucket: ${MINIO_BUCKET}
     key-prefix: uploads/
-    presign-expiry-seconds: 7200 # in seconds
+    presign-expiry-seconds: 900 # in seconds
     make-bucket-public: false
-  google:
-    oauth2:
-      client-id: ${GOOGLE_CLIENT_ID}
   document:
     max-docx-bytes: 102400
     max-txt-bytes: 102400

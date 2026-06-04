@@ -2,6 +2,7 @@ package com.example.teacherassistantai.controller;
 
 import com.example.teacherassistantai.common.response.ResponseData;
 import com.example.teacherassistantai.dto.auth.AuthenticationRequest;
+import com.example.teacherassistantai.dto.auth.RefreshTokenRequest;
 import com.example.teacherassistantai.dto.auth.RegistrationRequest;
 import com.example.teacherassistantai.dto.auth.SetNewPasswordRequest;
 import com.example.teacherassistantai.dto.auth.VerifyCodeRequest;
@@ -12,7 +13,6 @@ import com.example.teacherassistantai.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -47,9 +47,12 @@ public class AuthenticationController {
     )
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseData<?> register(@RequestBody @Valid RegistrationRequest registrationRequest) throws MessagingException {
-        authenticationService.register(registrationRequest);
-        return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Registration successful. Please check your email to activate your account.");
+    public ResponseData<?> register(@RequestBody @Valid RegistrationRequest registrationRequest) {
+        var result = authenticationService.register(registrationRequest);
+        String message = result.isResent()
+                ? "Account already exists but not activated. A new activation code has been sent."
+                : "Registration successful. Please check your email to activate your account.";
+        return new ResponseData<>(HttpStatus.ACCEPTED.value(), message, result);
     }
 
     @Operation(
@@ -58,9 +61,9 @@ public class AuthenticationController {
     )
     @PostMapping("/refresh")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseData<?> refreshToken(HttpServletRequest request) {
+    public ResponseData<?> refreshToken(@RequestBody @Valid RefreshTokenRequest request) {
         return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Token refreshed successfully",
-                authenticationService.refreshToken(request));
+                authenticationService.refreshToken(request.getRefreshToken()));
     }
 
     @Operation(
@@ -69,8 +72,9 @@ public class AuthenticationController {
     )
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseData<?> logout(HttpServletRequest request) {
-        authenticationService.logout(request);
+    public ResponseData<?> logout(HttpServletRequest request,
+                                  @RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
+        authenticationService.logout(request, refreshTokenRequest.getRefreshToken());
         return new ResponseData<>(HttpStatus.OK.value(), "Logout successful");
     }
 
@@ -89,9 +93,9 @@ public class AuthenticationController {
             description = "Gửi email đặt lại mật khẩu cho người dùng."
     )
     @PostMapping("/forgot-password")
-    public ResponseData<?> forgotPassword(@RequestParam @NotBlank String email) throws MessagingException {
-        return new ResponseData<>(HttpStatus.OK.value(),
-                authenticationService.forgotPassword(email));
+    public ResponseData<?> forgotPassword(@RequestParam @NotBlank String email) {
+        var result = authenticationService.forgotPassword(email);
+        return new ResponseData<>(HttpStatus.OK.value(), "An email has been sent to your email address.", result);
     }
 
 
@@ -110,9 +114,19 @@ public class AuthenticationController {
             description = "Gửi lại mã kích hoạt tài khoản bằng email (Dùng khi mã cũ bị hết hạn)."
     )
     @PostMapping("/resend-activation-code")
-    public ResponseData<?> resendActivationCode(@RequestParam @NotBlank String email) throws MessagingException {
-        authenticationService.resendActivationCode(email);
-        return new ResponseData<>(HttpStatus.OK.value(), "A new activation code has been sent to your email.");
+    public ResponseData<?> resendActivationCode(@RequestParam @NotBlank String email) {
+        var result = authenticationService.resendActivationCode(email);
+        return new ResponseData<>(HttpStatus.OK.value(), "A new activation code has been sent to your email.", result);
+    }
+
+    @Operation(
+            summary = "Resend reset code",
+            description = "Gửi lại mã đặt lại mật khẩu (dùng khi mã cũ đã hết hạn)."
+    )
+    @PostMapping("/resend-reset-code")
+    public ResponseData<?> resendResetCode(@RequestParam @NotBlank String email) {
+        var result = authenticationService.resendResetCode(email);
+        return new ResponseData<>(HttpStatus.OK.value(), "A new reset code has been sent to your email.", result);
     }
 
     @Operation(

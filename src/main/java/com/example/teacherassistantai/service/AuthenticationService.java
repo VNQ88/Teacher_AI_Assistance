@@ -2,8 +2,8 @@ package com.example.teacherassistantai.service;
 
 import com.example.teacherassistantai.dto.auth.*;
 import com.example.teacherassistantai.entity.User;
-import com.example.teacherassistantai.exception.InvalidDataException;
 import com.example.teacherassistantai.exception.ResourceNotFoundException;
+import com.example.teacherassistantai.exception.UnauthorizedException;
 import com.example.teacherassistantai.integration.email.EmailService;
 import com.example.teacherassistantai.integration.email.EmailTemplateName;
 import com.example.teacherassistantai.integration.redis.RedisToken;
@@ -14,9 +14,11 @@ import com.example.teacherassistantai.integration.redis.verification_code.Verifi
 import com.example.teacherassistantai.repository.RoleRepository;
 import com.example.teacherassistantai.repository.UserRepository;
 import com.example.teacherassistantai.security.JwtService;
+import com.example.teacherassistantai.security.TokenType;
 import com.example.teacherassistantai.security.UserDetailServiceImpl;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.micrometer.common.util.StringUtils;
-import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +28,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.exceptions.TemplateInputException;
 
 import java.security.SecureRandom;
 import java.util.Set;
@@ -66,8 +69,8 @@ public class AuthenticationService {
         );
 
         var user = (User) auth.getPrincipal();
-        var accessToken = jwtService.generateToken(user, (long) validDuration * 1000);
-        var refreshToken = jwtService.generateToken(user, (long) refreshDuration * 1000);
+        var accessToken = jwtService.generateAccessToken(user, (long) validDuration * 1000);
+        var refreshToken = jwtService.generateRefreshToken(user, (long) refreshDuration * 1000);
 
         return AuthenticationResponse.builder()
                 .accessToken(accessToken)
@@ -75,16 +78,18 @@ public class AuthenticationService {
                 .build();
     }
 
-    @Transactional(rollbackOn = {MessagingException.class, TemplateInputException.class})
-    public void register(RegistrationRequest registrationRequest) throws MessagingException {
+    @Transactional
+    public OtpSentResponse register(RegistrationRequest registrationRequest) {
         if (userRepository.existsByEmail(registrationRequest.getEmail())) {
             var existingUser = userDetailService.loadUserByUsername(registrationRequest.getEmail());
             if (existingUser.isEnabled()) {
                 throw new RuntimeException("User with this email already exists and is activated");
-            } else {
-                sendValidationEmail((User) existingUser, EmailTemplateName.ACTIVATE_ACCOUNT, VerificationCodePurpose.ACTIVATE_ACCOUNT);
             }
-            return;
+            sendValidationEmail((User) existingUser, EmailTemplateName.ACTIVATE_ACCOUNT, VerificationCodePurpose.ACTIVATE_ACCOUNT);
+            return OtpSentResponse.builder()
+                    .expiresInSeconds(verificationCodeExpirationMinutes * 60)
+                    .resent(true)
+                    .build();
         }
 
         var userRole = roleRepository.findByName("STUDENT")
@@ -98,9 +103,12 @@ public class AuthenticationService {
                 .build();
         userRepository.save(user);
         sendValidationEmail(user, EmailTemplateName.ACTIVATE_ACCOUNT, VerificationCodePurpose.ACTIVATE_ACCOUNT);
+        return OtpSentResponse.builder()
+                .expiresInSeconds(verificationCodeExpirationMinutes * 60)
+                .build();
     }
 
-    private void sendValidationEmail(User user, EmailTemplateName templateName, VerificationCodePurpose purpose) throws MessagingException {
+    private void sendValidationEmail(User user, EmailTemplateName templateName, VerificationCodePurpose purpose) {
         var newCode = generateAndSaveVerificationCode(user, purpose);
 
         emailService.sendEmail(user.getEmail(),
@@ -108,7 +116,14 @@ public class AuthenticationService {
                 templateName,
                 activationUrl,
                 newCode,
-                "Activate your account");
+                emailSubject(templateName));
+    }
+
+    private String emailSubject(EmailTemplateName templateName) {
+        return switch (templateName) {
+            case ACTIVATE_ACCOUNT -> "Activate your account";
+            case RESET_PASSWORD -> "Reset your password";
+        };
     }
 
     private String generateAndSaveVerificationCode(User user, VerificationCodePurpose purpose) {
@@ -159,7 +174,7 @@ public class AuthenticationService {
         verificationCodeRepository.delete(savedToken);
     }
 
-    public void resendActivationCode(String email) throws MessagingException {
+    public OtpSentResponse resendActivationCode(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -168,33 +183,21 @@ public class AuthenticationService {
         }
 
         sendValidationEmail(user, EmailTemplateName.ACTIVATE_ACCOUNT, VerificationCodePurpose.ACTIVATE_ACCOUNT);
+        return OtpSentResponse.builder()
+                .expiresInSeconds(verificationCodeExpirationMinutes * 60)
+                .build();
     }
 
-    public AuthenticationResponse refreshToken(HttpServletRequest request) {
+    public AuthenticationResponse refreshToken(String refreshToken) {
         log.info("---------- refreshToken ----------");
 
-        final String refreshToken = request.getHeader(HttpHeaders.REFERER);
-        if (StringUtils.isBlank(refreshToken)) {
-            throw new InvalidDataException("Token must be not blank");
-        }
-        if (redisTokenService.isRefreshTokenRevoked(refreshToken)) {
-            throw new InvalidDataException("Refresh token has been revoked");
-        }
-        final String userName = jwtService.extractUsername(refreshToken);
-        var user = userDetailService.loadUserByUsername(userName);
-        if (!jwtService.isTokenValid(refreshToken, user)) {
-            throw new InvalidDataException("Not allow access with this token");
+        UserDetails user = validateRefreshToken(refreshToken);
+        if (!redisTokenService.revokeRefreshTokenIfUnused(refreshToken, jwtService.extractExpiration(refreshToken))) {
+            throw new UnauthorizedException("Refresh token has been revoked");
         }
 
-        String newAccessToken = jwtService.generateToken(user, (long) validDuration * 1000);
-        String newRefreshToken = jwtService.generateToken(user, (long) refreshDuration * 1000);
-
-        redisTokenService.save(RedisToken.builder()
-                .id(refreshToken)
-                .accessToken(null)
-                .refreshToken(refreshToken)
-                .expireTime(jwtService.extractExpiration(refreshToken))
-                .build());
+        String newAccessToken = jwtService.generateAccessToken(user, (long) validDuration * 1000);
+        String newRefreshToken = jwtService.generateRefreshToken(user, (long) refreshDuration * 1000);
 
         return AuthenticationResponse.builder()
                 .accessToken(newAccessToken)
@@ -202,52 +205,45 @@ public class AuthenticationService {
                 .build();
     }
 
-    public void logout(HttpServletRequest request) {
+    public void logout(HttpServletRequest request, String refreshToken) {
         log.info("---------- logout ----------");
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        final String refreshToken = request.getHeader(HttpHeaders.REFERER);
-        if (StringUtils.isBlank(authHeader) || !authHeader.startsWith("Bearer ")) {
-            throw new InvalidDataException("Access token must not be blank");
-        }
-        final String accessToken = authHeader.substring(7);
-        if (StringUtils.isBlank(refreshToken)) {
-            throw new InvalidDataException("Refresh token must not be blank");
+        UserDetails user = validateRefreshToken(refreshToken);
+        if (!redisTokenService.revokeRefreshTokenIfUnused(refreshToken, jwtService.extractExpiration(refreshToken))) {
+            throw new UnauthorizedException("Refresh token has been revoked");
         }
 
-        final String userName = jwtService.extractUsername(accessToken);
-        var user = userDetailService.loadUserByUsername(userName);
-        if (!jwtService.isTokenValid(accessToken, user)) {
-            throw new InvalidDataException("Invalid access token");
-        }
-        if (!jwtService.isTokenValid(refreshToken, user)) {
-            throw new InvalidDataException("Invalid refresh token");
-        }
-
-        redisTokenService.save(RedisToken.builder()
-                .id(accessToken)
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .expireTime(jwtService.extractExpiration(refreshToken))
-                .build());
+        revokeAccessTokenIfUsable(request, user);
     }
 
-    public String forgotPassword(String email) throws MessagingException {
+    public OtpSentResponse forgotPassword(String email) {
         log.info("---------- forgotPassword ----------");
         if (!userRepository.existsByEmail(email))
             throw new RuntimeException("User with this email does not exist");
         User existingUser = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         if (!existingUser.isEnabled()) {
             sendValidationEmail(existingUser, EmailTemplateName.ACTIVATE_ACCOUNT, VerificationCodePurpose.ACTIVATE_ACCOUNT);
-            return "Your account is not activated. An activation email has been sent to your email address.";
-        }
-        else {
+        } else {
             sendValidationEmail(existingUser, EmailTemplateName.RESET_PASSWORD, VerificationCodePurpose.RESET_PASSWORD);
-            return "A password reset email has been sent to your email address.";
         }
+        return OtpSentResponse.builder()
+                .expiresInSeconds(verificationCodeExpirationMinutes * 60)
+                .build();
+    }
+
+    public OtpSentResponse resendResetCode(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (!user.isEnabled()) {
+            throw new RuntimeException("Account is not activated.");
+        }
+        sendValidationEmail(user, EmailTemplateName.RESET_PASSWORD, VerificationCodePurpose.RESET_PASSWORD);
+        return OtpSentResponse.builder()
+                .expiresInSeconds(verificationCodeExpirationMinutes * 60)
+                .build();
     }
 
     public void verifyResetCode(VerifyCodeRequest request)  {
-        verifyCode(request.getCode(), VerificationCodePurpose.RESET_PASSWORD);
+        verifyCodeForEmail(request.getCode(), VerificationCodePurpose.RESET_PASSWORD, request.getEmail());
         // Với Redis, ta không cần đánh dấu 'validatedAt'. Cứ để nguyên đó để hàm resetPassword sử dụng,
         // nếu quá thời gian nó sẽ tự mất.
     }
@@ -258,20 +254,90 @@ public class AuthenticationService {
             throw new IllegalArgumentException("Password and confirm password do not match");
         }
 
-        VerificationCode resetCode = verifyCode(request.getCode(), VerificationCodePurpose.RESET_PASSWORD);
-        User user = userRepository.findById(resetCode.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        VerifiedCode verifiedCode = verifyCodeForEmail(request.getCode(), VerificationCodePurpose.RESET_PASSWORD, request.getEmail());
+        User user = verifiedCode.user();
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         user.setEnabled(true);
         userRepository.save(user);
+        redisTokenService.revokeAllUserTokens(user.getId());
 
         // Hủy mã OTP khỏi Redis sau khi đổi pass thành công
-        verificationCodeRepository.delete(resetCode);
+        verificationCodeRepository.delete(verifiedCode.code());
     }
 
 
     //    ----------------- Private methods -----------------
+    private UserDetails validateRefreshToken(String refreshToken) {
+        if (StringUtils.isBlank(refreshToken)) {
+            throw new UnauthorizedException("Refresh token is required");
+        }
+        if (redisTokenService.isRefreshTokenRevoked(refreshToken)) {
+            throw new UnauthorizedException("Refresh token has been revoked");
+        }
+
+        try {
+            final String userName = jwtService.extractUsername(refreshToken);
+            UserDetails user = userDetailService.loadUserByUsername(userName);
+            if (!jwtService.isTokenValid(refreshToken, user)) {
+                throw new UnauthorizedException("Invalid refresh token");
+            }
+            if (!jwtService.isTokenType(refreshToken, TokenType.REFRESH)) {
+                throw new UnauthorizedException("Invalid refresh token");
+            }
+            if (redisTokenService.isTokenRevokedByUserInvalidation(
+                    jwtService.extractUserId(refreshToken),
+                    jwtService.extractIssuedAt(refreshToken))) {
+                throw new UnauthorizedException("Refresh token has been revoked");
+            }
+
+            return user;
+        } catch (ExpiredJwtException ex) {
+            throw new UnauthorizedException("Refresh token has expired");
+        } catch (UsernameNotFoundException ex) {
+            throw new UnauthorizedException("Invalid refresh token");
+        } catch (JwtException | IllegalArgumentException ex) {
+            throw new UnauthorizedException("Invalid refresh token");
+        }
+    }
+
+    private void revokeAccessTokenIfUsable(HttpServletRequest request, UserDetails user) {
+        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (StringUtils.isBlank(authHeader) || !authHeader.startsWith("Bearer ")) {
+            return;
+        }
+
+        final String accessToken = authHeader.substring(7);
+        try {
+            if (!jwtService.isTokenType(accessToken, TokenType.ACCESS) || !jwtService.isTokenValid(accessToken, user)) {
+                return;
+            }
+            redisTokenService.save(RedisToken.builder()
+                    .id(accessToken)
+                    .accessToken(accessToken)
+                    .refreshToken(null)
+                    .expireTime(jwtService.extractExpiration(accessToken))
+                    .build());
+        } catch (RuntimeException ex) {
+            log.debug("Skipping access token revocation during logout: {}", ex.getMessage());
+        }
+    }
+
+    private VerifiedCode verifyCodeForEmail(String code, VerificationCodePurpose purpose, String email) {
+        if (StringUtils.isBlank(email)) {
+            throw new IllegalArgumentException("Email is required");
+        }
+
+        VerificationCode savedToken = verifyCode(code, purpose);
+        User user = userRepository.findById(savedToken.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (!email.strip().equalsIgnoreCase(user.getEmail())) {
+            throw new IllegalArgumentException("Code is invalid or has expired");
+        }
+
+        return new VerifiedCode(savedToken, user);
+    }
+
     private VerificationCode verifyCode(String code, VerificationCodePurpose purpose){
         // Do Redis có cơ chế tự hủy (TTL), nếu record vẫn còn tồn tại thì tức là còn hạn.
         // Nếu không tìm thấy, nghĩa là mã sai hoặc mã đã hết thời gian lưu trữ.
@@ -281,5 +347,8 @@ public class AuthenticationService {
 
         return verificationCodeRepository.findByPurposeAndCode(purpose, code.strip())
                 .orElseThrow(() -> new IllegalArgumentException("Code is invalid or has expired"));
+    }
+
+    private record VerifiedCode(VerificationCode code, User user) {
     }
 }

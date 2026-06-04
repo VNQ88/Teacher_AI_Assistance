@@ -7,7 +7,7 @@ out
 bin
 .env
 .env.*
-!.env.prod.example
+!.env.prod
 docs
 input
 output

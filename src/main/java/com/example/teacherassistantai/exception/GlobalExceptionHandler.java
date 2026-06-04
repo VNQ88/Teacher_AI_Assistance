@@ -174,6 +174,18 @@ public class GlobalExceptionHandler {
         return errorResponse;
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    @ResponseStatus(UNAUTHORIZED)
+    public ErrorResponse handleUnauthorizedException(UnauthorizedException e, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(new Date());
+        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
+        errorResponse.setStatus(UNAUTHORIZED.value());
+        errorResponse.setError(UNAUTHORIZED.getReasonPhrase());
+        errorResponse.setMessage(e.getMessage());
+        return errorResponse;
+    }
+
     @ExceptionHandler(AccessDeniedOperationException.class)
     @ResponseStatus(FORBIDDEN)
     public ErrorResponse handleAccessDeniedException(AccessDeniedOperationException e, WebRequest request) {

@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 public class SetNewPasswordRequest {
     @Email
+    @NotBlank(message = "Email is required")
     private String email;
     @NotBlank
     private String code;
