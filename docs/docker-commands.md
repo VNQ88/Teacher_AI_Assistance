@@ -1,5 +1,11 @@
 # Docker Commands
 
+## Build Image (máy local)
+
+```bash
+docker build -t vnq88/teacher-assistant-ai:1.0.0 .
+```
+
 ## Build & Push Image (máy local)
 
 ```bash
@@ -50,6 +56,21 @@ docker buildx build --platform linux/amd64 \
 # 3. Trên Droplet
 docker compose --env-file .env.prod -f compose.prod.yml --profile proxy pull
 docker compose --env-file .env.prod -f compose.prod.yml --profile proxy up -d
+```
+
+## Pull & Chạy Lại Container App
+
+```bash
+cd /opt/teacher-assistant-ai
+
+# Stop riêng container app
+docker compose --env-file .env.prod -f compose.prod.yml stop app
+
+# Pull image mới cho app
+docker compose --env-file .env.prod -f compose.prod.yml pull app
+
+# Chạy lại container app sau khi pull, ép tạo lại container từ image mới
+docker compose --env-file .env.prod -f compose.prod.yml up -d --force-recreate app
 ```
 
 ## Restart / Stop

@@ -64,8 +64,8 @@ spring:
 application:
   jwt:
     signer-key: ${JWT_SECRET_KEY}
-    valid-duration: 6000
-    refreshable-duration: 360000
+    valid-duration: 600
+    refreshable-duration: 604800
   mailing:
     sendgrid:
       api-key: ${SENDGRID_API_KEY}
