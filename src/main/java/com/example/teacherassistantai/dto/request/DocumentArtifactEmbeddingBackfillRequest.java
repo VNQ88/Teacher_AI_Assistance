@@ -7,11 +7,11 @@ import lombok.Data;
 @Data
 public class DocumentArtifactEmbeddingBackfillRequest {
 
-    @Min(1)
-    @Max(200)
+    @Min(value = 1, message = "Số lượng mỗi lô phải lớn hơn hoặc bằng 1")
+    @Max(value = 200, message = "Số lượng mỗi lô không được vượt quá 200")
     private Integer batchSize = 25;
 
-    @Min(1)
-    @Max(100)
+    @Min(value = 1, message = "Số lô tối đa phải lớn hơn hoặc bằng 1")
+    @Max(value = 100, message = "Số lô tối đa không được vượt quá 100")
     private Integer maxBatches = 1;
 }

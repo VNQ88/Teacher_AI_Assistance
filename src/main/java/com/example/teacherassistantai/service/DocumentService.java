@@ -21,6 +21,7 @@ import com.example.teacherassistantai.repository.SubjectRepository;
 import com.example.teacherassistantai.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,6 +42,8 @@ import java.util.UUID;
 public class DocumentService {
 
     private static final List<String> ALLOWED_EXTENSIONS = List.of("pdf", "docx", "txt");
+    private static final String SUBJECT_DOCUMENT_EXISTS_MESSAGE =
+            "Môn học này đã có tài liệu. Vui lòng xóa tài liệu hiện tại trước khi tải lên tài liệu mới.";
 
     private final DocumentRepository documentRepository;
     private final SubjectRepository subjectRepository;
@@ -58,7 +61,11 @@ public class DocumentService {
         validateUploadRequest(file);
 
         Subject subject = subjectRepository.findById(subjectId)
-                .orElseThrow(() -> new ResourceNotFoundException("Subject not found with id: " + subjectId));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy môn học với id: " + subjectId));
+
+        if (documentRepository.existsBySubjectId(subject.getId())) {
+            throw new InvalidDataException(SUBJECT_DOCUMENT_EXISTS_MESSAGE);
+        }
 
         User currentUser = getCurrentUser();
         String extension = getExtension(file.getOriginalFilename());
@@ -70,7 +77,7 @@ public class DocumentService {
         try {
             minioChannel.upload(file, objectKey);
         } catch (Exception e) {
-            throw new StorageOperationException("Upload original document to storage failed", e);
+            throw new StorageOperationException("Không thể tải tài liệu lên kho lưu trữ. Vui lòng thử lại.", e);
         }
 
         String resolvedTitle = StringUtils.hasText(title)
@@ -89,7 +96,13 @@ public class DocumentService {
                 .status(DocumentStatus.UPLOADED)
                 .build();
 
-        Document saved = documentRepository.save(document);
+        Document saved;
+        try {
+            saved = documentRepository.saveAndFlush(document);
+        } catch (DataIntegrityViolationException ex) {
+            cleanupUploadedObjectAfterSaveFailure(objectKey);
+            throw new InvalidDataException(SUBJECT_DOCUMENT_EXISTS_MESSAGE);
+        }
         log.info("Uploaded document id={}, subjectId={}, type={}", saved.getId(), subjectId, normalizedType);
 
         triggerProcessingAfterCommit(saved.getId());
@@ -114,7 +127,7 @@ public class DocumentService {
     @Transactional(readOnly = true)
     public DocumentResponse getDocumentById(Long documentId) {
         Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + documentId));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tài liệu với id: " + documentId));
         return toResponse(document);
     }
 
@@ -134,15 +147,15 @@ public class DocumentService {
     @Transactional
     public void deleteDocument(Long documentId) {
         Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + documentId));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tài liệu với id: " + documentId));
 
         User currentUser = getCurrentUser();
         validateDeletePermission(document, currentUser);
 
-        removeStorageObject(document.getOriginalObjectKey(), documentId, "original");
+        removeStorageObject(document.getOriginalObjectKey(), documentId, "gốc");
         removeStorageObject(document.getMarkdownObjectKey(), documentId, "markdown");
-        removeStorageObject(document.getHierarchyObjectKey(), documentId, "hierarchy");
-        removeStorageObject(document.getChunksObjectKey(), documentId, "chunks");
+        removeStorageObject(document.getHierarchyObjectKey(), documentId, "cấu trúc");
+        removeStorageObject(document.getChunksObjectKey(), documentId, "danh sách đoạn");
 
         documentChunkRepository.deleteMessageSourceLinksByDocumentId(documentId);
         documentChunkRepository.deleteByDocumentId(documentId);
@@ -158,7 +171,7 @@ public class DocumentService {
     @Transactional
     public DocumentResponse updateDocument(Long documentId, UpdateDocumentRequest request) {
         Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + documentId));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tài liệu với id: " + documentId));
 
         User currentUser = getCurrentUser();
         validateDeletePermission(document, currentUser);
@@ -173,7 +186,7 @@ public class DocumentService {
     @Transactional
     public DocumentResponse reprocessDocument(Long documentId) {
         Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + documentId));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tài liệu với id: " + documentId));
 
         User currentUser = getCurrentUser();
         validateDeletePermission(document, currentUser);
@@ -191,21 +204,21 @@ public class DocumentService {
 
     private void validateUploadRequest(MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            throw new InvalidDataException("File is required");
+            throw new InvalidDataException("Vui lòng chọn file tài liệu để tải lên.");
         }
 
         String extension = getExtension(file.getOriginalFilename());
         if (!ALLOWED_EXTENSIONS.contains(extension)) {
-            throw new InvalidDataException("Only PDF/DOCX/TXT are supported");
+            throw new InvalidDataException("Chỉ hỗ trợ file PDF, DOCX hoặc TXT.");
         }
     }
 
     private void validateFileSizeByType(MultipartFile file, String extension) {
         if ("docx".equals(extension) && file.getSize() >= ingestionProps.getMaxDocxBytes()) {
-            throw new InvalidDataException("DOCX file must be smaller than 100KB");
+            throw new InvalidDataException("Dung lượng file DOCX phải nhỏ hơn 100KB.");
         }
         if ("txt".equals(extension) && file.getSize() >= ingestionProps.getMaxTxtBytes()) {
-            throw new InvalidDataException("TXT file must be smaller than 100KB");
+            throw new InvalidDataException("Dung lượng file TXT phải nhỏ hơn 100KB.");
         }
     }
 
@@ -223,7 +236,7 @@ public class DocumentService {
     private String getExtension(String originalFilename) {
         String ext = StringUtils.getFilenameExtension(originalFilename);
         if (!StringUtils.hasText(ext)) {
-            throw new InvalidDataException("File extension is required");
+            throw new InvalidDataException("Tên file phải có phần mở rộng PDF, DOCX hoặc TXT.");
         }
         return ext.toLowerCase(Locale.ROOT);
     }
@@ -238,10 +251,10 @@ public class DocumentService {
     private User getCurrentUser() {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) {
-            throw new ResourceNotFoundException("User not authenticated");
+            throw new ResourceNotFoundException("Bạn cần đăng nhập để thực hiện thao tác này.");
         }
         return userRepository.findByEmail(auth.getName())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy thông tin người dùng hiện tại."));
     }
 
     private void validateDeletePermission(Document document, User currentUser) {
@@ -253,7 +266,7 @@ public class DocumentService {
         boolean isUploader = uploaderId != null && uploaderId.equals(currentUser.getId());
 
         if (!isAdmin && !isUploader) {
-            throw new AccessDeniedOperationException("You don't have permission to delete this document");
+            throw new AccessDeniedOperationException("Bạn không có quyền thao tác với tài liệu này.");
         }
     }
 
@@ -266,9 +279,20 @@ public class DocumentService {
             minioChannel.removeObject(objectKey);
         } catch (StorageOperationException ex) {
             throw new StorageOperationException(
-                    "Failed to delete %s object for document id=%d".formatted(objectType, documentId),
+                    "Không thể xóa file %s của tài liệu id=%d khỏi kho lưu trữ.".formatted(objectType, documentId),
                     ex
             );
+        }
+    }
+
+    private void cleanupUploadedObjectAfterSaveFailure(String objectKey) {
+        if (!StringUtils.hasText(objectKey)) {
+            return;
+        }
+        try {
+            minioChannel.removeObject(objectKey);
+        } catch (StorageOperationException ex) {
+            log.warn("Failed to cleanup uploaded object after document save failure: objectKey={}", objectKey, ex);
         }
     }
 

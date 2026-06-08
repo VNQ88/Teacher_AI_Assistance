@@ -81,7 +81,7 @@ public class DocumentEnrichmentAdminService {
     @Transactional
     public void deleteArtifacts(Long documentId, DocumentEnrichmentRequest request) {
         Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + documentId));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tài liệu với id: " + documentId));
         List<DocumentNodeArtifactType> artifactTypes = artifactTypes(request);
         if (artifactTypes.isEmpty()) {
             artifactRepository.deleteByDocumentId(documentId);
@@ -141,9 +141,9 @@ public class DocumentEnrichmentAdminService {
 
     private Document markQueued(Long documentId, boolean forceRegenerate) {
         Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + documentId));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tài liệu với id: " + documentId));
         if (document.getStatus() != DocumentStatus.READY && document.getStatus() != DocumentStatus.FAILED) {
-            throw new InvalidDataException("Document must be in READY or FAILED status before enrichment can run");
+            throw new InvalidDataException("Tài liệu phải ở trạng thái Sẵn sàng hoặc Lỗi xử lý trước khi tạo học liệu.");
         }
         document.setEnrichmentStatus(DocumentEnrichmentStatus.QUEUED);
         document.setEnrichmentCompletedAt(null);
@@ -154,15 +154,15 @@ public class DocumentEnrichmentAdminService {
 
     private Document ensureDocumentExists(Long documentId) {
         return documentRepository.findById(documentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + documentId));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tài liệu với id: " + documentId));
     }
 
     private DocumentNode getNodeInDocument(Long documentId, Long nodeId) {
         DocumentNode node = documentNodeRepository.findById(nodeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Document node not found with id: " + nodeId));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy mục nội dung tài liệu với id: " + nodeId));
         Long nodeDocumentId = node.getDocument() == null ? null : node.getDocument().getId();
         if (!documentId.equals(nodeDocumentId)) {
-            throw new InvalidDataException("Document node does not belong to document id: " + documentId);
+            throw new InvalidDataException("Mục nội dung này không thuộc tài liệu id: " + documentId);
         }
         return node;
     }

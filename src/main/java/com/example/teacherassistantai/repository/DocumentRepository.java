@@ -19,6 +19,8 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
 
     Optional<Document> findByMarkdownObjectKey(String markdownObjectKey);
 
+    boolean existsBySubjectId(Long subjectId);
+
     @Query("""
             SELECT d.id AS id,
                    d.originalObjectKey AS originalObjectKey,

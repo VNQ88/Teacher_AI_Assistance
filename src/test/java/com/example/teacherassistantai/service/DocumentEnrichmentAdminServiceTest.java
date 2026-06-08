@@ -114,7 +114,7 @@ class DocumentEnrichmentAdminServiceTest {
 
         assertThatThrownBy(() -> adminService.enrichNode(10L, 100L, null))
                 .isInstanceOf(InvalidDataException.class)
-                .hasMessageContaining("does not belong");
+                .hasMessageContaining("Mục nội dung này không thuộc tài liệu");
     }
 
     @Test
