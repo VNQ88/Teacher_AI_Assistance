@@ -22,6 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import org.springframework.data.redis.core.RedisTemplate;
@@ -70,6 +72,7 @@ public class DocumentEnrichmentService {
     private final AiModelRoutingService aiModelRoutingService;
     private final OriginalSummaryNodeService originalSummaryNodeService;
     private final DocumentReadinessService documentReadinessService;
+    private final DocumentNodeArtifactEmbeddingService artifactEmbeddingService;
 
     @Async("documentEnrichmentExecutor")
     public void enqueueDocumentEnrichment(Long documentId) {
@@ -407,6 +410,7 @@ public class DocumentEnrichmentService {
                 )
                 .orElse(null);
         if (!forceRegenerate && existing != null && existing.getStatus() == DocumentNodeArtifactStatus.COMPLETED) {
+            enqueueSummaryRetrievalEmbedding(existing);
             return ArtifactOutcome.existingCompleted();
         }
 
@@ -427,6 +431,7 @@ public class DocumentEnrichmentService {
         try {
             existing = upsertArtifact(existing, document, node, DocumentNodeArtifactType.SUMMARY, promptVersion, model, sourceHash,
                     DocumentNodeArtifactStatus.RUNNING, pendingContent(node, DocumentNodeArtifactType.SUMMARY, sourceHash), null, null);
+            clearSummaryRetrievalEmbedding(existing);
             SummaryGenerationContext context = new SummaryGenerationContext(
                     document,
                     node,
@@ -438,8 +443,9 @@ public class DocumentEnrichmentService {
             );
             DocumentNodeArtifactGenerationResult result = generator.generateSummary(context);
             Map<String, Object> completedContent = completedSummaryContent(result.contentJsonb(), input);
-            upsertArtifact(existing, document, node, DocumentNodeArtifactType.SUMMARY, promptVersion, model, sourceHash,
+            DocumentNodeArtifact completed = upsertArtifact(existing, document, node, DocumentNodeArtifactType.SUMMARY, promptVersion, model, sourceHash,
                     DocumentNodeArtifactStatus.COMPLETED, completedContent, null, result.tokenCount());
+            enqueueSummaryRetrievalEmbedding(completed);
             return ArtifactOutcome.generatedCompleted();
         } catch (BackgroundRateLimitedException ex) {
             log.info("Artifact RATE_LIMITED nodeId={} until={}", node.getId(), ex.getPausedUntil());
@@ -983,6 +989,30 @@ public class DocumentEnrichmentService {
             artifact.setTokenCount(tokenCount);
             return artifactRepository.save(artifact);
         });
+    }
+
+    private void clearSummaryRetrievalEmbedding(DocumentNodeArtifact artifact) {
+        if (artifact == null || artifact.getId() == null) {
+            return;
+        }
+        artifactEmbeddingService.clearRetrievalEmbedding(artifact.getId());
+    }
+
+    private void enqueueSummaryRetrievalEmbedding(DocumentNodeArtifact artifact) {
+        if (artifact == null || artifact.getId() == null) {
+            return;
+        }
+        Runnable task = () -> artifactEmbeddingService.embedCompletedSummaryArtifactAsync(artifact.getId());
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    task.run();
+                }
+            });
+            return;
+        }
+        task.run();
     }
 
     private Map<String, Object> skippedContent(DocumentNode node,

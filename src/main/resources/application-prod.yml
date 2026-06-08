@@ -102,6 +102,14 @@ application:
       scoped-vector:
         enabled: true
         min-confidence: 0.85
+      coarse-to-fine:
+        enabled: ${RAG_COARSE_TO_FINE_ENABLED:true}
+        coarse-top-k: 4
+        fine-candidate-top-k-per-node: 8
+        flat-guardrail-candidate-top-k: 8
+        max-coarse-distance: 0.0
+        max-fine-candidates: 32
+        include-document-root: false
     enrichment:
       enabled: true
       auto-run-after-ready: true

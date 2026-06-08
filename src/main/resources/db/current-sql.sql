@@ -1,5 +1,7 @@
 -- we don't know how to generate root <with-no-name> (class Root) :(
 
+create extension if not exists vector;
+
 comment on database postgres is 'default administrative connection database';
 
 -- Unknown how to generate base type type
@@ -354,6 +356,11 @@ create table document_node_artifacts
             check ((artifact_type)::text = ANY
         ((ARRAY ['SUMMARY'::character varying, 'REVIEW_QUESTION_SET'::character varying])::text[])),
     content_jsonb    jsonb        not null,
+    retrieval_text   text,
+    retrieval_text_hash varchar(128),
+    embedding        vector(1024),
+    embedding_model  varchar(120),
+    embedding_dimensions integer,
     error_message    text,
     model            varchar(120) not null,
     prompt_version   varchar(80)  not null,
@@ -378,9 +385,31 @@ create table document_node_artifacts
 alter table document_node_artifacts
     owner to postgres;
 
+comment on column document_node_artifacts.retrieval_text is
+    'Text used to generate the coarse retrieval embedding for this artifact.';
+
+comment on column document_node_artifacts.retrieval_text_hash is
+    'Hash of retrieval_text used to skip unchanged artifact embedding work.';
+
+comment on column document_node_artifacts.embedding is
+    'Coarse retrieval embedding generated from retrieval_text.';
+
+comment on column document_node_artifacts.embedding_model is
+    'Embedding model used for artifact coarse retrieval embedding.';
+
+comment on column document_node_artifacts.embedding_dimensions is
+    'Embedding vector dimension used for artifact coarse retrieval embedding.';
+
 create index idx_node_artifacts_document_type_status
     on document_node_artifacts (document_id, artifact_type, status);
 
 create index idx_node_artifacts_node_type
     on document_node_artifacts (document_node_id, artifact_type);
 
+create index idx_node_artifacts_embedding_hnsw
+    on document_node_artifacts using hnsw (embedding vector_cosine_ops)
+    where (embedding IS NOT NULL);
+
+create index idx_node_artifacts_embedding_model
+    on document_node_artifacts (embedding_model, embedding_dimensions)
+    where (embedding IS NOT NULL);

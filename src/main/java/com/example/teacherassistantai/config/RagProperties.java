@@ -281,6 +281,8 @@ public class RagProperties {
     public static class Retrieval {
         private ScopedVector scopedVector = new ScopedVector();
 
+        private CoarseToFine coarseToFine = new CoarseToFine();
+
         @Data
         public static class ScopedVector {
             private boolean enabled = true;
@@ -288,6 +290,28 @@ public class RagProperties {
             @DecimalMin("0.0")
             @DecimalMax("1.0")
             private double minConfidence = 0.85;
+        }
+
+        @Data
+        public static class CoarseToFine {
+            private boolean enabled = true;
+
+            @Min(1)
+            private int coarseTopK = 4;
+
+            @Min(1)
+            private int fineCandidateTopKPerNode = 8;
+
+            @Min(1)
+            private int flatGuardrailCandidateTopK = 8;
+
+            @DecimalMin("0.0")
+            private double maxCoarseDistance = 0.0;
+
+            @Min(1)
+            private int maxFineCandidates = 32;
+
+            private boolean includeDocumentRoot = false;
         }
     }
 }
