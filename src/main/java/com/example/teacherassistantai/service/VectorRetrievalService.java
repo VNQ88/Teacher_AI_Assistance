@@ -8,10 +8,12 @@ import com.example.teacherassistantai.entity.DocumentNode;
 import com.example.teacherassistantai.exception.InvalidDataException;
 import com.example.teacherassistantai.integration.ai.AiEmbeddingGateway;
 import com.example.teacherassistantai.repository.DocumentChunkRepository;
+import com.example.teacherassistantai.repository.DocumentNodeArtifactRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,6 +29,7 @@ public class VectorRetrievalService {
     private final RagProperties ragProperties;
     private final LocalRerankingService localRerankingService;
     private final RagScopeResolverService ragScopeResolverService;
+    private final CoarseNodeSearchService coarseNodeSearchService;
 
     public List<DocumentChunk> retrieve(ChatSession session, String question, int topK) {
         return retrieveTrace(session, question, topK).selected();
@@ -46,6 +49,13 @@ public class VectorRetrievalService {
                 .policyCandidateCount(trace.policyCandidates().size())
                 .selectedCount(trace.selected().size())
                 .selectedChunkTypes(selectedTypeDistribution)
+                .coarseHitCount(trace.coarseTrace().coarseHits().size())
+                .coarseHits(trace.coarseTrace().coarseHits().stream()
+                        .map(this::toDebugCoarseHit)
+                        .toList())
+                .fineCandidateCount(trace.coarseTrace().fineCandidateCount())
+                .flatGuardrailCandidateCount(trace.coarseTrace().flatGuardrailCandidateCount())
+                .fallbackReason(trace.coarseTrace().fallbackReason())
                 .parentGroups(trace.parentGroups().stream()
                         .map(this::toDebugParentGroup)
                         .toList())
@@ -69,6 +79,9 @@ public class VectorRetrievalService {
         String queryVectorLiteral = queryVectorLiteral(question);
         if (scopedNode != null) {
             return doScopedVector(session, question, intent, safeTopK, candidateTopK, scopedNode, queryVectorLiteral);
+        }
+        if (ragProperties.getRetrieval().getCoarseToFine().isEnabled()) {
+            return doCoarseToFineVector(session, question, intent, safeTopK, candidateTopK, queryVectorLiteral);
         }
         return doFlatVector(session, question, intent, safeTopK, candidateTopK, queryVectorLiteral, RetrievalMode.FLAT_VECTOR, null);
     }
@@ -121,8 +134,7 @@ public class VectorRetrievalService {
                 localRerankingService.rerank(question, candidates, intent, safeTopK);
         List<DocumentChunk> selected = rerankResult.selected();
 
-        logRetrievalDiagnostics(question, intent, candidates, rerankResult.policyCandidates(), selected);
-        return new RetrievalTrace(
+        RetrievalTrace trace = new RetrievalTrace(
                 intent,
                 candidates,
                 rerankResult.scored(),
@@ -130,8 +142,108 @@ public class VectorRetrievalService {
                 rerankResult.parentGroups(),
                 selected,
                 RetrievalMode.SCOPED_VECTOR,
-                scopedNode.getId()
+                scopedNode.getId(),
+                CoarseTrace.empty()
         );
+        logRetrievalDiagnostics(question, trace);
+        return trace;
+    }
+
+    private RetrievalTrace doCoarseToFineVector(ChatSession session,
+                                                String question,
+                                                LocalRerankingService.RetrievalIntent intent,
+                                                int safeTopK,
+                                                int candidateTopK,
+                                                String queryVectorLiteral) {
+        Long subjectId = session.getSubject().getId();
+        List<DocumentNodeArtifactRepository.CoarseNodeHit> coarseHits;
+        try {
+            coarseHits = safeList(coarseNodeSearchService.search(subjectId, queryVectorLiteral));
+        } catch (RuntimeException ex) {
+            log.warn("Coarse retrieval search failed - fallback flat: subjectId={}", subjectId, ex);
+            return doFlatVector(session, question, intent, safeTopK, candidateTopK, queryVectorLiteral,
+                    RetrievalMode.COARSE_TO_FINE_EMPTY_FALLBACK, null,
+                    new CoarseTrace(List.of(), 0, 0, "COARSE_SEARCH_ERROR"));
+        }
+
+        if (coarseHits.isEmpty()) {
+            return doFlatVector(session, question, intent, safeTopK, candidateTopK, queryVectorLiteral,
+                    RetrievalMode.COARSE_TO_FINE_EMPTY_FALLBACK, null,
+                    new CoarseTrace(coarseHits, 0, 0, "NO_COARSE_HITS"));
+        }
+
+        RagProperties.Retrieval.CoarseToFine config = ragProperties.getRetrieval().getCoarseToFine();
+        int perNodeTopK = Math.max(1, config.getFineCandidateTopKPerNode());
+        int maxFineCandidates = Math.max(1, config.getMaxFineCandidates());
+        List<DocumentChunk> fineCandidates = new ArrayList<>();
+        for (DocumentNodeArtifactRepository.CoarseNodeHit hit : coarseHits) {
+            if (fineCandidates.size() >= maxFineCandidates) {
+                break;
+            }
+            Long nodeId = hit.getNodeId();
+            if (nodeId == null) {
+                continue;
+            }
+            int remaining = maxFineCandidates - fineCandidates.size();
+            int nodeLimit = Math.min(perNodeTopK, remaining);
+            fineCandidates.addAll(safeList(documentChunkRepository.searchByNodeSubtreeVector(
+                    subjectId,
+                    nodeId,
+                    queryVectorLiteral,
+                    ragProperties.getMinChunkChars(),
+                    nodeLimit
+            )));
+        }
+
+        if (fineCandidates.isEmpty()) {
+            return doFlatVector(session, question, intent, safeTopK, candidateTopK, queryVectorLiteral,
+                    RetrievalMode.COARSE_TO_FINE_INSUFFICIENT_FALLBACK, null,
+                    new CoarseTrace(coarseHits, 0, 0, "NO_FINE_CANDIDATES"));
+        }
+
+        int guardrailTopK = Math.max(1, config.getFlatGuardrailCandidateTopK());
+        List<DocumentChunk> flatGuardrailCandidates = documentChunkRepository.searchBySubjectVector(
+                subjectId,
+                queryVectorLiteral,
+                ragProperties.getMinChunkChars(),
+                guardrailTopK,
+                intent.sectionNumber()
+        );
+        List<DocumentChunk> mergedCandidates = dedupeChunks(fineCandidates, flatGuardrailCandidates);
+
+        LocalRerankingService.RerankResult rerankResult =
+                localRerankingService.rerank(question, mergedCandidates, intent, safeTopK);
+        List<DocumentChunk> selected = rerankResult.selected();
+        CoarseTrace coarseTrace = new CoarseTrace(
+                coarseHits,
+                fineCandidates.size(),
+                flatGuardrailCandidates == null ? 0 : flatGuardrailCandidates.size(),
+                null
+        );
+        if (selected.isEmpty()) {
+            return doFlatVector(session, question, intent, safeTopK, candidateTopK, queryVectorLiteral,
+                    RetrievalMode.COARSE_TO_FINE_ZERO_SELECTED_FALLBACK, null,
+                    new CoarseTrace(
+                            coarseHits,
+                            fineCandidates.size(),
+                            flatGuardrailCandidates == null ? 0 : flatGuardrailCandidates.size(),
+                            "ZERO_SELECTED_CHUNKS"
+                    ));
+        }
+
+        RetrievalTrace trace = new RetrievalTrace(
+                intent,
+                mergedCandidates,
+                rerankResult.scored(),
+                rerankResult.policyCandidates(),
+                rerankResult.parentGroups(),
+                selected,
+                RetrievalMode.COARSE_TO_FINE_VECTOR,
+                null,
+                coarseTrace
+        );
+        logRetrievalDiagnostics(question, trace);
+        return trace;
     }
 
     private RetrievalTrace doFlatVector(ChatSession session,
@@ -142,6 +254,19 @@ public class VectorRetrievalService {
                                         String queryVectorLiteral,
                                         RetrievalMode retrievalMode,
                                         Long scopedNodeId) {
+        return doFlatVector(session, question, intent, safeTopK, candidateTopK, queryVectorLiteral,
+                retrievalMode, scopedNodeId, CoarseTrace.empty());
+    }
+
+    private RetrievalTrace doFlatVector(ChatSession session,
+                                        String question,
+                                        LocalRerankingService.RetrievalIntent intent,
+                                        int safeTopK,
+                                        int candidateTopK,
+                                        String queryVectorLiteral,
+                                        RetrievalMode retrievalMode,
+                                        Long scopedNodeId,
+                                        CoarseTrace coarseTrace) {
         List<DocumentChunk> candidates = documentChunkRepository.searchBySubjectVector(
                 session.getSubject().getId(),
                 queryVectorLiteral,
@@ -154,8 +279,7 @@ public class VectorRetrievalService {
                 localRerankingService.rerank(question, candidates, intent, safeTopK);
         List<DocumentChunk> selected = rerankResult.selected();
 
-        logRetrievalDiagnostics(question, intent, candidates, rerankResult.policyCandidates(), selected);
-        return new RetrievalTrace(
+        RetrievalTrace trace = new RetrievalTrace(
                 intent,
                 candidates,
                 rerankResult.scored(),
@@ -163,8 +287,11 @@ public class VectorRetrievalService {
                 rerankResult.parentGroups(),
                 selected,
                 retrievalMode,
-                scopedNodeId
+                scopedNodeId,
+                coarseTrace
         );
+        logRetrievalDiagnostics(question, trace);
+        return trace;
     }
 
     private String queryVectorLiteral(String question) {
@@ -190,14 +317,13 @@ public class VectorRetrievalService {
         }
     }
 
-    private void logRetrievalDiagnostics(String question,
-                                         LocalRerankingService.RetrievalIntent intent,
-                                         List<DocumentChunk> candidates,
-                                         List<LocalRerankingService.ScoredChunk> policyCandidates,
-                                         List<DocumentChunk> selected) {
+    private void logRetrievalDiagnostics(String question, RetrievalTrace trace) {
         if (!log.isDebugEnabled()) {
             return;
         }
+        LocalRerankingService.RetrievalIntent intent = trace.intent();
+        List<DocumentChunk> candidates = trace.candidates();
+        List<DocumentChunk> selected = trace.selected();
         long sectionMatches = selected.stream()
                 .filter(c -> localRerankingService.containsSectionNumber(c.getContent(), intent.sectionNumber())
                         || localRerankingService.containsSectionNumber(c.getSectionPath(), intent.sectionNumber()))
@@ -208,16 +334,63 @@ public class VectorRetrievalService {
                 .count();
         Map<String, Long> selectedTypeDistribution = selected.stream()
                 .collect(java.util.stream.Collectors.groupingBy(localRerankingService::chunkType, LinkedHashMap::new, java.util.stream.Collectors.counting()));
-        log.debug("RAG retrieval diagnostics: question='{}', intentType={}, sectionIntent={}, candidates={}, policyCandidates={}, selected={}, parentGroups={}, sectionMatches={}, selectedTypes={}",
+        List<Long> coarseHitNodes = trace.coarseTrace().coarseHits().stream()
+                .map(DocumentNodeArtifactRepository.CoarseNodeHit::getNodeId)
+                .toList();
+        log.debug("RAG retrieval diagnostics: mode={}, question='{}', intentType={}, sectionIntent={}, candidates={}, policyCandidates={}, selected={}, parentGroups={}, sectionMatches={}, selectedTypes={}, coarseHitNodes={}, fineCandidates={}, flatGuardrailCandidates={}, fallbackReason={}",
+                trace.retrievalMode(),
                 question,
                 intent.type(),
                 intent.sectionNumber(),
                 candidates.size(),
-                policyCandidates.size(),
+                trace.policyCandidates().size(),
                 selected.size(),
                 selectedParents,
                 sectionMatches,
-                selectedTypeDistribution);
+                selectedTypeDistribution,
+                coarseHitNodes,
+                trace.coarseTrace().fineCandidateCount(),
+                trace.coarseTrace().flatGuardrailCandidateCount(),
+                trace.coarseTrace().fallbackReason());
+    }
+
+    @SafeVarargs
+    private List<DocumentChunk> dedupeChunks(List<DocumentChunk>... sources) {
+        Map<String, DocumentChunk> byKey = new LinkedHashMap<>();
+        for (List<DocumentChunk> source : sources) {
+            if (source == null) {
+                continue;
+            }
+            for (DocumentChunk chunk : source) {
+                if (chunk == null) {
+                    continue;
+                }
+                byKey.putIfAbsent(chunkKey(chunk), chunk);
+            }
+        }
+        return List.copyOf(byKey.values());
+    }
+
+    private String chunkKey(DocumentChunk chunk) {
+        return chunk.getId() == null
+                ? "identity:" + System.identityHashCode(chunk)
+                : "id:" + chunk.getId();
+    }
+
+    private <T> List<T> safeList(List<T> values) {
+        return values == null ? List.of() : values;
+    }
+
+    private RagDebugRetrieveResponse.CoarseHit toDebugCoarseHit(DocumentNodeArtifactRepository.CoarseNodeHit hit) {
+        return RagDebugRetrieveResponse.CoarseHit.builder()
+                .artifactId(hit.getArtifactId())
+                .nodeId(hit.getNodeId())
+                .documentId(hit.getDocumentId())
+                .documentTitle(hit.getDocumentTitle())
+                .nodeType(hit.getNodeType())
+                .sectionPath(hit.getSectionPath())
+                .distance(hit.getDistance())
+                .build();
     }
 
     private RagDebugRetrieveResponse.ParentGroup toDebugParentGroup(LocalRerankingService.ScoredParentGroup group) {
@@ -320,7 +493,11 @@ public class VectorRetrievalService {
     private enum RetrievalMode {
         FLAT_VECTOR,
         SCOPED_VECTOR,
-        SCOPED_EMPTY_FALLBACK
+        SCOPED_EMPTY_FALLBACK,
+        COARSE_TO_FINE_VECTOR,
+        COARSE_TO_FINE_EMPTY_FALLBACK,
+        COARSE_TO_FINE_INSUFFICIENT_FALLBACK,
+        COARSE_TO_FINE_ZERO_SELECTED_FALLBACK
     }
 
     private record RetrievalTrace(
@@ -331,7 +508,26 @@ public class VectorRetrievalService {
             List<LocalRerankingService.ScoredParentGroup> parentGroups,
             List<DocumentChunk> selected,
             RetrievalMode retrievalMode,
-            Long scopedNodeId
+            Long scopedNodeId,
+            CoarseTrace coarseTrace
     ) {
+        private RetrievalTrace {
+            coarseTrace = coarseTrace == null ? CoarseTrace.empty() : coarseTrace;
+        }
+    }
+
+    private record CoarseTrace(
+            List<DocumentNodeArtifactRepository.CoarseNodeHit> coarseHits,
+            int fineCandidateCount,
+            int flatGuardrailCandidateCount,
+            String fallbackReason
+    ) {
+        private CoarseTrace {
+            coarseHits = coarseHits == null ? List.of() : List.copyOf(coarseHits);
+        }
+
+        static CoarseTrace empty() {
+            return new CoarseTrace(List.of(), 0, 0, null);
+        }
     }
 }

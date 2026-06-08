@@ -3,7 +3,9 @@ package com.example.teacherassistantai.service;
 import com.example.teacherassistantai.common.enumerate.DocumentEnrichmentStatus;
 import com.example.teacherassistantai.common.enumerate.DocumentNodeArtifactType;
 import com.example.teacherassistantai.common.enumerate.DocumentStatus;
+import com.example.teacherassistantai.dto.request.DocumentArtifactEmbeddingBackfillRequest;
 import com.example.teacherassistantai.dto.request.DocumentEnrichmentRequest;
+import com.example.teacherassistantai.dto.response.DocumentArtifactEmbeddingBackfillResponse;
 import com.example.teacherassistantai.dto.response.DocumentEnrichmentJobResponse;
 import com.example.teacherassistantai.dto.response.DocumentNodeArtifactResponse;
 import com.example.teacherassistantai.entity.Document;
@@ -31,6 +33,7 @@ public class DocumentEnrichmentAdminService {
     private final DocumentNodeRepository documentNodeRepository;
     private final DocumentNodeArtifactRepository artifactRepository;
     private final DocumentEnrichmentService enrichmentService;
+    private final DocumentNodeArtifactEmbeddingService artifactEmbeddingService;
 
     @Transactional(readOnly = true)
     public List<DocumentNodeArtifactResponse> getDocumentArtifacts(Long documentId) {
@@ -90,6 +93,50 @@ public class DocumentEnrichmentAdminService {
         document.setEnrichmentCompletedAt(null);
         document.setEnrichmentError(null);
         documentRepository.save(document);
+    }
+
+    @Transactional(readOnly = true)
+    public DocumentArtifactEmbeddingBackfillResponse getArtifactEmbeddingCoverage(Long documentId, Long subjectId) {
+        if (documentId != null) {
+            ensureDocumentExists(documentId);
+        }
+        return artifactEmbeddingResponse(
+                documentId,
+                subjectId,
+                null,
+                null,
+                false,
+                "Artifact embedding coverage",
+                artifactEmbeddingService.retrievalEmbeddingCoverage(documentId, subjectId)
+        );
+    }
+
+    @Transactional
+    public DocumentArtifactEmbeddingBackfillResponse queueArtifactEmbeddingBackfill(Long documentId,
+                                                                                   Long subjectId,
+                                                                                   DocumentArtifactEmbeddingBackfillRequest request) {
+        if (documentId != null) {
+            ensureDocumentExists(documentId);
+        }
+        int batchSize = request == null || request.getBatchSize() == null ? 25 : request.getBatchSize();
+        int maxBatches = request == null || request.getMaxBatches() == null ? 1 : request.getMaxBatches();
+        DocumentNodeArtifactEmbeddingService.RetrievalEmbeddingCoverage coverage =
+                artifactEmbeddingService.retrievalEmbeddingCoverage(documentId, subjectId);
+        enqueueAfterCommit(() -> artifactEmbeddingService.enqueueCompletedSummaryEmbeddingBackfill(
+                documentId,
+                subjectId,
+                batchSize,
+                maxBatches
+        ));
+        return artifactEmbeddingResponse(
+                documentId,
+                subjectId,
+                batchSize,
+                maxBatches,
+                true,
+                "Artifact embedding backfill queued",
+                coverage
+        );
     }
 
     private Document markQueued(Long documentId, boolean forceRegenerate) {
@@ -161,6 +208,30 @@ public class DocumentEnrichmentAdminService {
                 .forceRegenerate(forceRegenerate)
                 .message(message)
                 .queuedAt(LocalDateTime.now())
+                .build();
+    }
+
+    private DocumentArtifactEmbeddingBackfillResponse artifactEmbeddingResponse(
+            Long documentId,
+            Long subjectId,
+            Integer batchSize,
+            Integer maxBatches,
+            boolean queued,
+            String message,
+            DocumentNodeArtifactEmbeddingService.RetrievalEmbeddingCoverage coverage) {
+        return DocumentArtifactEmbeddingBackfillResponse.builder()
+                .documentId(documentId)
+                .subjectId(subjectId)
+                .batchSize(batchSize)
+                .maxBatches(maxBatches)
+                .queued(queued)
+                .message(message)
+                .queuedAt(queued ? LocalDateTime.now() : null)
+                .totalCompletedSummaries(coverage.totalCompletedSummaries())
+                .embeddedCurrent(coverage.embeddedCurrent())
+                .pending(coverage.pending())
+                .embeddingModel(coverage.embeddingModel())
+                .embeddingDimensions(coverage.embeddingDimensions())
                 .build();
     }
 

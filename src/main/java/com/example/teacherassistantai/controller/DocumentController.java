@@ -3,8 +3,10 @@ package com.example.teacherassistantai.controller;
 import com.example.teacherassistantai.common.enumerate.DocumentStatus;
 import com.example.teacherassistantai.common.response.PageResponse;
 import com.example.teacherassistantai.common.response.ResponseData;
+import com.example.teacherassistantai.dto.request.DocumentArtifactEmbeddingBackfillRequest;
 import com.example.teacherassistantai.dto.request.DocumentEnrichmentRequest;
 import com.example.teacherassistantai.dto.request.UpdateDocumentRequest;
+import com.example.teacherassistantai.dto.response.DocumentArtifactEmbeddingBackfillResponse;
 import com.example.teacherassistantai.dto.response.DocumentChunkDebugResponse;
 import com.example.teacherassistantai.dto.response.DocumentEnrichmentJobResponse;
 import com.example.teacherassistantai.dto.response.DocumentHierarchyDebugResponse;
@@ -57,6 +59,26 @@ public class DocumentController {
         log.info("Upload document: subjectId={}, originalName={}", subjectId, file.getOriginalFilename());
         DocumentResponse response = documentService.uploadDocument(file, subjectId, title, description);
         return new ResponseData<>(HttpStatus.CREATED.value(), "Document uploaded", response);
+    }
+
+    @GetMapping("/artifact-embeddings/stats")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
+    @Operation(summary = "Get artifact embedding coverage", description = "Return completed summary artifact embedding coverage, optionally scoped by subject")
+    public ResponseData<DocumentArtifactEmbeddingBackfillResponse> getArtifactEmbeddingCoverage(
+            @RequestParam(required = false) Long subjectId) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Artifact embedding coverage",
+                documentEnrichmentAdminService.getArtifactEmbeddingCoverage(null, subjectId));
+    }
+
+    @PostMapping("/artifact-embeddings/backfill")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
+    @Operation(summary = "Queue artifact embedding backfill", description = "Queue summary artifact embedding backfill for all documents or one subject")
+    public ResponseData<DocumentArtifactEmbeddingBackfillResponse> backfillArtifactEmbeddings(
+            @RequestParam(required = false) Long subjectId,
+            @RequestBody(required = false) @Valid DocumentArtifactEmbeddingBackfillRequest request) {
+        log.info("Queue artifact embedding backfill: subjectId={}, request={}", subjectId, request);
+        return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Artifact embedding backfill queued",
+                documentEnrichmentAdminService.queueArtifactEmbeddingBackfill(null, subjectId, request));
     }
 
     @GetMapping("/{documentId}")
@@ -134,6 +156,26 @@ public class DocumentController {
     public ResponseData<java.util.List<DocumentNodeArtifactResponse>> getDocumentArtifacts(@PathVariable @Min(1) Long documentId) {
         return new ResponseData<>(HttpStatus.OK.value(), "Document artifacts",
                 documentEnrichmentAdminService.getDocumentArtifacts(documentId));
+    }
+
+    @GetMapping("/{documentId}/artifact-embeddings/stats")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
+    @Operation(summary = "Get document artifact embedding coverage", description = "Return completed summary artifact embedding coverage for one document")
+    public ResponseData<DocumentArtifactEmbeddingBackfillResponse> getDocumentArtifactEmbeddingCoverage(
+            @PathVariable @Min(1) Long documentId) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Document artifact embedding coverage",
+                documentEnrichmentAdminService.getArtifactEmbeddingCoverage(documentId, null));
+    }
+
+    @PostMapping("/{documentId}/artifact-embeddings/backfill")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
+    @Operation(summary = "Queue document artifact embedding backfill", description = "Queue summary artifact embedding backfill for one document")
+    public ResponseData<DocumentArtifactEmbeddingBackfillResponse> backfillDocumentArtifactEmbeddings(
+            @PathVariable @Min(1) Long documentId,
+            @RequestBody(required = false) @Valid DocumentArtifactEmbeddingBackfillRequest request) {
+        log.info("Queue document artifact embedding backfill: documentId={}, request={}", documentId, request);
+        return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Document artifact embedding backfill queued",
+                documentEnrichmentAdminService.queueArtifactEmbeddingBackfill(documentId, null, request));
     }
 
     @GetMapping("/{documentId}/nodes/{nodeId}/artifacts")

@@ -4,7 +4,9 @@ import com.example.teacherassistantai.common.enumerate.DocumentEnrichmentStatus;
 import com.example.teacherassistantai.common.enumerate.DocumentNodeArtifactStatus;
 import com.example.teacherassistantai.common.enumerate.DocumentNodeArtifactType;
 import com.example.teacherassistantai.common.enumerate.DocumentStatus;
+import com.example.teacherassistantai.dto.request.DocumentArtifactEmbeddingBackfillRequest;
 import com.example.teacherassistantai.dto.request.DocumentEnrichmentRequest;
+import com.example.teacherassistantai.dto.response.DocumentArtifactEmbeddingBackfillResponse;
 import com.example.teacherassistantai.dto.response.DocumentEnrichmentJobResponse;
 import com.example.teacherassistantai.dto.response.DocumentNodeArtifactResponse;
 import com.example.teacherassistantai.entity.Document;
@@ -27,6 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class DocumentEnrichmentAdminServiceTest {
@@ -35,6 +38,7 @@ class DocumentEnrichmentAdminServiceTest {
     private DocumentNodeRepository documentNodeRepository;
     private DocumentNodeArtifactRepository artifactRepository;
     private DocumentEnrichmentService enrichmentService;
+    private DocumentNodeArtifactEmbeddingService artifactEmbeddingService;
     private DocumentEnrichmentAdminService adminService;
 
     @BeforeEach
@@ -43,11 +47,13 @@ class DocumentEnrichmentAdminServiceTest {
         documentNodeRepository = mock(DocumentNodeRepository.class);
         artifactRepository = mock(DocumentNodeArtifactRepository.class);
         enrichmentService = mock(DocumentEnrichmentService.class);
+        artifactEmbeddingService = mock(DocumentNodeArtifactEmbeddingService.class);
         adminService = new DocumentEnrichmentAdminService(
                 documentRepository,
                 documentNodeRepository,
                 artifactRepository,
-                enrichmentService
+                enrichmentService,
+                artifactEmbeddingService
         );
     }
 
@@ -128,6 +134,86 @@ class DocumentEnrichmentAdminServiceTest {
         assertThat(document.getStatus()).isEqualTo(DocumentStatus.READY);
         assertThat(document.getEnrichmentStatus()).isEqualTo(DocumentEnrichmentStatus.NOT_STARTED);
         assertThat(document.getEnrichmentError()).isNull();
+    }
+
+    @Test
+    void getArtifactEmbeddingCoverage_returnsDocumentScopedStats() {
+        Document document = document(DocumentStatus.READY);
+        when(documentRepository.findById(10L)).thenReturn(Optional.of(document));
+        when(artifactEmbeddingService.retrievalEmbeddingCoverage(10L, null))
+                .thenReturn(new DocumentNodeArtifactEmbeddingService.RetrievalEmbeddingCoverage(
+                        12,
+                        8,
+                        4,
+                        "embed-v1",
+                        1024
+                ));
+
+        DocumentArtifactEmbeddingBackfillResponse response =
+                adminService.getArtifactEmbeddingCoverage(10L, null);
+
+        assertThat(response.getDocumentId()).isEqualTo(10L);
+        assertThat(response.getTotalCompletedSummaries()).isEqualTo(12);
+        assertThat(response.getEmbeddedCurrent()).isEqualTo(8);
+        assertThat(response.getPending()).isEqualTo(4);
+        assertThat(response.getEmbeddingModel()).isEqualTo("embed-v1");
+        assertThat(response.getEmbeddingDimensions()).isEqualTo(1024);
+        assertThat(response.getQueued()).isFalse();
+        assertThat(response.getQueuedAt()).isNull();
+    }
+
+    @Test
+    void queueArtifactEmbeddingBackfill_returnsStatsAndDispatchesAsyncBackfill() {
+        Document document = document(DocumentStatus.READY);
+        when(documentRepository.findById(10L)).thenReturn(Optional.of(document));
+        when(artifactEmbeddingService.retrievalEmbeddingCoverage(10L, null))
+                .thenReturn(new DocumentNodeArtifactEmbeddingService.RetrievalEmbeddingCoverage(
+                        12,
+                        8,
+                        4,
+                        "embed-v1",
+                        1024
+                ));
+        DocumentArtifactEmbeddingBackfillRequest request = new DocumentArtifactEmbeddingBackfillRequest();
+        request.setBatchSize(20);
+        request.setMaxBatches(3);
+
+        DocumentArtifactEmbeddingBackfillResponse response =
+                adminService.queueArtifactEmbeddingBackfill(10L, null, request);
+
+        assertThat(response.getDocumentId()).isEqualTo(10L);
+        assertThat(response.getBatchSize()).isEqualTo(20);
+        assertThat(response.getMaxBatches()).isEqualTo(3);
+        assertThat(response.getPending()).isEqualTo(4);
+        assertThat(response.getQueued()).isTrue();
+        assertThat(response.getQueuedAt()).isNotNull();
+        verify(artifactEmbeddingService).enqueueCompletedSummaryEmbeddingBackfill(10L, null, 20, 3);
+    }
+
+    @Test
+    void queueArtifactEmbeddingBackfill_usesDefaultsForSubjectScope() {
+        when(artifactEmbeddingService.retrievalEmbeddingCoverage(null, 7L))
+                .thenReturn(new DocumentNodeArtifactEmbeddingService.RetrievalEmbeddingCoverage(
+                        5,
+                        2,
+                        3,
+                        "embed-v1",
+                        1024
+                ));
+
+        DocumentArtifactEmbeddingBackfillResponse response =
+                adminService.queueArtifactEmbeddingBackfill(null, 7L, null);
+
+        assertThat(response.getDocumentId()).isNull();
+        assertThat(response.getSubjectId()).isEqualTo(7L);
+        assertThat(response.getBatchSize()).isEqualTo(25);
+        assertThat(response.getMaxBatches()).isEqualTo(1);
+        assertThat(response.getTotalCompletedSummaries()).isEqualTo(5);
+        assertThat(response.getEmbeddedCurrent()).isEqualTo(2);
+        assertThat(response.getPending()).isEqualTo(3);
+        assertThat(response.getQueued()).isTrue();
+        verifyNoInteractions(documentRepository);
+        verify(artifactEmbeddingService).enqueueCompletedSummaryEmbeddingBackfill(null, 7L, 25, 1);
     }
 
     private Document document(DocumentStatus status) {

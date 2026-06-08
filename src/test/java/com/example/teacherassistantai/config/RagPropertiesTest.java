@@ -39,6 +39,13 @@ class RagPropertiesTest {
             assertThat(properties.getEnrichment().getReviewQuestionComposition().getMaxQuestionsPerChapterInDocument()).isEqualTo(3);
             assertThat(properties.getRetrieval().getScopedVector().isEnabled()).isTrue();
             assertThat(properties.getRetrieval().getScopedVector().getMinConfidence()).isEqualTo(0.85);
+            assertThat(properties.getRetrieval().getCoarseToFine().isEnabled()).isTrue();
+            assertThat(properties.getRetrieval().getCoarseToFine().getCoarseTopK()).isEqualTo(4);
+            assertThat(properties.getRetrieval().getCoarseToFine().getFineCandidateTopKPerNode()).isEqualTo(8);
+            assertThat(properties.getRetrieval().getCoarseToFine().getFlatGuardrailCandidateTopK()).isEqualTo(8);
+            assertThat(properties.getRetrieval().getCoarseToFine().getMaxCoarseDistance()).isEqualTo(0.0);
+            assertThat(properties.getRetrieval().getCoarseToFine().getMaxFineCandidates()).isEqualTo(32);
+            assertThat(properties.getRetrieval().getCoarseToFine().isIncludeDocumentRoot()).isFalse();
         });
     }
 
@@ -68,7 +75,14 @@ class RagPropertiesTest {
                         "application.rag.enrichment.review-question-composition.max-questions-per-chapter-in-part=7",
                         "application.rag.enrichment.review-question-composition.max-total-questions-in-document=25",
                         "application.rag.retrieval.scoped-vector.enabled=false",
-                        "application.rag.retrieval.scoped-vector.min-confidence=0.75"
+                        "application.rag.retrieval.scoped-vector.min-confidence=0.75",
+                        "application.rag.retrieval.coarse-to-fine.enabled=false",
+                        "application.rag.retrieval.coarse-to-fine.coarse-top-k=5",
+                        "application.rag.retrieval.coarse-to-fine.fine-candidate-top-k-per-node=9",
+                        "application.rag.retrieval.coarse-to-fine.flat-guardrail-candidate-top-k=10",
+                        "application.rag.retrieval.coarse-to-fine.max-coarse-distance=0.42",
+                        "application.rag.retrieval.coarse-to-fine.max-fine-candidates=40",
+                        "application.rag.retrieval.coarse-to-fine.include-document-root=true"
                 )
                 .run(context -> {
                     RagProperties properties = context.getBean(RagProperties.class);
@@ -96,6 +110,13 @@ class RagPropertiesTest {
                     assertThat(properties.getEnrichment().getReviewQuestionComposition().getMaxTotalQuestionsInDocument()).isEqualTo(25);
                     assertThat(properties.getRetrieval().getScopedVector().isEnabled()).isFalse();
                     assertThat(properties.getRetrieval().getScopedVector().getMinConfidence()).isEqualTo(0.75);
+                    assertThat(properties.getRetrieval().getCoarseToFine().isEnabled()).isFalse();
+                    assertThat(properties.getRetrieval().getCoarseToFine().getCoarseTopK()).isEqualTo(5);
+                    assertThat(properties.getRetrieval().getCoarseToFine().getFineCandidateTopKPerNode()).isEqualTo(9);
+                    assertThat(properties.getRetrieval().getCoarseToFine().getFlatGuardrailCandidateTopK()).isEqualTo(10);
+                    assertThat(properties.getRetrieval().getCoarseToFine().getMaxCoarseDistance()).isEqualTo(0.42);
+                    assertThat(properties.getRetrieval().getCoarseToFine().getMaxFineCandidates()).isEqualTo(40);
+                    assertThat(properties.getRetrieval().getCoarseToFine().isIncludeDocumentRoot()).isTrue();
                 });
     }
 

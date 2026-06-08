@@ -9,6 +9,7 @@ import com.example.teacherassistantai.entity.DocumentNode;
 import com.example.teacherassistantai.entity.Subject;
 import com.example.teacherassistantai.integration.ai.AiEmbeddingGateway;
 import com.example.teacherassistantai.repository.DocumentChunkRepository;
+import com.example.teacherassistantai.repository.DocumentNodeArtifactRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,6 +44,9 @@ class VectorRetrievalServiceTest {
     @Mock
     private RagScopeResolverService ragScopeResolverService;
 
+    @Mock
+    private CoarseNodeSearchService coarseNodeSearchService;
+
     private RagProperties ragProperties;
 
     private VectorRetrievalService service;
@@ -60,7 +64,8 @@ class VectorRetrievalServiceTest {
                 documentChunkRepository,
                 ragProperties,
                 new LocalRerankingService(),
-                ragScopeResolverService
+                ragScopeResolverService,
+                coarseNodeSearchService
         );
     }
 
@@ -215,6 +220,7 @@ class VectorRetrievalServiceTest {
         assertEquals("FACTUAL", response.getIntentType());
         assertEquals(2, response.getSectionNumber());
         assertEquals(1, response.getCandidateCount());
+        assertEquals(0, response.getCoarseHitCount());
         assertEquals(1, response.getParentGroups().size());
         assertEquals(1, response.getSelectedChunks().size());
         assertEquals(501L, response.getSelectedChunks().getFirst().getChunkId());
@@ -249,6 +255,7 @@ class VectorRetrievalServiceTest {
         assertEquals(1, response.getCandidateCount());
         verify(documentChunkRepository).searchByNodeSubtreeVector(eq(1L), eq(42L), anyString(), eq(40), eq(24));
         verify(documentChunkRepository, never()).searchBySubjectVector(anyLong(), anyString(), anyInt(), anyInt(), org.mockito.ArgumentMatchers.<Integer>any());
+        verifyNoInteractions(coarseNodeSearchService);
     }
 
     @Test
@@ -356,6 +363,101 @@ class VectorRetrievalServiceTest {
         verify(documentChunkRepository).searchBySubjectVector(eq(1L), anyString(), eq(40), eq(24), eq(3));
     }
 
+    @Test
+    void debugRetrieve_shouldUseFlatVector_whenCoarseToFineDisabled() {
+        ragProperties.getRetrieval().getCoarseToFine().setEnabled(false);
+        when(embeddingGateway.embed(anyString())).thenReturn(vector1024());
+        DocumentChunk chunk = chunk(1101L, "TEXT",
+                "Khai niem nha nuoc la to chuc quyen luc cong.", null, 1, null);
+        when(documentChunkRepository.searchBySubjectVector(
+                eq(1L), anyString(), eq(40), eq(24), org.mockito.ArgumentMatchers.<Integer>isNull()))
+                .thenReturn(List.of(chunk));
+
+        RagDebugRetrieveResponse response = service.debugRetrieve(session(), "Khái niệm nhà nước là gì?", 1);
+
+        assertEquals("FLAT_VECTOR", response.getRetrievalMode());
+        assertEquals(1, response.getSelectedCount());
+        assertEquals(0, response.getCoarseHitCount());
+        assertThat(response.getFallbackReason()).isNull();
+        verifyNoInteractions(coarseNodeSearchService);
+    }
+
+    @Test
+    void debugRetrieve_shouldFallbackFlat_whenCoarseHasNoHits() {
+        when(embeddingGateway.embed(anyString())).thenReturn(vector1024());
+        when(coarseNodeSearchService.search(eq(1L), anyString())).thenReturn(List.of());
+        DocumentChunk chunk = chunk(1201L, "TEXT",
+                "Khai niem phap luat la he thong quy tac xu su.", null, 1, null);
+        when(documentChunkRepository.searchBySubjectVector(
+                eq(1L), anyString(), eq(40), eq(24), org.mockito.ArgumentMatchers.<Integer>isNull()))
+                .thenReturn(List.of(chunk));
+
+        RagDebugRetrieveResponse response = service.debugRetrieve(session(), "Khái niệm pháp luật là gì?", 1);
+
+        assertEquals("COARSE_TO_FINE_EMPTY_FALLBACK", response.getRetrievalMode());
+        assertEquals("NO_COARSE_HITS", response.getFallbackReason());
+        assertEquals(0, response.getCoarseHitCount());
+        assertEquals(0, response.getFineCandidateCount());
+        assertEquals(0, response.getFlatGuardrailCandidateCount());
+        assertEquals(1, response.getSelectedCount());
+    }
+
+    @Test
+    void debugRetrieve_shouldFallbackFlat_whenCoarseHitsButFineCandidatesEmpty() {
+        when(embeddingGateway.embed(anyString())).thenReturn(vector1024());
+        when(coarseNodeSearchService.search(eq(1L), anyString()))
+                .thenReturn(List.of(coarseHit(10L, 42L, 9L, "Document", "section", "Chương 1 > Mục 1", 0.12)));
+        when(documentChunkRepository.searchByNodeSubtreeVector(eq(1L), eq(42L), anyString(), eq(40), eq(8)))
+                .thenReturn(List.of());
+        DocumentChunk flatChunk = chunk(1301L, "TEXT",
+                "Noi dung fallback flat.", null, 1, null);
+        when(documentChunkRepository.searchBySubjectVector(
+                eq(1L), anyString(), eq(40), eq(24), org.mockito.ArgumentMatchers.<Integer>isNull()))
+                .thenReturn(List.of(flatChunk));
+
+        RagDebugRetrieveResponse response = service.debugRetrieve(session(), "Nội dung chính là gì?", 1);
+
+        assertEquals("COARSE_TO_FINE_INSUFFICIENT_FALLBACK", response.getRetrievalMode());
+        assertEquals("NO_FINE_CANDIDATES", response.getFallbackReason());
+        assertEquals(1, response.getCoarseHitCount());
+        assertEquals(42L, response.getCoarseHits().getFirst().getNodeId());
+        assertEquals(0, response.getFineCandidateCount());
+        assertEquals(0, response.getFlatGuardrailCandidateCount());
+        assertEquals(1, response.getSelectedCount());
+    }
+
+    @Test
+    void debugRetrieve_shouldUseCoarseToFineAndDeduplicateFlatGuardrailCandidates() {
+        when(embeddingGateway.embed(anyString())).thenReturn(vector1024());
+        when(coarseNodeSearchService.search(eq(1L), anyString()))
+                .thenReturn(List.of(coarseHit(11L, 43L, 9L, "Document", "section", "Chương 2 > I", 0.09)));
+
+        DocumentNode parent = DocumentNode.builder().nodeKey("section-43").build();
+        parent.setId(43L);
+        DocumentChunk fineChunk = chunk(1401L, "TEXT",
+                "Khai niem nha nuoc la to chuc quyen luc cong dac biet.", "Chương 2 > I", 1, parent);
+        DocumentChunk guardrailChunk = chunk(1402L, "TEXT",
+                "Nha nuoc co chu quyen va bo may quan ly xa hoi.", "Chương 2 > II", 2, parent);
+        when(documentChunkRepository.searchByNodeSubtreeVector(eq(1L), eq(43L), anyString(), eq(40), eq(8)))
+                .thenReturn(List.of(fineChunk));
+        when(documentChunkRepository.searchBySubjectVector(
+                eq(1L), anyString(), eq(40), eq(8), org.mockito.ArgumentMatchers.<Integer>isNull()))
+                .thenReturn(List.of(fineChunk, guardrailChunk));
+
+        RagDebugRetrieveResponse response = service.debugRetrieve(session(), "Khái niệm nhà nước là gì?", 4);
+
+        assertEquals("COARSE_TO_FINE_VECTOR", response.getRetrievalMode());
+        assertThat(response.getFallbackReason()).isNull();
+        assertEquals(1, response.getCoarseHitCount());
+        assertEquals(1, response.getFineCandidateCount());
+        assertEquals(2, response.getFlatGuardrailCandidateCount());
+        assertEquals(2, response.getCandidateCount());
+        assertEquals(2, response.getSelectedCount());
+        assertEquals(43L, response.getCoarseHits().getFirst().getNodeId());
+        verify(documentChunkRepository, never()).searchBySubjectVector(
+                eq(1L), anyString(), eq(40), eq(24), org.mockito.ArgumentMatchers.<Integer>isNull());
+    }
+
     private List<Double> vector1024() {
         return IntStream.range(0, 1024)
                 .mapToObj(i -> 0.01d)
@@ -386,5 +488,50 @@ class VectorRetrievalServiceTest {
                 .build();
         chunk.setId(id);
         return chunk;
+    }
+
+    private DocumentNodeArtifactRepository.CoarseNodeHit coarseHit(Long artifactId,
+                                                                   Long nodeId,
+                                                                   Long documentId,
+                                                                   String documentTitle,
+                                                                   String nodeType,
+                                                                   String sectionPath,
+                                                                   Double distance) {
+        return new DocumentNodeArtifactRepository.CoarseNodeHit() {
+            @Override
+            public Long getArtifactId() {
+                return artifactId;
+            }
+
+            @Override
+            public Long getNodeId() {
+                return nodeId;
+            }
+
+            @Override
+            public Long getDocumentId() {
+                return documentId;
+            }
+
+            @Override
+            public String getDocumentTitle() {
+                return documentTitle;
+            }
+
+            @Override
+            public String getNodeType() {
+                return nodeType;
+            }
+
+            @Override
+            public String getSectionPath() {
+                return sectionPath;
+            }
+
+            @Override
+            public Double getDistance() {
+                return distance;
+            }
+        };
     }
 }

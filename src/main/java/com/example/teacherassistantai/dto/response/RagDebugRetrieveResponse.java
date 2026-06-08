@@ -18,10 +18,27 @@ public class RagDebugRetrieveResponse {
     private Integer policyCandidateCount;
     private Integer selectedCount;
     private Map<String, Long> selectedChunkTypes;
+    private Integer coarseHitCount;
+    private List<CoarseHit> coarseHits;
+    private Integer fineCandidateCount;
+    private Integer flatGuardrailCandidateCount;
+    private String fallbackReason;
     private List<ParentGroup> parentGroups;
     private List<Chunk> candidateChunks;
     private List<Chunk> selectedChunks;
     private String promptContextPreview;
+
+    @Data
+    @Builder
+    public static class CoarseHit {
+        private Long artifactId;
+        private Long nodeId;
+        private Long documentId;
+        private String documentTitle;
+        private String nodeType;
+        private String sectionPath;
+        private Double distance;
+    }
 
     @Data
     @Builder

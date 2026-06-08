@@ -18,6 +18,7 @@ import com.example.teacherassistantai.repository.DocumentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -44,6 +45,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -60,6 +62,7 @@ class DocumentEnrichmentServiceTest {
     private OriginalSummaryNodeService originalSummaryNodeService;
     private com.example.teacherassistantai.service.quiz.HierarchicalQuizEnrichmentService quizEnrichmentService;
     private DocumentReadinessService documentReadinessService;
+    private DocumentNodeArtifactEmbeddingService artifactEmbeddingService;
     private RedisTemplate<String, String> redisTemplate;
     private TransactionTemplate transactionTemplate;
     private RagProperties ragProperties;
@@ -76,6 +79,7 @@ class DocumentEnrichmentServiceTest {
         aiModelRoutingService = mock(AiModelRoutingService.class);
         originalSummaryNodeService = mock(OriginalSummaryNodeService.class);
         quizEnrichmentService = mock(com.example.teacherassistantai.service.quiz.HierarchicalQuizEnrichmentService.class);
+        artifactEmbeddingService = mock(DocumentNodeArtifactEmbeddingService.class);
         ragProperties = new RagProperties();
         transactionTemplate = new TransactionTemplate(new NoOpTransactionManager());
         redisTemplate = redisTemplate();
@@ -189,6 +193,40 @@ class DocumentEnrichmentServiceTest {
         assertThat(fixture.document().getStatus()).isEqualTo(DocumentStatus.READY);
         assertThat(fixture.document().getEnrichmentStatus()).isEqualTo(DocumentEnrichmentStatus.ENRICHED);
         assertThat(fixture.document().getEnrichmentError()).isNull();
+    }
+
+    @Test
+    void enrichNode_summaryCompleted_clearsOldEmbeddingAndQueuesArtifactEmbedding() {
+        Fixture fixture = fixture();
+        DocumentEnrichmentService service = service(List.of(summaryGenerator(new ArrayList<>())));
+        mockCommonScope(fixture);
+        when(documentNodeRepository.findById(fixture.node().getId()))
+                .thenReturn(Optional.of(fixture.node()));
+        List<DocumentNodeArtifactStatus> savedStatuses = new ArrayList<>();
+        when(artifactRepository.save(any(DocumentNodeArtifact.class)))
+                .thenAnswer(invocation -> {
+                    DocumentNodeArtifact artifact = invocation.getArgument(0);
+                    savedStatuses.add(artifact.getStatus());
+                    if (artifact.getId() == null) {
+                        artifact.setId(880L);
+                    }
+                    return artifact;
+                });
+
+        service.enrichNode(fixture.node().getId(), false, List.of(DocumentNodeArtifactType.SUMMARY));
+
+        InOrder inOrder = inOrder(artifactRepository, artifactEmbeddingService);
+        inOrder.verify(artifactRepository).findByDocumentNodeIdAndArtifactTypeAndPromptVersionAndModelAndSourceHash(
+                anyLong(), eq(DocumentNodeArtifactType.SUMMARY), anyString(), anyString(), anyString());
+        inOrder.verify(artifactRepository).save(any(DocumentNodeArtifact.class));
+        inOrder.verify(artifactEmbeddingService).clearRetrievalEmbedding(880L);
+        inOrder.verify(artifactRepository).findById(880L);
+        inOrder.verify(artifactRepository).save(any(DocumentNodeArtifact.class));
+        inOrder.verify(artifactEmbeddingService).embedCompletedSummaryArtifactAsync(880L);
+        assertThat(savedStatuses).containsExactly(
+                DocumentNodeArtifactStatus.RUNNING,
+                DocumentNodeArtifactStatus.COMPLETED
+        );
     }
 
     @Test
@@ -1026,7 +1064,8 @@ class DocumentEnrichmentServiceTest {
                 reviewQuestionCountResolver,
                 aiModelRoutingService,
                 originalSummaryNodeService,
-                documentReadinessService
+                documentReadinessService,
+                artifactEmbeddingService
         );
     }
 
