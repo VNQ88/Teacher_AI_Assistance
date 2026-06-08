@@ -17,7 +17,10 @@ import java.util.List;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "documents")
+@Table(
+        name = "documents",
+        uniqueConstraints = @UniqueConstraint(name = "uk_documents_subject_id", columnNames = "subject_id")
+)
 public class Document extends BaseEntity {
 
     @Column(length = 255, nullable = false)

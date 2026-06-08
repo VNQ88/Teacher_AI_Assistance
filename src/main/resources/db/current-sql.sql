@@ -195,7 +195,9 @@ create table documents
         constraint documents_enrichment_status_check
             check ((enrichment_status)::text = ANY
                    ((ARRAY ['NOT_STARTED'::character varying, 'QUEUED'::character varying, 'RUNNING'::character varying, 'ENRICHED'::character varying, 'PARTIAL_FAILED'::character varying, 'FAILED'::character varying, 'SKIPPED'::character varying])::text[])),
-    enrichment_retry_count  integer      default 0                                not null
+    enrichment_retry_count  integer      default 0                                not null,
+    constraint uk_documents_subject_id
+        unique (subject_id)
 );
 
 alter table documents

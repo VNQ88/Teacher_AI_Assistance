@@ -85,7 +85,7 @@ public class DocumentDebugService {
 
     private Document getDocument(Long documentId) {
         return documentRepository.findById(documentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + documentId));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tài liệu với id: " + documentId));
     }
 
     private DocumentNodeDebugResponse toNodeResponse(DocumentNode node, List<DocumentNodeDebugResponse> children) {

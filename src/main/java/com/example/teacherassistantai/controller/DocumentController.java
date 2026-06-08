@@ -53,7 +53,7 @@ public class DocumentController {
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
     @Operation(summary = "Upload document", description = "Upload PDF/DOCX/TXT document and trigger async processing")
     public ResponseData<DocumentResponse> uploadDocument(@RequestPart("file") MultipartFile file,
-                                                         @RequestParam("subjectId") @Min(1) Long subjectId,
+                                                         @RequestParam("subjectId") @Min(value = 1, message = "Mã môn học phải lớn hơn hoặc bằng 1") Long subjectId,
                                                          @RequestParam(value = "title", required = false) String title,
                                                          @RequestParam(value = "description", required = false) String description) {
         log.info("Upload document: subjectId={}, originalName={}", subjectId, file.getOriginalFilename());
@@ -83,7 +83,7 @@ public class DocumentController {
 
     @GetMapping("/{documentId}")
     @Operation(summary = "Get document detail")
-    public ResponseData<DocumentResponse> getDocumentById(@PathVariable @Min(1) Long documentId) {
+    public ResponseData<DocumentResponse> getDocumentById(@PathVariable @Min(value = 1, message = "Mã tài liệu phải lớn hơn hoặc bằng 1") Long documentId) {
         return new ResponseData<>(HttpStatus.OK.value(), "Document", documentService.getDocumentById(documentId));
     }
 
@@ -92,7 +92,7 @@ public class DocumentController {
     public ResponseData<PageResponse<?>> getDocuments(@RequestParam(required = false) Long subjectId,
                                                       @RequestParam(required = false) DocumentStatus status,
                                                       @RequestParam(defaultValue = "0") int pageNo,
-                                                      @RequestParam(defaultValue = "20") @Min(1) int pageSize) {
+                                                      @RequestParam(defaultValue = "20") @Min(value = 1, message = "Kích thước trang phải lớn hơn hoặc bằng 1") int pageSize) {
         return new ResponseData<>(HttpStatus.OK.value(), "Documents",
                 documentService.getDocuments(subjectId, status, pageNo, pageSize));
     }
@@ -100,7 +100,7 @@ public class DocumentController {
     @PatchMapping("/{documentId}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
     @Operation(summary = "Update document metadata", description = "Update title and description of a document")
-    public ResponseData<DocumentResponse> updateDocument(@PathVariable @Min(1) Long documentId,
+    public ResponseData<DocumentResponse> updateDocument(@PathVariable @Min(value = 1, message = "Mã tài liệu phải lớn hơn hoặc bằng 1") Long documentId,
                                                          @RequestBody @Valid UpdateDocumentRequest request) {
         log.info("Update document metadata: id={}", documentId);
         return new ResponseData<>(HttpStatus.OK.value(), "Document updated",
@@ -110,7 +110,7 @@ public class DocumentController {
     @PostMapping("/{documentId}/reprocess")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
     @Operation(summary = "Reprocess document", description = "Reset a FAILED document to UPLOADED and re-trigger the full processing pipeline")
-    public ResponseData<DocumentResponse> reprocessDocument(@PathVariable @Min(1) Long documentId) {
+    public ResponseData<DocumentResponse> reprocessDocument(@PathVariable @Min(value = 1, message = "Mã tài liệu phải lớn hơn hoặc bằng 1") Long documentId) {
         log.info("Reprocess document request: id={}", documentId);
         return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Document reprocessing started",
                 documentService.reprocessDocument(documentId));
@@ -119,7 +119,7 @@ public class DocumentController {
     @DeleteMapping("/{documentId}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
     @Operation(summary = "Delete document", description = "Delete document, all related chunks, and storage objects")
-    public ResponseData<Void> deleteDocument(@PathVariable @Min(1) Long documentId) {
+    public ResponseData<Void> deleteDocument(@PathVariable @Min(value = 1, message = "Mã tài liệu phải lớn hơn hoặc bằng 1") Long documentId) {
         log.info("Delete document request: id={}", documentId);
         documentService.deleteDocumentById(documentId);
         return new ResponseData<>(HttpStatus.OK.value(), "Document deleted");
@@ -128,7 +128,7 @@ public class DocumentController {
     @GetMapping("/{documentId}/hierarchy")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
     @Operation(summary = "Debug document hierarchy", description = "Return document hierarchy tree persisted in document_nodes")
-    public ResponseData<DocumentHierarchyDebugResponse> getDocumentHierarchy(@PathVariable @Min(1) Long documentId) {
+    public ResponseData<DocumentHierarchyDebugResponse> getDocumentHierarchy(@PathVariable @Min(value = 1, message = "Mã tài liệu phải lớn hơn hoặc bằng 1") Long documentId) {
         return new ResponseData<>(HttpStatus.OK.value(), "Document hierarchy",
                 documentDebugService.getHierarchy(documentId));
     }
@@ -136,7 +136,7 @@ public class DocumentController {
     @GetMapping("/{documentId}/nodes")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
     @Operation(summary = "Debug document nodes", description = "Return flat document_nodes ordered by source order")
-    public ResponseData<java.util.List<DocumentNodeDebugResponse>> getDocumentNodes(@PathVariable @Min(1) Long documentId) {
+    public ResponseData<java.util.List<DocumentNodeDebugResponse>> getDocumentNodes(@PathVariable @Min(value = 1, message = "Mã tài liệu phải lớn hơn hoặc bằng 1") Long documentId) {
         return new ResponseData<>(HttpStatus.OK.value(), "Document nodes",
                 documentDebugService.getNodes(documentId));
     }
@@ -144,7 +144,7 @@ public class DocumentController {
     @GetMapping("/{documentId}/chunks")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
     @Operation(summary = "Debug document chunks", description = "Return document_chunks with hierarchy metadata")
-    public ResponseData<java.util.List<DocumentChunkDebugResponse>> getDocumentChunks(@PathVariable @Min(1) Long documentId,
+    public ResponseData<java.util.List<DocumentChunkDebugResponse>> getDocumentChunks(@PathVariable @Min(value = 1, message = "Mã tài liệu phải lớn hơn hoặc bằng 1") Long documentId,
                                                                                      @RequestParam(required = false) String type) {
         return new ResponseData<>(HttpStatus.OK.value(), "Document chunks",
                 documentDebugService.getChunks(documentId, type));
@@ -153,7 +153,7 @@ public class DocumentController {
     @GetMapping("/{documentId}/artifacts")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
     @Operation(summary = "Get document enrichment artifacts", description = "Return summary/question artifacts for all hierarchy nodes in a document")
-    public ResponseData<java.util.List<DocumentNodeArtifactResponse>> getDocumentArtifacts(@PathVariable @Min(1) Long documentId) {
+    public ResponseData<java.util.List<DocumentNodeArtifactResponse>> getDocumentArtifacts(@PathVariable @Min(value = 1, message = "Mã tài liệu phải lớn hơn hoặc bằng 1") Long documentId) {
         return new ResponseData<>(HttpStatus.OK.value(), "Document artifacts",
                 documentEnrichmentAdminService.getDocumentArtifacts(documentId));
     }
@@ -162,7 +162,7 @@ public class DocumentController {
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
     @Operation(summary = "Get document artifact embedding coverage", description = "Return completed summary artifact embedding coverage for one document")
     public ResponseData<DocumentArtifactEmbeddingBackfillResponse> getDocumentArtifactEmbeddingCoverage(
-            @PathVariable @Min(1) Long documentId) {
+            @PathVariable @Min(value = 1, message = "Mã tài liệu phải lớn hơn hoặc bằng 1") Long documentId) {
         return new ResponseData<>(HttpStatus.OK.value(), "Document artifact embedding coverage",
                 documentEnrichmentAdminService.getArtifactEmbeddingCoverage(documentId, null));
     }
@@ -171,7 +171,7 @@ public class DocumentController {
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
     @Operation(summary = "Queue document artifact embedding backfill", description = "Queue summary artifact embedding backfill for one document")
     public ResponseData<DocumentArtifactEmbeddingBackfillResponse> backfillDocumentArtifactEmbeddings(
-            @PathVariable @Min(1) Long documentId,
+            @PathVariable @Min(value = 1, message = "Mã tài liệu phải lớn hơn hoặc bằng 1") Long documentId,
             @RequestBody(required = false) @Valid DocumentArtifactEmbeddingBackfillRequest request) {
         log.info("Queue document artifact embedding backfill: documentId={}, request={}", documentId, request);
         return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Document artifact embedding backfill queued",
@@ -181,8 +181,8 @@ public class DocumentController {
     @GetMapping("/{documentId}/nodes/{nodeId}/artifacts")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
     @Operation(summary = "Get node enrichment artifacts", description = "Return summary/question artifacts for one hierarchy node")
-    public ResponseData<java.util.List<DocumentNodeArtifactResponse>> getNodeArtifacts(@PathVariable @Min(1) Long documentId,
-                                                                                      @PathVariable @Min(1) Long nodeId) {
+    public ResponseData<java.util.List<DocumentNodeArtifactResponse>> getNodeArtifacts(@PathVariable @Min(value = 1, message = "Mã tài liệu phải lớn hơn hoặc bằng 1") Long documentId,
+                                                                                      @PathVariable @Min(value = 1, message = "Mã mục nội dung phải lớn hơn hoặc bằng 1") Long nodeId) {
         return new ResponseData<>(HttpStatus.OK.value(), "Document node artifacts",
                 documentEnrichmentAdminService.getNodeArtifacts(documentId, nodeId));
     }
@@ -190,7 +190,7 @@ public class DocumentController {
     @PostMapping("/{documentId}/enrich")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
     @Operation(summary = "Queue document enrichment", description = "Queue summary/question artifact generation for all enrichable hierarchy nodes")
-    public ResponseData<DocumentEnrichmentJobResponse> enrichDocument(@PathVariable @Min(1) Long documentId,
+    public ResponseData<DocumentEnrichmentJobResponse> enrichDocument(@PathVariable @Min(value = 1, message = "Mã tài liệu phải lớn hơn hoặc bằng 1") Long documentId,
                                                                       @RequestBody(required = false) DocumentEnrichmentRequest request) {
         log.info("Queue document enrichment: documentId={}, request={}", documentId, request);
         return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Document enrichment queued",
@@ -200,8 +200,8 @@ public class DocumentController {
     @PostMapping("/{documentId}/nodes/{nodeId}/enrich")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
     @Operation(summary = "Queue node enrichment", description = "Queue summary/question artifact generation for one hierarchy node")
-    public ResponseData<DocumentEnrichmentJobResponse> enrichNode(@PathVariable @Min(1) Long documentId,
-                                                                  @PathVariable @Min(1) Long nodeId,
+    public ResponseData<DocumentEnrichmentJobResponse> enrichNode(@PathVariable @Min(value = 1, message = "Mã tài liệu phải lớn hơn hoặc bằng 1") Long documentId,
+                                                                  @PathVariable @Min(value = 1, message = "Mã mục nội dung phải lớn hơn hoặc bằng 1") Long nodeId,
                                                                   @RequestBody(required = false) DocumentEnrichmentRequest request) {
         log.info("Queue node enrichment: documentId={}, nodeId={}, request={}", documentId, nodeId, request);
         return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Document node enrichment queued",
@@ -211,7 +211,7 @@ public class DocumentController {
     @PostMapping("/{documentId}/artifacts/retry-failed")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
     @Operation(summary = "Retry failed enrichment artifacts", description = "Queue regeneration for failed or missing artifacts while completed artifacts are skipped")
-    public ResponseData<DocumentEnrichmentJobResponse> retryFailedArtifacts(@PathVariable @Min(1) Long documentId,
+    public ResponseData<DocumentEnrichmentJobResponse> retryFailedArtifacts(@PathVariable @Min(value = 1, message = "Mã tài liệu phải lớn hơn hoặc bằng 1") Long documentId,
                                                                            @RequestBody(required = false) DocumentEnrichmentRequest request) {
         log.info("Retry failed document artifacts: documentId={}, request={}", documentId, request);
         return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Failed artifact retry queued",
@@ -221,7 +221,7 @@ public class DocumentController {
     @DeleteMapping("/{documentId}/artifacts")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
     @Operation(summary = "Delete enrichment artifacts", description = "Delete all or selected artifact types for a document")
-    public ResponseData<Void> deleteArtifacts(@PathVariable @Min(1) Long documentId,
+    public ResponseData<Void> deleteArtifacts(@PathVariable @Min(value = 1, message = "Mã tài liệu phải lớn hơn hoặc bằng 1") Long documentId,
                                               @RequestBody(required = false) DocumentEnrichmentRequest request) {
         log.info("Delete document artifacts: documentId={}, request={}", documentId, request);
         documentEnrichmentAdminService.deleteArtifacts(documentId, request);

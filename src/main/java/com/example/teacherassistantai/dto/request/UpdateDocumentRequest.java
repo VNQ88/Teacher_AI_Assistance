@@ -9,10 +9,10 @@ import lombok.Setter;
 @Setter
 public class UpdateDocumentRequest {
 
-    @NotBlank(message = "Title must not be blank")
-    @Size(max = 255, message = "Title must be <= 255 characters")
+    @NotBlank(message = "Tiêu đề không được để trống")
+    @Size(max = 255, message = "Tiêu đề không được vượt quá 255 ký tự")
     private String title;
 
-    @Size(max = 1000, message = "Description must be <= 1000 characters")
+    @Size(max = 1000, message = "Mô tả không được vượt quá 1000 ký tự")
     private String description;
 }
