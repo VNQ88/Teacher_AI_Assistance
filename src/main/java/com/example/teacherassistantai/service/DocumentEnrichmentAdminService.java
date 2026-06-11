@@ -3,6 +3,7 @@ package com.example.teacherassistantai.service;
 import com.example.teacherassistantai.common.enumerate.DocumentEnrichmentStatus;
 import com.example.teacherassistantai.common.enumerate.DocumentNodeArtifactType;
 import com.example.teacherassistantai.common.enumerate.DocumentStatus;
+import com.example.teacherassistantai.config.RagProperties;
 import com.example.teacherassistantai.dto.request.DocumentArtifactEmbeddingBackfillRequest;
 import com.example.teacherassistantai.dto.request.DocumentEnrichmentRequest;
 import com.example.teacherassistantai.dto.response.DocumentArtifactEmbeddingBackfillResponse;
@@ -34,6 +35,7 @@ public class DocumentEnrichmentAdminService {
     private final DocumentNodeArtifactRepository artifactRepository;
     private final DocumentEnrichmentService enrichmentService;
     private final DocumentNodeArtifactEmbeddingService artifactEmbeddingService;
+    private final RagProperties ragProperties;
 
     @Transactional(readOnly = true)
     public List<DocumentNodeArtifactResponse> getDocumentArtifacts(Long documentId) {
@@ -55,6 +57,7 @@ public class DocumentEnrichmentAdminService {
 
     @Transactional
     public DocumentEnrichmentJobResponse enrichDocument(Long documentId, DocumentEnrichmentRequest request) {
+        ensureAdminEnrichmentEnabled();
         Document document = markQueued(documentId, forceRegenerate(request));
         List<DocumentNodeArtifactType> artifactTypes = artifactTypes(request);
         enqueueAfterCommit(() -> enrichmentService.enqueueDocumentEnrichment(documentId, forceRegenerate(request), artifactTypes));
@@ -63,6 +66,7 @@ public class DocumentEnrichmentAdminService {
 
     @Transactional
     public DocumentEnrichmentJobResponse enrichNode(Long documentId, Long nodeId, DocumentEnrichmentRequest request) {
+        ensureAdminEnrichmentEnabled();
         DocumentNode node = getNodeInDocument(documentId, nodeId);
         Document document = markQueued(documentId, forceRegenerate(request));
         List<DocumentNodeArtifactType> artifactTypes = artifactTypes(request);
@@ -72,6 +76,7 @@ public class DocumentEnrichmentAdminService {
 
     @Transactional
     public DocumentEnrichmentJobResponse retryFailedArtifacts(Long documentId, DocumentEnrichmentRequest request) {
+        ensureAdminEnrichmentEnabled();
         Document document = markQueued(documentId, false);
         List<DocumentNodeArtifactType> artifactTypes = artifactTypes(request);
         enqueueAfterCommit(() -> enrichmentService.enqueueDocumentEnrichment(documentId, false, artifactTypes));
@@ -80,6 +85,7 @@ public class DocumentEnrichmentAdminService {
 
     @Transactional
     public void deleteArtifacts(Long documentId, DocumentEnrichmentRequest request) {
+        ensureAdminEnrichmentEnabled();
         Document document = documentRepository.findById(documentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tài liệu với id: " + documentId));
         List<DocumentNodeArtifactType> artifactTypes = artifactTypes(request);
@@ -115,6 +121,7 @@ public class DocumentEnrichmentAdminService {
     public DocumentArtifactEmbeddingBackfillResponse queueArtifactEmbeddingBackfill(Long documentId,
                                                                                    Long subjectId,
                                                                                    DocumentArtifactEmbeddingBackfillRequest request) {
+        ensureArtifactEmbeddingBackfillEnabled();
         if (documentId != null) {
             ensureDocumentExists(documentId);
         }
@@ -256,5 +263,18 @@ public class DocumentEnrichmentAdminService {
                 .createdAt(artifact.getCreatedAt())
                 .updatedAt(artifact.getUpdatedAt())
                 .build();
+    }
+
+    private void ensureAdminEnrichmentEnabled() {
+        if (!ragProperties.getEnrichment().isEnabled()
+                || !ragProperties.getEnrichment().isAdminEndpointsEnabled()) {
+            throw new InvalidDataException("Document enrichment admin endpoints are disabled in this environment.");
+        }
+    }
+
+    private void ensureArtifactEmbeddingBackfillEnabled() {
+        if (!ragProperties.getEnrichment().isArtifactEmbeddingBackfillEnabled()) {
+            throw new InvalidDataException("Artifact embedding backfill is disabled in this environment.");
+        }
     }
 }

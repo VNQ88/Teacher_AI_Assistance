@@ -1,0 +1,2 @@
+uploadFilePath,uploadSubjectId,uploadContentType
+tests/jmeter/data/upload/sample-1kb.txt,295,text/plain

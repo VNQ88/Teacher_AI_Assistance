@@ -4,6 +4,7 @@ import com.example.teacherassistantai.common.enumerate.DocumentEnrichmentStatus;
 import com.example.teacherassistantai.common.enumerate.DocumentNodeArtifactStatus;
 import com.example.teacherassistantai.common.enumerate.DocumentNodeArtifactType;
 import com.example.teacherassistantai.common.enumerate.DocumentStatus;
+import com.example.teacherassistantai.config.RagProperties;
 import com.example.teacherassistantai.dto.request.DocumentArtifactEmbeddingBackfillRequest;
 import com.example.teacherassistantai.dto.request.DocumentEnrichmentRequest;
 import com.example.teacherassistantai.dto.response.DocumentArtifactEmbeddingBackfillResponse;
@@ -39,6 +40,7 @@ class DocumentEnrichmentAdminServiceTest {
     private DocumentNodeArtifactRepository artifactRepository;
     private DocumentEnrichmentService enrichmentService;
     private DocumentNodeArtifactEmbeddingService artifactEmbeddingService;
+    private RagProperties ragProperties;
     private DocumentEnrichmentAdminService adminService;
 
     @BeforeEach
@@ -48,12 +50,14 @@ class DocumentEnrichmentAdminServiceTest {
         artifactRepository = mock(DocumentNodeArtifactRepository.class);
         enrichmentService = mock(DocumentEnrichmentService.class);
         artifactEmbeddingService = mock(DocumentNodeArtifactEmbeddingService.class);
+        ragProperties = new RagProperties();
         adminService = new DocumentEnrichmentAdminService(
                 documentRepository,
                 documentNodeRepository,
                 artifactRepository,
                 enrichmentService,
-                artifactEmbeddingService
+                artifactEmbeddingService,
+                ragProperties
         );
     }
 
@@ -103,6 +107,17 @@ class DocumentEnrichmentAdminServiceTest {
         assertThat(response.getEnrichmentStatus()).isEqualTo(DocumentEnrichmentStatus.QUEUED);
         assertThat(response.getArtifactTypes()).containsExactly(DocumentNodeArtifactType.SUMMARY);
         verify(enrichmentService).enqueueDocumentEnrichment(10L, true, List.of(DocumentNodeArtifactType.SUMMARY));
+    }
+
+    @Test
+    void enrichDocument_rejectsWhenAdminEnrichmentIsDisabled() {
+        ragProperties.getEnrichment().setAdminEndpointsEnabled(false);
+
+        assertThatThrownBy(() -> adminService.enrichDocument(10L, null))
+                .isInstanceOf(InvalidDataException.class)
+                .hasMessageContaining("disabled");
+
+        verifyNoInteractions(documentRepository, enrichmentService);
     }
 
     @Test
@@ -188,6 +203,17 @@ class DocumentEnrichmentAdminServiceTest {
         assertThat(response.getQueued()).isTrue();
         assertThat(response.getQueuedAt()).isNotNull();
         verify(artifactEmbeddingService).enqueueCompletedSummaryEmbeddingBackfill(10L, null, 20, 3);
+    }
+
+    @Test
+    void queueArtifactEmbeddingBackfill_rejectsWhenBackfillIsDisabled() {
+        ragProperties.getEnrichment().setArtifactEmbeddingBackfillEnabled(false);
+
+        assertThatThrownBy(() -> adminService.queueArtifactEmbeddingBackfill(10L, null, null))
+                .isInstanceOf(InvalidDataException.class)
+                .hasMessageContaining("disabled");
+
+        verifyNoInteractions(documentRepository, artifactEmbeddingService);
     }
 
     @Test

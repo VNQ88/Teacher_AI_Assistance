@@ -4,10 +4,12 @@ import com.example.teacherassistantai.exception.AiRateLimitedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@Profile("!security-test")
 public class DigitalOceanChatGateway implements AiChatGateway {
 
     private final ChatClient chatClient;
