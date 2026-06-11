@@ -32,6 +32,8 @@ public class EmailService {
     private String emailFrom;
     @Value("${application.mailing.sendgrid.from-name:Teacher Assistant AI}")
     private String emailFromName;
+    @Value("${application.mailing.sendgrid.enabled:true}")
+    private boolean sendgridEnabled = true;
 
     public void sendEmail(
             String to,
@@ -40,6 +42,11 @@ public class EmailService {
             String confirmationUrl,
             String activationCode,
             String subject) {
+        if (!sendgridEnabled) {
+            log.info("SendGrid disabled; skipping email send to={}", to);
+            return;
+        }
+
         String templateName;
         if (emailTemplateName == null){
             templateName = "confirm-email";

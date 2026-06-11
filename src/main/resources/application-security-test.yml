@@ -1,0 +1,49 @@
+spring:
+  ai:
+    retry:
+      max-attempts: 1
+    openai:
+      api-key: security-test-disabled
+      chat:
+        base-url: http://127.0.0.1:9
+        completions-path: /v1/chat/completions
+        options:
+          model: security-test-sandbox
+      embedding:
+        base-url: http://127.0.0.1:9
+        embeddings-path: /v1/embeddings
+        options:
+          model: security-test-sandbox
+
+application:
+  mailing:
+    sendgrid:
+      enabled: false
+      api-key: security-test-disabled
+      from-email: security-test@example.invalid
+      from-name: Teacher Assistant AI Security Test
+    front-end:
+      activation-url: http://127.0.0.1/security-test/activate
+  rag:
+    enrichment:
+      enabled: false
+      auto-run-after-ready: false
+      admin-endpoints-enabled: false
+      artifact-embedding-backfill-enabled: false
+      auto-retry-on-partial-failed: false
+    ai:
+      base-url: http://127.0.0.1:9
+      api-key: security-test-disabled
+      chat-model: security-test-sandbox
+      embedding-model: security-test-sandbox
+      timeout-seconds: 1
+      enrichment:
+        base-url: http://127.0.0.1:9
+        api-key: security-test-disabled
+        summary-model: security-test-sandbox
+        review-question-model: security-test-sandbox
+        ondemand-review-question-model: security-test-sandbox
+        timeout-seconds: 1
+        ondemand-timeout-seconds: 1
+      rate-limit:
+        enabled: false

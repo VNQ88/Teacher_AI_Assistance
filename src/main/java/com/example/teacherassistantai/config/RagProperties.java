@@ -141,6 +141,10 @@ public class RagProperties {
 
         private boolean autoRunAfterReady = true;
 
+        private boolean adminEndpointsEnabled = true;
+
+        private boolean artifactEmbeddingBackfillEnabled = true;
+
         @NotBlank
         private String promptVersion = "enrichment-v1";
 

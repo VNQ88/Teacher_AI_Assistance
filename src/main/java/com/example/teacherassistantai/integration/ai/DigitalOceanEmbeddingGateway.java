@@ -4,12 +4,14 @@ import com.example.teacherassistantai.config.RagProperties;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.embedding.EmbeddingRequest;
 import org.springframework.ai.embedding.EmbeddingResponse;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@Profile("!security-test")
 public class DigitalOceanEmbeddingGateway implements AiEmbeddingGateway {
 
     private final EmbeddingModel embeddingModel;

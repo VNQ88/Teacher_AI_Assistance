@@ -47,6 +47,27 @@ services:
     networks:
       - backend
 
+  zap-public-baseline:
+    image: ghcr.io/zaproxy/zaproxy:${ZAP_TAG:-stable}
+    container_name: zap-public-baseline
+    profiles:
+      - security-test
+    network_mode: host
+    volumes:
+      - ${ZAP_REPORT_DIR:-./reports/security/zap}:/zap/wrk
+    command:
+      - zap-baseline.py
+      - -t
+      - ${ZAP_BASELINE_TARGET:-http://127.0.0.1:8080/api/v3/api-docs}
+      - -m
+      - ${ZAP_BASELINE_MINUTES:-1}
+      - -r
+      - zap-public-baseline.html
+      - -w
+      - zap-public-baseline.md
+      - -J
+      - zap-public-baseline.json
+
 networks:
   backend:
     driver: bridge
