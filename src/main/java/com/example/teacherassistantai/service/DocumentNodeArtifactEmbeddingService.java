@@ -85,7 +85,11 @@ public class DocumentNodeArtifactEmbeddingService {
             return true;
         }
 
-        List<Double> embedding = embedThrottled(artifactId, retrievalText);
+        Optional<List<Double>> embeddingResult = embedThrottled(artifactId, retrievalText);
+        if (embeddingResult.isEmpty()) {
+            return false;
+        }
+        List<Double> embedding = embeddingResult.get();
         if (!hasExpectedDimensions(artifactId, embedding, embeddingDimensions)) {
             return false;
         }
@@ -188,21 +192,21 @@ public class DocumentNodeArtifactEmbeddingService {
                 .isPresent();
     }
 
-    private List<Double> embedThrottled(Long artifactId, String retrievalText) {
+    private Optional<List<Double>> embedThrottled(Long artifactId, String retrievalText) {
         try {
             artifactEmbeddingThrottle.acquire();
             try {
-                return embeddingGateway.embed(retrievalText);
+                return Optional.ofNullable(embeddingGateway.embed(retrievalText));
             } finally {
                 artifactEmbeddingThrottle.release();
             }
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
             log.warn("Summary artifact embedding interrupted: artifactId={}", artifactId);
-            return List.of();
+            return Optional.empty();
         } catch (Exception ex) {
             log.warn("Summary artifact embedding failed: artifactId={}", artifactId, ex);
-            return List.of();
+            return Optional.empty();
         }
     }
 

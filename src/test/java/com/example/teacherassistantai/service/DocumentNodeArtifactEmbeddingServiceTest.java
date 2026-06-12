@@ -14,6 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
@@ -33,7 +35,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
 class DocumentNodeArtifactEmbeddingServiceTest {
 
     @Mock
@@ -129,6 +131,25 @@ class DocumentNodeArtifactEmbeddingServiceTest {
         boolean embedded = service.embedCompletedSummaryArtifact(44L);
 
         assertThat(embedded).isFalse();
+        verify(artifactRepository, never()).updateRetrievalEmbedding(
+                eq(44L), anyString(), anyString(), anyString(), anyString(), eq(4));
+    }
+
+    @Test
+    void embedCompletedSummaryArtifact_doesNotReportDimensionMismatchWhenGatewayFails(CapturedOutput output) {
+        DocumentNodeArtifact artifact = completedSummaryArtifact();
+        when(artifactRepository.findCompletedSummaryForRetrievalEmbedding(44L))
+                .thenReturn(Optional.of(artifact));
+        when(artifactRepository.findRetrievalEmbeddingState(44L))
+                .thenReturn(Optional.empty());
+        when(embeddingGateway.embed(anyString()))
+                .thenThrow(new RuntimeException("Read timed out"));
+
+        boolean embedded = service.embedCompletedSummaryArtifact(44L);
+
+        assertThat(embedded).isFalse();
+        assertThat(output).contains("Summary artifact embedding failed: artifactId=44");
+        assertThat(output).doesNotContain("Summary artifact embedding dimension mismatch");
         verify(artifactRepository, never()).updateRetrievalEmbedding(
                 eq(44L), anyString(), anyString(), anyString(), anyString(), eq(4));
     }

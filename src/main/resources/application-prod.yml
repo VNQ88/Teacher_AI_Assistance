@@ -95,8 +95,8 @@ application:
     candidate-top-k: 24
     min-chunk-chars: 40
     embedding-dimensions: 1024
-    embedding-batch-size: 64
-    embedding-concurrency: 3
+    embedding-batch-size: ${RAG_EMBEDDING_BATCH_SIZE:32}
+    embedding-concurrency: ${RAG_EMBEDDING_CONCURRENCY:2}
     max-history-messages: 5
     retrieval:
       scoped-vector:
@@ -155,7 +155,7 @@ application:
       api-key: ${DIGITALOCEAN_RAG_MODEL_ACCESS_KEY}
       chat-model: ${DIGITALOCEAN_RAG_CHAT_MODEL:${DIGITALOCEAN_CHAT_MODEL}}
       embedding-model: ${DIGITALOCEAN_EMBEDDING_MODEL}
-      timeout-seconds: 80
+      timeout-seconds: ${RAG_AI_TIMEOUT_SECONDS:120}
       enrichment:
         base-url: ${DIGITALOCEAN_ENRICHMENT_BASE_URL:${DIGITALOCEAN_BASE_URL}}
         api-key: ${DIGITALOCEAN_ENRICHMENT_MODEL_ACCESS_KEY}
